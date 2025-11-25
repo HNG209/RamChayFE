@@ -1,6 +1,7 @@
 // components/layout/Footer.tsx
 import Link from "next/link";
 import { Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -9,7 +10,15 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {/* Cột 1: Giới thiệu RamChay */}
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold text-lime-primary">RamChay 🌱</h3>
+            <Image
+              src="/logo.png" // Next.js tự hiểu bắt đầu từ thư mục public
+              alt="RamChay Logo" // Cần thiết cho SEO
+              width={150} // Chiều rộng gốc của ảnh (để Next.js tính tỉ lệ)
+              height={50} // Chiều cao gốc của ảnh
+              quality={100} // Chất lượng ảnh (1-100)
+              priority={true} // Quan trọng: Báo Next.js tải ngay lập tức (vì là Logo đầu trang)
+              className="h-15 w-auto object-contain" // Tailwind: Cao 40px, rộng tự động co giãn
+            />
             <p className="text-gray-600 text-sm leading-relaxed text-justify">
               Tại RamChay, chúng tôi tin rằng mỗi bữa ăn là một sự kết nối giữa
               con người và thiên nhiên. Mang đến những thực phẩm chay thuần

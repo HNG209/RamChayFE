@@ -7,11 +7,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { RegisterRequest } from "@/types/backend"; // Import kiểu dữ liệu
 import Link from "next/link"; // Dùng Link của Next.js để chuyển trang mượt hơn
+import { useRegisterMutation } from "@/redux/services/authApi";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const [register, { isLoading }] = useRegisterMutation();
 
   const formik = useFormik<RegisterRequest>({
     initialValues: {
@@ -39,8 +42,7 @@ export default function RegisterPage() {
       setSuccessMessage(null);
 
       try {
-        // --- GIẢ LẬP GỌI API ĐĂNG KÝ ---
-        // const res = await fetch("http://localhost:8080/api/auth/register", ...);
+        await register(values).unwrap();
 
         await new Promise((r) => setTimeout(r, 1500)); // Đợi 1.5s
 

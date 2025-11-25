@@ -26,3 +26,10 @@ export interface RegisterRequest {
   fullName: string;
   phone: string;
 }
+
+export interface RegisterResponse {
+  id: number;
+  username: string;
+  fullName: string;
+  phone: string[];
+}
