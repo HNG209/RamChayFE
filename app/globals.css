@@ -10,6 +10,13 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-cream-light: #FFFDF6;
+  --color-cream-dark: #FAF6E9;
+  --color-lime-accent: #DDEB9D;
+  --color-lime-primary: #A0C878;
+  
+  /* Màu hover cho nút bấm */
+  --color-lime-hover: #8EBC65;
 }
 
 @media (prefers-color-scheme: dark) {
