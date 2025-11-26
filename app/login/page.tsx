@@ -4,15 +4,17 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 import { useState } from "react";
 // Import kiểu dữ liệu đã định nghĩa để tái sử dụng
-import { AuthResponse, LoginRequest } from "@/types/backend";
+import { LoginResponse, LoginRequest } from "@/types/backend";
 import Link from "next/link";
+import { useLoginMutation } from "@/redux/services/authApi";
 
 export default function LoginPage() {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
+
+  const [login, { isLoading: isLoggingIn }] = useLoginMutation();
 
   // Cấu hình Formik
   const formik = useFormik<LoginRequest>({
@@ -37,28 +39,15 @@ export default function LoginPage() {
       setServerError(null);
 
       try {
+        await login(values).unwrap();
         // --- GIẢ LẬP GỌI API ---
-        await new Promise((r) => setTimeout(r, 1000));
+        // await new Promise((r) => setTimeout(r, 1000));
 
         if (values.password === "wrong") {
           throw new Error("Mật khẩu không đúng (Test Formik)");
         }
 
-        const data: AuthResponse = {
-          token: "fake-jwt-token-formik-123",
-          roles: values.username.includes("admin")
-            ? ["ROLE_ADMIN"]
-            : ["ROLE_USER"],
-        };
-        // -----------------------
-
-        Cookies.set("token", data.token, { expires: 1 });
-
-        if (data.roles.includes("ROLE_ADMIN")) {
-          router.push("/admin/dashboard");
-        } else {
-          router.push("/");
-        }
+        router.push("/");
       } catch (err: any) {
         setServerError(err.message || "Lỗi hệ thống");
       } finally {
@@ -139,7 +128,8 @@ export default function LoginPage() {
             disabled={formik.isSubmitting}
             className="w-full bg-lime-primary hover:bg-lime-hover text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2"
           >
-            {formik.isSubmitting ? "Đang kiểm tra..." : "Đăng nhập"}
+            {/* {formik.isSubmitting ? "Đang kiểm tra..." : "Đăng nhập"} */}
+            {isLoggingIn ? "Đang kiểm tra..." : "Đăng nhập"}
           </button>
         </form>
         <div className="mt-8 text-center">

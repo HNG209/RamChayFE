@@ -2,7 +2,8 @@
 import { baseApi } from "./baseApi";
 import {
   LoginRequest,
-  AuthResponse,
+  LoginResponse,
+  MyProfile,
   RegisterRequest,
   RegisterResponse,
 } from "@/types/backend";
@@ -10,11 +11,19 @@ import {
 // Sử dụng injectEndpoints để thêm vào gốc
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation<AuthResponse, LoginRequest>({
+    login: builder.mutation<LoginResponse, LoginRequest>({
       query: (credentials: LoginRequest) => ({
         url: "/auth/login",
         method: "POST",
         data: credentials,
+      }),
+      invalidatesTags: ["User"], // refresh lại cache, tự động gọi lại getMyProfile
+    }),
+
+    logout: builder.mutation<void, void>({
+      query: () => ({
+        url: "/auth/logout",
+        method: "POST",
       }),
     }),
 
@@ -26,13 +35,14 @@ export const authApi = baseApi.injectEndpoints({
       }),
     }),
 
-    // Ví dụ API lấy thông tin user hiện tại
-    // getProfile: builder.query<any, void>({
-    //   query: () => ({
-    //     url: '/users/profile',
-    //     method: 'GET',
-    //   }),
-    // }),
+    // Lấy người dùng đang đăng nhập
+    getMyProfile: builder.query<MyProfile, void>({
+      query: () => ({
+        url: "/auth/me",
+        method: "GET",
+      }),
+      providesTags: ["User"],
+    }),
   }),
   overrideExisting: false, // Để tránh ghi đè nếu lỡ import 2 lần
 });
@@ -41,5 +51,6 @@ export const authApi = baseApi.injectEndpoints({
 export const {
   useLoginMutation,
   useRegisterMutation,
-  // useGetProfileQuery
+  useGetMyProfileQuery,
+  useLogoutMutation,
 } = authApi;

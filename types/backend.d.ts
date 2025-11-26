@@ -7,10 +7,11 @@ export interface LoginRequest {
 }
 
 // Dữ liệu nhận về từ API Login
-export interface AuthResponse {
-  token: string;
-  roles: string[];
-  expiresIn?: number;
+export interface LoginResponse {
+  message: string;
+  refreshToken: string;
+  accessToken: string;
+  // expiresIn?: number;
 }
 
 // Ví dụ tái sử dụng cho User sau này
@@ -32,4 +33,15 @@ export interface RegisterResponse {
   username: string;
   fullName: string;
   phone: string[];
+}
+
+export interface MyProfile {
+  id: number;
+  username: string;
+  roles: string[];
+  permissions: string[];
+
+  fullName: string;
+  phones: string[];
+  addresses: string[];
 }
