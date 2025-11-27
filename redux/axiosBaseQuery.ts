@@ -2,6 +2,27 @@ import axios from "axios";
 import type { BaseQueryFn } from "@reduxjs/toolkit/query";
 import type { AxiosRequestConfig, AxiosError } from "axios";
 
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+let store: any; // Biến lưu store
+
+// Hàm này sẽ được gọi ở file store.ts
+export const injectStore = (_store: any) => {
+  store = _store;
+};
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 interface ApiResponse<T = unknown> {
   code: number;
   message: string;
@@ -23,17 +44,11 @@ api.interceptors.response.use(
 
     // Kiểm tra xem có đúng format Spring Boot không (có field code và result)
     if (data && typeof data.code === "number") {
-      // TRƯỜNG HỢP 1: THÀNH CÔNG (Code 1000)
       if (data.code === 1000) {
-        // Quan trọng: Gán lại data bằng chính cái result bên trong
-        // Giúp bỏ đi lớp vỏ bọc ApiResponse
         response.data = data.result;
         return response;
       }
 
-      // TRƯỜNG HỢP 2: LỖI NGHIỆP VỤ (HTTP 200 nhưng Code != 1000)
-      // Ví dụ: User tồn tại, Sai password...
-      // Ta phải ném lỗi để code nhảy xuống catch
       return Promise.reject({
         response: response,
         message: data.message || "Lỗi nghiệp vụ không xác định",
@@ -45,10 +60,62 @@ api.interceptors.response.use(
     return response;
   },
   (error: AxiosError) => {
-    // Xử lý lỗi HTTP (401, 403, 404, 500...)
+    return Promise.reject(error);
+  }
+);
 
-    // (Chỗ này sau này bạn sẽ chèn logic Refresh Token nếu gặp lỗi 401)
+api.interceptors.response.use(
+  (response) => response, // Success thì cho qua
+  async (error) => {
+    const originalRequest = error.config || error.response?.config;
 
+    // Lấy mã lỗi: Ưu tiên lấy từ object tự reject ở trên (error.code)
+    const errorCode = error.response.data.code || error.response?.status;
+
+    // KIỂM TRA: Nếu là lỗi 3005 (Hết hạn) và chưa từng retry
+    if (errorCode === 3005 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise(function (resolve, reject) {
+          failedQueue.push({ resolve, reject });
+        })
+          .then(() => {
+            return api(originalRequest); // Gọi lại request cũ sau khi refresh xong
+          })
+          .catch((err) => {
+            return Promise.reject(err);
+          });
+      }
+
+      // Nếu chưa ai refresh -> Mình xung phong đi refresh
+      originalRequest._retry = true; // Đánh dấu để không lặp vô tận
+      isRefreshing = true;
+
+      try {
+        // GỌI API REFRESH
+        // Vì dùng Cookie HttpOnly, trình duyệt tự gửi RefreshToken đi
+        await api.post("/auth/refresh");
+
+        // Nếu thành công -> AccessToken mới đã được Server set vào Cookie
+
+        processQueue(null);
+
+        // Gọi lại request ban đầu bị lỗi
+        return api(originalRequest);
+      } catch (refreshError) {
+        // Refresh thất bại (RefreshToken cũng hết hạn hoặc bị thu hồi)
+        processQueue(refreshError, null);
+
+        await api.post("/auth/logout");
+
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
+        }
+
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false; // Mở khóa
+      }
+    }
     return Promise.reject(error);
   }
 );
@@ -65,10 +132,8 @@ export const axiosBaseQuery =
     unknown,
     unknown
   > =>
-  // Đây là lúc RTK Query ra lệnh: "Hãy gọi API này cho tôi"
   async ({ url, method, data, params, headers }) => {
     try {
-      // Gọi thằng nhân viên Axios đi làm việc
       const result = await api({
         url: url,
         method: method,
