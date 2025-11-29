@@ -15,10 +15,9 @@ import {
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 // import { logout } from "@/redux/slices/authSlice"; // Nhớ import action logout
-import { MyProfile } from "@/types/backend"; // Import type user
 import { UserAvatar } from "../UserAvatar";
 import { useLogoutMutation } from "@/redux/services/authApi";
 
@@ -31,13 +30,12 @@ const NAV_ITEMS = [
 
 export default function Header() {
   const router = useRouter();
-  const dispatch = useDispatch();
   const pathname = usePathname();
 
   // State
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // Menu dropdown desktop
-  const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
+  const [logout] = useLogoutMutation();
 
   // Lấy user từ Redux (ép kiểu MyProfile để gợi ý code)
   const user = useSelector((state: RootState) => state.auth.user);
@@ -206,7 +204,7 @@ export default function Header() {
       )}
 
       <div
-        className={`fixed top-0 right-0 h-full w-[280px] bg-white shadow-2xl z-[60] transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 h-full w-[280px] bg-white shadow-2xl z-60 transform transition-transform duration-300 ease-in-out ${
           isDrawerOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -266,7 +264,7 @@ export default function Header() {
                   <li>
                     <Link
                       href="/profile"
-                      className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                      className="px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                     >
                       <User className="w-4 h-4" /> Tài khoản của tôi
                     </Link>
@@ -274,7 +272,7 @@ export default function Header() {
                   <li>
                     <Link
                       href="/orders"
-                      className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                      className="px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                     >
                       <FileText className="w-4 h-4" /> Đơn mua
                     </Link>

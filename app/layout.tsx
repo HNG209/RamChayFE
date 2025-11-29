@@ -27,15 +27,7 @@ export default function RootLayout({
       >
         <ReduxProvider>
           <AuthInitializer>
-            {/* Header luôn nằm trên cùng */}
-            <Header />
-
-            {/* Nội dung chính của từng trang sẽ nằm ở đây */}
-            {/* flex-grow giúp đẩy Footer xuống dưới cùng kể cả khi nội dung ngắn */}
             <main className="grow">{children}</main>
-
-            {/* Footer luôn nằm dưới cùng */}
-            <Footer />
           </AuthInitializer>
         </ReduxProvider>
       </body>

@@ -5,12 +5,6 @@ import type { AxiosRequestConfig, AxiosError } from "axios";
 let isRefreshing = false;
 let failedQueue: any[] = [];
 
-let store: any; // Biến lưu store
-
-// Hàm này sẽ được gọi ở file store.ts
-export const injectStore = (_store: any) => {
-  store = _store;
-};
 
 const processQueue = (error: any, token: string | null = null) => {
   failedQueue.forEach((prom) => {
