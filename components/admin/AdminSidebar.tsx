@@ -11,6 +11,7 @@ import {
   LogOut,
   ChevronRight, // Thêm icon này để trang trí
 } from "lucide-react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useLogoutMutation } from "@/redux/services/authApi";
 import { useRouter } from "next/navigation";
@@ -61,6 +62,10 @@ export default function AdminSidebar() {
   const user = useSelector(
     (state: RootState) => state.auth.user
   ) as MyProfile | null;
+
+  const [openProducts, setOpenProducts] = useState<boolean>(
+    pathname?.startsWith("/admin/products") ?? false
+  );
 
   // Trả về true nếu user có ít nhất 1 role khớp với allowedRoles của menu
   const hasPermission = (allowedRoles: string[]) => {
@@ -123,21 +128,69 @@ export default function AdminSidebar() {
         </p>
         {ADMIN_MENU.map((item) => {
           if (!hasPermission(item.allowedRoles)) return null;
+
+          // Special handling for Products: render expandable submenu
+          if (item.href === "/admin/products") {
+            const isParentActive = pathname?.startsWith("/admin/products");
+            return (
+              <div key={item.href}>
+                <button
+                  onClick={() => setOpenProducts((prev: boolean) => !prev)}
+                  className={`group w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${isParentActive
+                      ? "bg-lime-primary/10 text-lime-400 font-semibold"
+                      : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                    }`}
+                >
+                  <item.icon
+                    className={`w-5 h-5 transition-colors ${isParentActive ? "text-lime-400" : "group-hover:text-white"
+                      }`}
+                  />
+                  <span className="flex-1 text-left">{item.label}</span>
+                  <ChevronRight
+                    className={`w-4 h-4 transition-transform ${openProducts ? "rotate-90" : ""}`}
+                  />
+                </button>
+
+                {openProducts && (
+                  <div className="mt-2 space-y-1 pl-10">
+                    <Link
+                      href="/admin/products/manage"
+                      className={`block px-3 py-2 rounded-lg text-sm ${pathname === "/admin/products/manage"
+                          ? "bg-lime-primary/10 text-lime-400 font-semibold"
+                          : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                        }`}
+                    >
+                      Quản lý sản phẩm
+                    </Link>
+
+                    <Link
+                      href="/admin/products/add"
+                      className={`block px-3 py-2 rounded-lg text-sm ${pathname === "/admin/products/add"
+                          ? "bg-lime-primary/10 text-lime-400 font-semibold"
+                          : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                        }`}
+                    >
+                      Thêm sản phẩm
+                    </Link>
+                  </div>
+                )}
+              </div>
+            );
+          }
+
           const isActive = pathname === item.href;
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${
-                isActive
+              className={`group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${isActive
                   ? "bg-lime-primary/10 text-lime-400 font-semibold shadow-[0_0_15px_rgba(163,230,53,0.1)]"
                   : "text-gray-400 hover:bg-gray-800 hover:text-white"
-              }`}
+                }`}
             >
               <item.icon
-                className={`w-5 h-5 transition-colors ${
-                  isActive ? "text-lime-400" : "group-hover:text-white"
-                }`}
+                className={`w-5 h-5 transition-colors ${isActive ? "text-lime-400" : "group-hover:text-white"
+                  }`}
               />
               {item.label}
             </Link>

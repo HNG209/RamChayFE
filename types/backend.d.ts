@@ -45,3 +45,14 @@ export interface MyProfile {
   phones: string[];
   addresses: string[];
 }
+
+// Product entity used by frontend
+export interface Product {
+  id: number;
+  name: string;
+  sku?: string;
+  price: number;
+  stock?: number;
+  imageUrl?: string;
+  description?: string;
+}
