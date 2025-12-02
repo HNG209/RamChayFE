@@ -39,7 +39,7 @@ const ADMIN_MENU = [
   },
   {
     label: "Người quản lý",
-    href: "/admin/users",
+    href: "/admin/managers",
     icon: Users,
     allowedRoles: ["ROLE_ADMIN"],
   },
