@@ -45,3 +45,45 @@ export interface MyProfile {
   phones: string[];
   addresses: string[];
 }
+
+export interface CategoryCreationRequest {
+  categoryName: string;
+  description: string;
+}
+
+export interface CategoryCreationResponse {
+  id: number;
+  categoryName: string;
+  description: string;
+}
+
+export interface MediaUploadRequest {
+  publicId: string;
+  secureUrl: string;
+}
+
+export interface MediaUploadResponse {
+  publicId: string;
+  secureUrl: string;
+}
+
+export interface ProductCreationRequest {
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  category: CategoryCreationRequest;
+  imageUrl: string;
+  mediaUploadRequests: MediaUploadRequest[];
+}
+
+export interface ProductCreationResponse {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  
+  imageUrl?: string; 
+  category?: CategoryCreationResponse;
+}
