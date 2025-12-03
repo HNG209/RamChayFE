@@ -39,6 +39,32 @@ export const productApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Product"],
     }),
+
+    // 4. Lấy chi tiết sản phẩm
+    getProductById: builder.query<ProductCreationResponse, number>({
+      query: (id) => ({
+        url: `/products/${id}`,
+        method: "GET",
+      }),
+      providesTags: (result, error, id) => [{ type: "Product", id }],
+    }),
+
+    // 5. Cập nhật sản phẩm
+    updateProduct: builder.mutation<
+      ProductCreationResponse,
+      { id: number; data: FormData }
+    >({
+      query: ({ id, data }) => ({
+        url: `/products/${id}`,
+        method: "PUT",
+        data: data,
+        headers: { "Content-Type": undefined },
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Product", id },
+        "Product",
+      ],
+    }),
   }),
   overrideExisting: false,
 });
@@ -46,5 +72,7 @@ export const productApi = baseApi.injectEndpoints({
 export const {
   useCreateProductMutation,
   useGetProductsQuery,
-  useDeleteProductMutation
+  useDeleteProductMutation,
+  useGetProductByIdQuery,
+  useUpdateProductMutation,
 } = productApi;

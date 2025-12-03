@@ -189,9 +189,6 @@ export default function CreateProductPage() {
                       </option>
                     ))}
                   </select>
-                  <button type="button" className="p-2.5 bg-gray-100 rounded-lg border border-gray-200">
-                    <Plus className="w-5 h-5 text-gray-600" />
-                  </button>
                 </div>
               </div>
             </div>

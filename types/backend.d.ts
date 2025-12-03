@@ -63,6 +63,7 @@ export interface MediaUploadRequest {
 }
 
 export interface MediaUploadResponse {
+  id: number;
   publicId: string;
   secureUrl: string;
 }
@@ -83,7 +84,9 @@ export interface ProductCreationResponse {
   description: string;
   price: number;
   stock: number;
-  
-  imageUrl?: string; 
+
+  imageUrl?: string;
   category?: CategoryCreationResponse;
+  mediaList?: MediaResponse[];
 }
+
