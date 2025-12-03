@@ -17,7 +17,7 @@ export const authApi = baseApi.injectEndpoints({
         method: "POST",
         data: credentials,
       }),
-      invalidatesTags: ["User"], // refresh lại cache, tự động gọi lại getMyProfile
+      invalidatesTags: ["User", "Cart"], // refresh lại cache, tự động gọi lại getMyProfile
     }),
 
     logout: builder.mutation<void, void>({
@@ -25,6 +25,7 @@ export const authApi = baseApi.injectEndpoints({
         url: "/auth/logout",
         method: "POST",
       }),
+      invalidatesTags: ["Cart"],
     }),
 
     register: builder.mutation<RegisterResponse, RegisterRequest>({
