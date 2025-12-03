@@ -45,3 +45,43 @@ export interface MyProfile {
   phones: string[];
   addresses: string[];
 }
+
+// Cart
+export interface CartProduct {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  quantity: number;
+  stock: number; // Số lượng tồn kho
+}
+
+export interface CartItemCreationRequest {
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+  productId: number;
+}
+
+export interface AddCartItemResponse {
+  cartId?: number;
+}
+
+export interface GetItemsResponse {
+  id: number;
+  productName: string;
+  quantity: number;
+  productId: number;
+  unitPrice: number;
+  indexImage: string;
+}
+
+export interface Page<T> {
+  content: T[];
+  page: {
+    size: number;
+    number: number;
+    totalElements: number;
+    totalPages: number;
+  };
+}
