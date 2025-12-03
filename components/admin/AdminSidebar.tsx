@@ -38,11 +38,17 @@ const ADMIN_MENU = [
     allowedRoles: ["ROLE_MANAGER"],
   },
   {
-    label: "Người quản lý",
+    label: "Nhân sự",
     href: "/admin/managers",
     icon: Users,
     allowedRoles: ["ROLE_ADMIN"],
   },
+  {
+    label: "Quyền hạn",
+    href: "/admin/roles",
+    icon: Users,
+    allowedRoles: ["ROLE_ADMIN"],
+  }
 ];
 
 const AdminAvatar = ({ fullName }: { fullName?: string }) => {
@@ -128,16 +134,14 @@ export default function AdminSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${
-                isActive
+              className={`group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${isActive
                   ? "bg-lime-primary/10 text-lime-400 font-semibold shadow-[0_0_15px_rgba(163,230,53,0.1)]"
                   : "text-gray-400 hover:bg-gray-800 hover:text-white"
-              }`}
+                }`}
             >
               <item.icon
-                className={`w-5 h-5 transition-colors ${
-                  isActive ? "text-lime-400" : "group-hover:text-white"
-                }`}
+                className={`w-5 h-5 transition-colors ${isActive ? "text-lime-400" : "group-hover:text-white"
+                  }`}
               />
               {item.label}
             </Link>
