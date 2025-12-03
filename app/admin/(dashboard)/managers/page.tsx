@@ -15,9 +15,7 @@ interface Item {
   createdAt: string
 }
 
-// ---------------------------
-// SearchBar Component
-// ---------------------------
+
 function SearchBar({
   onSearch,
   placeholder = "Tìm kiếm...",
@@ -283,7 +281,7 @@ export default function Home() {
   const [deleteConfirmItem, setDeleteConfirmItem] = useState<Item | null>(null)
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
 
-  const itemsPerPage = 5
+  const itemsPerPage = 6
 
   const { data, isLoading, isFetching } = usePaginManagerQuery({
     page: currentPage - 1,
@@ -321,7 +319,7 @@ export default function Home() {
 
   const handleEdit = useCallback(
     (item: Item) => {
-      router.push(`managers/${item.id}/edit`)
+      router.push(`managers/edit/${item.id}`)
     },
     [router],
   )
@@ -357,7 +355,7 @@ export default function Home() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">Manager List</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">Quản Lí Nhân Sự</h1>
           <p className="text-muted-foreground">Manage and track managers in your system</p>
         </div>
 
