@@ -75,7 +75,7 @@ export default function ProductManagingPage() {
             <input
               type="text"
               placeholder="Tìm kiếm..."
-              className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 placeholder-gray-400 text-gray-900"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -119,6 +119,7 @@ export default function ProductManagingPage() {
                     <th className="px-6 py-4 font-semibold text-gray-700">Sản phẩm</th>
                     <th className="px-6 py-4 font-semibold text-gray-700">Danh mục</th>
                     <th className="px-6 py-4 font-semibold text-gray-700">Giá bán</th>
+                    <th className="px-6 py-4 font-semibold text-gray-700">Đơn vị</th>
                     <th className="px-6 py-4 font-semibold text-gray-700 text-center">Tồn kho</th>
                     <th className="px-6 py-4 font-semibold text-gray-700 text-right">Hành động</th>
                   </tr>
@@ -161,6 +162,12 @@ export default function ProductManagingPage() {
 
                         <td className="px-6 py-4 font-bold text-gray-800">
                           {formatCurrency(product.price)}
+                        </td>
+
+                        <td className="px-6 py-4 text-center text-sm text-gray-600">
+                          <span className="bg-gray-100 px-2 py-1 rounded border border-gray-200">
+                            {product.unit || "-"}
+                          </span>
                         </td>
 
                         <td className="px-6 py-4 text-center">

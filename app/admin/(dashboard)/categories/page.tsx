@@ -10,37 +10,25 @@ import {
   Loader2,
   Package,
   AlignLeft,
+  AlertCircle,
 } from "lucide-react";
 import RoleGuard from "@/components/admin/RoleGuard";
-
-// 1. DATA MẪU (Đã bỏ productCount)
-const INITIAL_CATEGORIES = [
-  { 
-    id: 1, 
-    name: "Thực phẩm chế biến", 
-    description: "Các loại chả lụa, nem chua, giò thủ chay làm thủ công.",
-  },
-  { 
-    id: 2, 
-    name: "Thực phẩm khô", 
-    description: "Sườn non, bóng cá, tàu hũ ky và các loại đồ khô khác.",
-  },
-  { 
-    id: 3, 
-    name: "Rau củ & Nấm", 
-    description: "Nấm đông cô, nấm đùi gà và rau củ tươi sạch trong ngày.",
-  },
-  { 
-    id: 4, 
-    name: "Gia vị chay", 
-    description: "Hạt nêm, nước mắm chay, chao và các loại sốt chấm.",
-  },
-];
+// Import Hooks từ API thật
+import { 
+  useGetCategoriesQuery, 
+  useCreateCategoryMutation, 
+  useDeleteCategoryMutation 
+} from "@/redux/services/categoryApi";
 
 export default function CategoryManagementPage() {
   const router = useRouter();
-  const [categories, setCategories] = useState(INITIAL_CATEGORIES);
-  const [isLoading, setIsLoading] = useState(false);
+
+  // 1. GỌI API LẤY DANH SÁCH
+  const { data: categories = [], isLoading, isError } = useGetCategoriesQuery();
+
+  // 2. GỌI API THÊM & XÓA
+  const [createCategory, { isLoading: isCreating }] = useCreateCategoryMutation();
+  const [deleteCategory, { isLoading: isDeleting }] = useDeleteCategoryMutation();
 
   // State Form
   const [formData, setFormData] = useState({
@@ -49,38 +37,43 @@ export default function CategoryManagementPage() {
   });
 
   // Xử lý thay đổi input
-  const handleInputChange = (e: any) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Xử lý thêm danh mục
+  // --- XỬ LÝ THÊM DANH MỤC ---
   const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim()) return;
 
-    setIsLoading(true);
-    // Giả lập API POST
-    await new Promise(resolve => setTimeout(resolve, 800)); 
+    try {
+      // Gọi API Create
+      await createCategory({
+        categoryName: formData.name.trim(),
+        description: formData.description.trim()
+      }).unwrap();
 
-    const newId = categories.length + 1; 
-    const newCategory = {
-      id: newId,
-      name: formData.name.trim(),
-      description: formData.description.trim(),
-    };
-
-    setCategories((prev) => [...prev, newCategory]);
-    setFormData({ name: "", description: "" }); // Reset form
-    setIsLoading(false);
+      // Reset form sau khi thành công
+      setFormData({ name: "", description: "" });
+      alert("Thêm danh mục thành công!");
+      
+    } catch (error: any) {
+      console.error("Lỗi thêm danh mục:", error);
+      alert("Lỗi: " + (error?.data?.message || "Không thể thêm danh mục"));
+    }
   };
 
-  // Xử lý xoá danh mục (Đơn giản hóa logic xóa)
-  const handleDeleteCategory = (id: number, name: string) => {
-    // Vì không còn check productCount ở FE, ta chỉ hỏi xác nhận
+  // --- XỬ LÝ XÓA DANH MỤC ---
+  const handleDeleteCategory = async (id: number, name: string) => {
     if (window.confirm(`Bạn có chắc muốn xóa danh mục "${name}"?`)) {
-      // Giả lập API DELETE
-      setCategories((prev) => prev.filter((cat) => cat.id !== id));
+      try {
+        await deleteCategory(id).unwrap();
+        // Không cần alert cũng được, UI tự cập nhật nhờ tag "Category"
+      } catch (error: any) {
+        // Backend sẽ trả về lỗi nếu danh mục đang có sản phẩm (nhờ logic check existsByCategoryId mình đã làm)
+        alert("Xóa thất bại: " + (error?.data?.message || "Có lỗi xảy ra"));
+      }
     }
   };
 
@@ -129,7 +122,7 @@ export default function CategoryManagementPage() {
                     value={formData.name}
                     onChange={handleInputChange}
                     placeholder="Ví dụ: Đồ hộp chay..."
-                    className="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
+                    className="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all placeholder-gray-400 text-gray-900"
                     required
                   />
                 </div>
@@ -146,7 +139,7 @@ export default function CategoryManagementPage() {
                         value={formData.description}
                         onChange={handleInputChange}
                         placeholder="Mô tả ngắn về loại sản phẩm này..."
-                        className="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all resize-none"
+                        className="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all resize-none placeholder-gray-400 text-gray-900"
                     />
                     <AlignLeft className="absolute top-3 right-3 w-4 h-4 text-gray-400 pointer-events-none" />
                   </div>
@@ -154,10 +147,10 @@ export default function CategoryManagementPage() {
 
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isCreating}
                   className="w-full flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-70 shadow-sm hover:shadow"
                 >
-                  {isLoading ? (
+                  {isCreating ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
                       Đang xử lý...
@@ -175,7 +168,7 @@ export default function CategoryManagementPage() {
           
           {/* CỘT PHẢI (2/3): DANH SÁCH */}
           <div className="lg:col-span-2">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 min-h-[300px]">
                 <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                     <Package className="w-5 h-5 text-gray-600" />
                     Danh sách hiện có
@@ -184,52 +177,73 @@ export default function CategoryManagementPage() {
                     </span>
                 </h2>
 
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-gray-600">
-                        <thead className="bg-gray-50 text-gray-700 font-semibold border-b border-gray-100">
-                            <tr>
-                                {/* Điều chỉnh lại độ rộng cột vì đã mất cột SL SP */}
-                                <th className="p-4 w-[30%]">Tên Danh mục</th>
-                                <th className="p-4 w-[55%]">Mô tả</th> 
-                                <th className="p-4 w-[15%] text-right">Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {categories.map((cat) => (
-                                <tr key={cat.id} className="hover:bg-gray-50 transition-colors group">
-                                    {/* Tên */}
-                                    <td className="p-4 align-top font-semibold text-gray-800">
-                                        {cat.name}
-                                    </td>
-                                    
-                                    {/* Mô tả */}
-                                    <td className="p-4 align-top">
-                                        <p className="text-gray-500 line-clamp-2 text-xs leading-relaxed">
-                                            {cat.description || <span className="italic text-gray-300">Không có mô tả</span>}
-                                        </p>
-                                    </td>
-
-                                    {/* Hành động: Nút Xóa luôn active */}
-                                    <td className="p-4 align-top text-right">
-                                        <button
-                                            onClick={() => handleDeleteCategory(cat.id, cat.name)}
-                                            className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
-                                            title="Xóa danh mục"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-                
-                {categories.length === 0 && (
-                     <div className="flex flex-col items-center justify-center py-10 text-gray-400">
-                        <Tag className="w-10 h-10 mb-2 opacity-20" />
-                        <p className="text-sm">Chưa có danh mục nào.</p>
+                {/* TRẠNG THÁI LOADING */}
+                {isLoading && (
+                    <div className="flex flex-col items-center justify-center py-10">
+                        <Loader2 className="w-8 h-8 animate-spin text-green-600 mb-2" />
+                        <p className="text-gray-500 text-sm">Đang tải danh sách...</p>
                     </div>
+                )}
+
+                {/* TRẠNG THÁI ERROR */}
+                {isError && (
+                    <div className="flex flex-col items-center justify-center py-10 text-red-500">
+                        <AlertCircle className="w-8 h-8 mb-2" />
+                        <p className="text-sm">Không thể tải danh sách danh mục.</p>
+                    </div>
+                )}
+
+                {/* BẢNG DỮ LIỆU */}
+                {!isLoading && !isError && (
+                    <>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm text-gray-600">
+                                <thead className="bg-gray-50 text-gray-700 font-semibold border-b border-gray-100">
+                                    <tr>
+                                        <th className="p-4 w-[30%]">Tên Danh mục</th>
+                                        <th className="p-4 w-[55%]">Mô tả</th> 
+                                        <th className="p-4 w-[15%] text-right">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {categories.map((cat) => (
+                                        <tr key={cat.id} className="hover:bg-gray-50 transition-colors group">
+                                            {/* Tên */}
+                                            <td className="p-4 align-top font-semibold text-gray-800">
+                                                {cat.categoryName}
+                                            </td>
+                                            
+                                            {/* Mô tả */}
+                                            <td className="p-4 align-top">
+                                                <p className="text-gray-500 line-clamp-2 text-xs leading-relaxed">
+                                                    {cat.description || <span className="italic text-gray-300">Không có mô tả</span>}
+                                                </p>
+                                            </td>
+
+                                            {/* Hành động */}
+                                            <td className="p-4 align-top text-right">
+                                                <button
+                                                    onClick={() => handleDeleteCategory(cat.id, cat.categoryName)}
+                                                    disabled={isDeleting}
+                                                    className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all opacity-100 group-hover:opacity-100 disabled:opacity-50"
+                                                    title="Xóa danh mục"
+                                                >
+                                                    {isDeleting ? <Loader2 className="w-4 h-4 animate-spin"/> : <Trash2 className="w-4 h-4" />}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        {categories.length === 0 && (
+                            <div className="flex flex-col items-center justify-center py-10 text-gray-400">
+                                <Tag className="w-10 h-10 mb-2 opacity-20" />
+                                <p className="text-sm">Chưa có danh mục nào.</p>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
           </div>

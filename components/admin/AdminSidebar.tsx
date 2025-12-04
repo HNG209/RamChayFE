@@ -31,6 +31,12 @@ const ADMIN_MENU = [
     icon: Package,
     allowedRoles: ["ROLE_MANAGER", "ROLE_ADMIN"],
   },
+    {
+    label: "Loại sản phẩm",
+    href: "/admin/categories",
+    icon: Package,
+    allowedRoles: ["ROLE_MANAGER", "ROLE_ADMIN"],
+  },
   {
     label: "Đơn hàng",
     href: "/admin/orders",

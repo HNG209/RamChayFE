@@ -73,6 +73,7 @@ export interface ProductCreationRequest {
   description: string;
   price: number;
   stock: number;
+  unit: string;
   category: CategoryCreationRequest;
   imageUrl: string;
   mediaUploadRequests: MediaUploadRequest[];
@@ -84,7 +85,8 @@ export interface ProductCreationResponse {
   description: string;
   price: number;
   stock: number;
-
+  unit: string;
+  
   imageUrl?: string;
   category?: CategoryCreationResponse;
   mediaList?: MediaResponse[];

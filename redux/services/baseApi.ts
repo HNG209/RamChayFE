@@ -7,6 +7,6 @@ export const baseApi = createApi({
   reducerPath: 'api', // Tên định danh trong Store
   baseQuery: axiosBaseQuery(), // Dùng Axios
   // Khai báo trước các Tag để dùng cho Caching (quan trọng cho Product)
-  tagTypes: ['User', 'Product', 'Cart'], 
+  tagTypes: ['User', 'Product', 'Category', 'Cart'], 
   endpoints: () => ({}),
 });
