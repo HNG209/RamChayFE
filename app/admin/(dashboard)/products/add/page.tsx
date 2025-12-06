@@ -20,10 +20,10 @@ import { ProductCreationRequest } from "@/types/backend";
 
 export default function CreateProductPage() {
   const router = useRouter();
-  
+
   // Gọi API lấy danh sách danh mục để đổ vào Select box
   const { data: categories = [], isLoading: isLoadingCategories } = useGetCategoriesQuery();
-  
+
   const [createProduct, { isLoading }] = useCreateProductMutation();
 
   // 1. State form (Đã thêm unit)
@@ -33,7 +33,7 @@ export default function CreateProductPage() {
     price: "",
     stock: "",
     unit: "", // Trường đơn vị tính
-    categoryId: "", 
+    categoryId: "",
   });
 
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
@@ -70,8 +70,13 @@ export default function CreateProductPage() {
     const selectedCat = categories.find(c => c.id === Number(formData.categoryId));
 
     if (!selectedCat) {
-        alert("Vui lòng chọn danh mục hợp lệ!");
-        return;
+      alert("Vui lòng chọn danh mục hợp lệ!");
+      return;
+    }
+
+    if (selectedImages.length === 0) {
+      alert("Vui lòng tải lên ít nhất 1 hình ảnh sản phẩm!");
+      return;
     }
 
     try {
@@ -83,17 +88,16 @@ export default function CreateProductPage() {
         unit: formData.unit, // Gửi unit lên BE
 
         category: {
-            categoryName: selectedCat.categoryName,
-            description: selectedCat.description
+          categoryName: selectedCat.categoryName,
+          description: selectedCat.description
         },
-        
-        imageUrl: "", 
+
         mediaUploadRequests: [],
-        images: selectedImages 
+        images: selectedImages
       };
 
       await createProduct(payload).unwrap();
-      
+
       alert("Thêm sản phẩm thành công!");
       router.push("/admin/products");
 
@@ -173,8 +177,8 @@ export default function CreateProductPage() {
                       </option>
                     ))}
                   </select>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={() => router.push("/admin/categories")}
                     className="p-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-200 text-gray-600 transition-colors"
                     title="Quản lý danh mục"
@@ -193,12 +197,12 @@ export default function CreateProductPage() {
               Giá & Kho hàng
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              
+
               {/* Giá bán */}
               <div className="sm:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Giá bán <span className="text-red-500">*</span></label>
                 <div className="relative">
-                    <input
+                  <input
                     type="number"
                     name="price"
                     value={formData.price}
@@ -206,10 +210,10 @@ export default function CreateProductPage() {
                     placeholder="0"
                     className="w-full pl-3 pr-8 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-gray-900 placeholder-gray-400"
                     required
-                    />
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <span className="text-gray-500 text-sm">đ</span>
-                    </div>
+                  />
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <span className="text-gray-500 text-sm">đ</span>
+                  </div>
                 </div>
               </div>
 
@@ -217,7 +221,7 @@ export default function CreateProductPage() {
               <div className="sm:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Đơn vị tính <span className="text-red-500">*</span></label>
                 <div className="relative">
-                    <input
+                  <input
                     type="text"
                     name="unit"
                     value={formData.unit}
@@ -226,11 +230,11 @@ export default function CreateProductPage() {
                     list="unit-suggestions"
                     className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-gray-900 placeholder-gray-400"
                     required
-                    />
-                    <Scale className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                    <datalist id="unit-suggestions">
-                        <option value="Hộp" /><option value="Gói" /><option value="Chai" /><option value="Kg" /><option value="Cái" />
-                    </datalist>
+                  />
+                  <Scale className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  <datalist id="unit-suggestions">
+                    <option value="Hộp" /><option value="Gói" /><option value="Chai" /><option value="Kg" /><option value="Cái" />
+                  </datalist>
                 </div>
               </div>
 
@@ -267,25 +271,31 @@ export default function CreateProductPage() {
                 <input type="file" className="hidden" multiple accept="image/*" onChange={handleImageChange} />
               </label>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-2 mt-4">
-                {previewUrls.map((url, index) => (
-                  <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200">
-                    <img src={url} alt="Preview" className="w-full h-full object-cover" />
-                    <button type="button" onClick={() => removeImage(index)} className="absolute top-1 right-1 bg-white/80 p-1 rounded-full text-red-500 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white">
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
+              {previewUrls.map((url, index) => (
+                <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200">
+                  <img src={url} alt="Preview" className="w-full h-full object-cover" />
+                  <button type="button" onClick={() => removeImage(index)} className="absolute top-1 right-1 bg-white/80 p-1 rounded-full text-red-500 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white">
+                    <X className="w-4 h-4" />
+                  </button>
+                  {/* Đánh dấu ảnh đầu tiên là ảnh đại diện */}
+                  {index === 0 && (
+                    <span className="absolute bottom-1 left-1 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded shadow-sm">
+                      Đại diện
+                    </span>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
         {/* FOOTER */}
         <div className="lg:col-span-3 flex justify-end gap-3 pt-6 border-t border-gray-200">
-          <button type="button" onClick={() => router.back()} className="px-6 py-2.5 rounded-lg border border-gray-300 hover:bg-gray-50">Hủy</button>
+          <button type="button" onClick={() => router.back()} className="px-6 py-2.5 rounded-lg border border-gray-300 hover:bg-gray-50 text-black">Hủy bỏ</button>
           <button type="submit" disabled={isLoading} className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-70">
-            {isLoading ? <Loader2 className="animate-spin w-5 h-5"/> : <Save className="w-5 h-5"/>}
+            {isLoading ? <Loader2 className="animate-spin w-5 h-5" /> : <Save className="w-5 h-5" />}
             <span>Lưu sản phẩm</span>
           </button>
         </div>

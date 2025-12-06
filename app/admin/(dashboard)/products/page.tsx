@@ -103,9 +103,7 @@ export default function ProductManagingPage() {
             <div className="flex flex-col items-center justify-center py-20 text-red-500">
               <AlertCircle className="w-10 h-10 mb-2" />
               <p>Không thể tải danh sách sản phẩm.</p>
-              {/* Nếu muốn hiện chi tiết lỗi thì ép kiểu: */}
               <p className="text-sm text-gray-400 mt-1">
-                {/* Ép kiểu error sang any để đọc message */}
                 {(error as any)?.data?.message || "Lỗi kết nối server"}
               </p>
             </div>
@@ -119,7 +117,8 @@ export default function ProductManagingPage() {
                     <th className="px-6 py-4 font-semibold text-gray-700">Sản phẩm</th>
                     <th className="px-6 py-4 font-semibold text-gray-700">Danh mục</th>
                     <th className="px-6 py-4 font-semibold text-gray-700">Giá bán</th>
-                    <th className="px-6 py-4 font-semibold text-gray-700">Đơn vị</th>
+                    {/* THÊM CỘT ĐƠN VỊ TÍNH */}
+                    <th className="px-6 py-4 font-semibold text-gray-700 text-center">Đơn vị</th>
                     <th className="px-6 py-4 font-semibold text-gray-700 text-center">Tồn kho</th>
                     <th className="px-6 py-4 font-semibold text-gray-700 text-right">Hành động</th>
                   </tr>
@@ -132,9 +131,9 @@ export default function ProductManagingPage() {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-4">
                             <div className="h-12 w-12 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200 relative">
-                              {/* Sử dụng optional chaining (?.) vì imageUrl có thể undefined */}
+                              {/* --- SỬA Ở ĐÂY: Dùng product.index thay vì product.imageUrl --- */}
                               <img
-                                src={product.imageUrl || "https://placehold.co/100x100?text=No+Img"}
+                                src={product.indexImage || "https://placehold.co/100x100?text=No+Img"}
                                 alt={product.name}
                                 className="h-full w-full object-cover"
                                 onError={(e) => { e.currentTarget.src = "https://placehold.co/100x100?text=Error"; }}
@@ -155,7 +154,6 @@ export default function ProductManagingPage() {
                         {/* DANH MỤC */}
                         <td className="px-6 py-4">
                           <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
-                            {/* Xử lý an toàn nếu category bị null */}
                             {product.category?.categoryName || "Chưa phân loại"}
                           </span>
                         </td>
@@ -163,11 +161,12 @@ export default function ProductManagingPage() {
                         <td className="px-6 py-4 font-bold text-gray-800">
                           {formatCurrency(product.price)}
                         </td>
-
-                        <td className="px-6 py-4 text-center text-sm text-gray-600">
-                          <span className="bg-gray-100 px-2 py-1 rounded border border-gray-200">
-                            {product.unit || "-"}
-                          </span>
+                        
+                        {/* DATA CỘT ĐƠN VỊ TÍNH */}
+                        <td className="px-6 py-4 text-center">
+                            <span className="inline-block px-2 py-1 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600 font-medium">
+                                {product.unit || "-"}
+                            </span>
                         </td>
 
                         <td className="px-6 py-4 text-center">
@@ -196,7 +195,7 @@ export default function ProductManagingPage() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                      <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                         <Package className="w-12 h-12 mb-3 mx-auto text-gray-300" />
                         Không tìm thấy sản phẩm
                       </td>
@@ -214,7 +213,6 @@ export default function ProductManagingPage() {
 
 // --- HELPER COMPONENTS ---
 
-// Component hiển thị trạng thái kho hàng với màu sắc động
 function StockBadge({ stock }: { stock: number }) {
   if (stock === 0) {
     return (
@@ -230,7 +228,6 @@ function StockBadge({ stock }: { stock: number }) {
           Sắp hết: {stock}
         </span>
       </div>
-
     );
   }
   return (

@@ -75,8 +75,10 @@ export interface ProductCreationRequest {
   stock: number;
   unit: string;
   category: CategoryCreationRequest;
-  imageUrl: string;
+  indexImage?: string;
   mediaUploadRequests: MediaUploadRequest[];
+  imageIdsToDelete?: number[]; 
+
 }
 
 export interface ProductCreationResponse {
@@ -86,9 +88,9 @@ export interface ProductCreationResponse {
   price: number;
   stock: number;
   unit: string;
-  
-  imageUrl?: string;
+
+  indexImage?: string;
   category?: CategoryCreationResponse;
-  mediaList?: MediaResponse[];
+  mediaList?: MediaUploadResponse[];
 }
 
