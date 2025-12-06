@@ -76,6 +76,10 @@ export interface GetItemsResponse {
   indexImage: string;
 }
 
+export interface GetItemsResponseWithSelected extends GetItemsResponse {
+  selected: boolean;
+}
+
 export interface Page<T> {
   content: T[];
   page: {

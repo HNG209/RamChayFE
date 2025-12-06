@@ -5,9 +5,16 @@ import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 import CartItem from "@/components/CartItem";
-import { useGetCartItemsQuery } from "@/redux/services/cartApi";
+import {
+  useDeleteCartItemMutation,
+  useGetCartItemsQuery,
+  useUpdateCartItemMutation,
+} from "@/redux/services/cartApi";
 import { GetItemsResponse } from "@/types/backend";
 import { useInView } from "react-intersection-observer";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { toggleItemSelected } from "@/redux/slices/cartSlice";
 
 export default function CartPage() {
   const [page, setPage] = useState(0);
@@ -15,8 +22,11 @@ export default function CartPage() {
   const [cartItems, setCartItems] = useState<GetItemsResponse[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [isSelectedAll, setIsSelectedAll] = useState<boolean>(false);
+  const dispatch = useDispatch<AppDispatch>();
 
   const { data, isFetching } = useGetCartItemsQuery({ page, size: 10 });
+  const [updateCartItem] = useUpdateCartItemMutation();
+  const [deleteCartItem] = useDeleteCartItemMutation();
 
   // Watch scroll bottom
   const { ref, inView } = useInView({
@@ -30,23 +40,24 @@ export default function CartPage() {
 
     const newContent = data.content ?? [];
 
+    // --- Fix gộp dữ liệu ---
     setCartItems((prev) => {
-      const appended = newContent.filter(
-        (item) => !prev.some((p) => p.id === item.id)
+      const merged = [...prev, ...newContent];
+
+      return Array.from(
+        new Map(merged.map((item) => [item.id, item])).values()
       );
-      return [...prev, ...appended];
     });
 
+    // --- Fix append selected ids ---
     if (isSelectedAll) {
       setSelectedIds((prev) => {
-        const appended = newContent.filter(
-          (item) => !prev.some((p) => p === item.id)
-        );
-        return [...prev, ...appended.map((i) => i.id)];
+        const merged = [...prev, ...newContent.map((i) => i.id)];
+        return Array.from(new Set(merged));
       });
     }
 
-    // Trang cuối
+    // Check end page
     if (data.page.totalPages === page + 1 || newContent.length < 10) {
       setHasMore(false);
     }
@@ -88,6 +99,11 @@ export default function CartPage() {
     }
   };
 
+  // Cập nhật sản phẩm được chọn trong Redux
+  useEffect(() => {
+    dispatch(toggleItemSelected(selectedIds));
+  }, [selectedIds, dispatch]);
+
   // Cập nhật số lượng
   const updateQuantity = (id: number, newQuantity: number) => {
     setCartItems(
@@ -95,12 +111,14 @@ export default function CartPage() {
         item.id === id ? { ...item, quantity: Math.max(1, newQuantity) } : item
       )
     );
+    updateCartItem({ itemId: id, quantity: newQuantity });
   };
 
   // Xóa sản phẩm
   const removeItem = (id: number) => {
     setCartItems(cartItems.filter((item) => item.id !== id));
     setSelectedIds(selectedIds.filter((itemId) => itemId !== id));
+    deleteCartItem({ itemId: id });
   };
 
   // Tính toán tổng tiền

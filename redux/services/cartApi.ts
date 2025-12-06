@@ -16,6 +16,7 @@ export const cartApi = baseApi.injectEndpoints({
         method: "POST",
         data: data,
       }),
+      invalidatesTags: ["Cart"],
     }),
 
     getCartItems: builder.query<
@@ -29,10 +30,34 @@ export const cartApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Cart"],
     }),
-  }),
 
+    updateCartItem: builder.mutation<
+      void,
+      { itemId: number; quantity: number }
+    >({
+      query: ({ itemId, quantity }) => ({
+        url: `/cart-items/${itemId}`,
+        method: "PUT",
+        data: { quantity },
+      }),
+      // invalidatesTags: ["Cart"],
+    }),
+
+    deleteCartItem: builder.mutation<void, { itemId: number }>({
+      query: ({ itemId }) => ({
+        url: `/cart-items/${itemId}`,
+        method: "DELETE",
+      }),
+      // invalidatesTags: ["Cart"],
+    }),
+  }),
   overrideExisting: false, // Để tránh ghi đè nếu lỡ import 2 lần
 });
 
 // Xuất Hooks riêng từ file này
-export const { useAddItemMutation, useGetCartItemsQuery } = cartApi;
+export const {
+  useAddItemMutation,
+  useGetCartItemsQuery,
+  useUpdateCartItemMutation,
+  useDeleteCartItemMutation,
+} = cartApi;
