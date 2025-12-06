@@ -4,7 +4,7 @@ export const managerApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         getAllPermisson: builder.query<any, void>({
             query: () => ({
-                url: `/Permissons`,
+                url: `/permissions`,
                 method: "GET",
             }),
             providesTags: ["Permisson"],

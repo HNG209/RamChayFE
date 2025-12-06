@@ -40,9 +40,6 @@ export default function AddManagerPage() {
     }))
   }
 
-  // =======================================================
-  // LOGIC XỬ LÝ ROLE (MULTI-SELECT SIMULATION)
-  // =======================================================
 
   // Hàm thêm Role vào danh sách đã chọn
   const handleAddRole = (e: React.ChangeEvent<HTMLSelectElement>) => {

@@ -93,9 +93,6 @@ export default function EditManagerPage() {
     setPasswordData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // =======================================================
-  // LOGIC XỬ LÝ ROLE 
-  // =======================================================
 
   // Hàm thêm Role vào danh sách đã chọn
   const handleAddRole = (e: React.ChangeEvent<HTMLSelectElement>) => {
