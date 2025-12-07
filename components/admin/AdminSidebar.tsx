@@ -7,7 +7,6 @@ import {
   LayoutDashboard,
   Package,
   Users,
-  ShieldCheck,
   ShoppingBag,
   ShieldCheck,
   LogOut,
@@ -69,6 +68,11 @@ const ADMIN_MENU = [
         href: "/admin/managers",
         allowedRoles: ["ROLE_ADMIN"],
       },
+      {
+        label: "Thêm nhân viên",
+        href: "/admin/managers/add",
+        allowedRoles: ["ROLE_ADMIN"],
+      },
     ],
   },
   {
@@ -78,6 +82,11 @@ const ADMIN_MENU = [
       {
         label: "Danh sách quyền hạn",
         href: "/admin/roles",
+        allowedRoles: ["ROLE_ADMIN"],
+      },
+      {
+        label: "Thêm quyền hạn",
+        href: "/admin/roles/add",
         allowedRoles: ["ROLE_ADMIN"],
       },
     ],
