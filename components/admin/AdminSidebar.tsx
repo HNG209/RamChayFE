@@ -48,6 +48,12 @@ const ADMIN_MENU = [
       },
     ],
   },
+    {
+    label: "Loại sản phẩm",
+    href: "/admin/categories",
+    icon: Package,
+    allowedRoles: ["ROLE_MANAGER", "ROLE_ADMIN"],
+  },
   {
     label: "Đơn hàng",
     icon: ShoppingBag,
