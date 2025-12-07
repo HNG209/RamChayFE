@@ -5,7 +5,7 @@ import Image from "next/image"
 import { ShoppingCart, ChevronRight } from "lucide-react"
 import { useDispatch } from "react-redux"
 import type { Product } from "@/types/backend"
-import { addToCart } from "@/redux/slices/cartSlice"
+// import { addToCart } from "@/redux/slices/cartSlice"
 
 export default function ProductCard({ product }: { product: Product }) {
     const dispatch = useDispatch()
@@ -26,7 +26,7 @@ export default function ProductCard({ product }: { product: Product }) {
         e.preventDefault()
 
         // Add to cart
-        dispatch(addToCart(product))
+        // dispatch(addToCart(product))
 
         // Get button position
         const button = buttonRef.current
