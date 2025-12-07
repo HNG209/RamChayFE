@@ -20,6 +20,7 @@ import { RootState } from "@/redux/store";
 // import { logout } from "@/redux/slices/authSlice"; // Nhớ import action logout
 import { UserAvatar } from "../UserAvatar";
 import { useLogoutMutation } from "@/redux/services/authApi";
+import { useGetCartItemsQuery } from "@/redux/services/cartApi";
 
 const NAV_ITEMS = [
   { label: "Trang chủ", href: "/" },
@@ -39,9 +40,22 @@ export default function Header() {
 
   // Lấy user từ Redux (ép kiểu MyProfile để gợi ý code)
   const user = useSelector((state: RootState) => state.auth.user);
-  const cartItemsCount = useSelector((state: RootState) =>
-    state.cart.items.reduce((total, item) => total + item.quantity, 0)
+
+  // Fetch cart items để lấy số lượng
+  const { data: cartData } = useGetCartItemsQuery(
+    { page: 0, size: 100 },
+    {
+      // Refetch khi mount component hoặc khi argument thay đổi
+      refetchOnMountOrArgChange: true,
+      // Refetch khi window được focus lại
+      refetchOnFocus: true,
+      // Poll mỗi 3 giây (optional, có thể bỏ nếu không cần)
+      // pollingInterval: 3000,
+    }
   );
+  const cartItemsCount = cartData?.content.reduce((total, item) => total + item.quantity, 0) || 0;
+
+  console.log('Cart data in Header:', cartData, 'Count:', cartItemsCount);
 
   const isActive = (path: string) => pathname === path;
 
@@ -82,8 +96,8 @@ export default function Header() {
                 key={item.href}
                 href={item.href}
                 className={`text-sm font-medium transition-colors hover:text-lime-primary ${isActive(item.href)
-                    ? "text-lime-primary font-bold"
-                    : "text-gray-600"
+                  ? "text-lime-primary font-bold"
+                  : "text-gray-600"
                   }`}
               >
                 {item.label}
@@ -250,8 +264,8 @@ export default function Header() {
                   <Link
                     href={item.href}
                     className={`block px-4 py-3 rounded-lg ${isActive(item.href)
-                        ? "bg-lime-accent/30 text-lime-primary font-bold"
-                        : "text-gray-700 hover:bg-gray-50"
+                      ? "bg-lime-accent/30 text-lime-primary font-bold"
+                      : "text-gray-700 hover:bg-gray-50"
                       }`}
                     onClick={() => setIsDrawerOpen(false)}
                   >

@@ -99,6 +99,7 @@ export interface Page<T> {
 }
 // Category entity
 export interface Category {
+  id?: number;
   categoryName: string;
   description: string;
 }
@@ -110,6 +111,10 @@ export interface Product {
   description: string;
   price: number;
   stock: number;
+  unit?: string;
+  imageUrl?: string | null;
   category: Category;
+  mediaList?: string[];
+  // Alias for compatibility
   images?: string[];
 }

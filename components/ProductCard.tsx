@@ -3,12 +3,11 @@ import { useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { ShoppingCart, ChevronRight } from "lucide-react"
-import { useDispatch } from "react-redux"
 import type { Product } from "@/types/backend"
-import { addToCart } from "@/redux/slices/cartSlice"
+import { useAddItemMutation } from "@/redux/services/cartApi"
 
 export default function ProductCard({ product }: { product: Product }) {
-    const dispatch = useDispatch()
+    const [addItem] = useAddItemMutation()
     const buttonRef = useRef<HTMLButtonElement>(null)
 
     if (!product) {
@@ -22,11 +21,35 @@ export default function ProductCard({ product }: { product: Product }) {
     const categoryName = product.category?.categoryName || "Uncategorized"
     const firstImage = product.images?.[0]
 
-    const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault()
 
-        // Add to cart
-        dispatch(addToCart(product))
+        // Add to cart via API
+        try {
+            console.log('Adding to cart:', {
+                productId: product.id!,
+                quantity: 1,
+                unitPrice: product.price,
+                subtotal: product.price
+            })
+            const result = await addItem({
+                productId: product.id!,
+                quantity: 1,
+                unitPrice: product.price,
+                subtotal: product.price
+            }).unwrap()
+            console.log('Add to cart success:', result)
+        } catch (error: any) {
+            console.error("Failed to add to cart:", error)
+            console.error("Error details:", {
+                status: error?.status,
+                data: error?.data,
+                message: error?.message,
+                code: error?.code
+            })
+            alert(`Không thể thêm vào giỏ hàng: ${error?.data?.message || error?.message || 'Lỗi không xác định'}`)
+            return
+        }
 
         // Get button position
         const button = buttonRef.current

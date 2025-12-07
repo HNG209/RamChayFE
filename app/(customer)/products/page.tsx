@@ -3,6 +3,7 @@
 import { useState } from "react"
 import ProductCard from "@/components/ProductCard"
 import { Search, SlidersHorizontal, X } from "lucide-react"
+import { useGetProductsQuery } from "@/redux/services/productApi"
 
 const mockProducts = [
     {
@@ -48,6 +49,15 @@ export default function CustomerProductsPage() {
     const [searchTerm, setSearchTerm] = useState("")
     const [isFilterOpen, setIsFilterOpen] = useState(false)
 
+    // Fetch products từ API
+    const { data: productsData, isLoading, error } = useGetProductsQuery({
+        page: 0,
+        size: 100,
+        search: searchTerm
+    })
+
+    const apiProducts = productsData || []
+
     // Price range constants
     const MIN_PRICE = 0
     const MAX_PRICE = 100000
@@ -65,7 +75,7 @@ export default function CustomerProductsPage() {
     const [sortBy, setSortBy] = useState("default")
 
     // Lấy danh sách categories
-    const categories = ["all", ...new Set(mockProducts.map(p => p.category.categoryName))]
+    const categories = ["all", ...new Set(apiProducts.map(p => p.category?.categoryName).filter(Boolean))]
 
     // Apply filters
     const handleApplyFilters = () => {
@@ -89,7 +99,7 @@ export default function CustomerProductsPage() {
     }
 
     // Lọc sản phẩm
-    let filteredProducts = mockProducts
+    let filteredProducts = apiProducts
 
     // Lọc theo tìm kiếm
     if (searchTerm) {
@@ -372,15 +382,26 @@ export default function CustomerProductsPage() {
             )}
 
             {/* Products Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {filteredProducts && filteredProducts.length > 0 ? (
-                    filteredProducts.map((p) => <ProductCard key={p.id} product={p} />)
-                ) : (
-                    <div className="col-span-full text-center text-muted-foreground py-12">
-                        Không tìm thấy sản phẩm nào.
-                    </div>
-                )}
-            </div>
+            {isLoading ? (
+                <div className="col-span-full text-center py-12">
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-chocolate"></div>
+                    <p className="mt-4 text-muted-foreground">Đang tải sản phẩm...</p>
+                </div>
+            ) : error ? (
+                <div className="col-span-full text-center py-12 text-red-500">
+                    Lỗi khi tải sản phẩm. Vui lòng thử lại sau.
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {filteredProducts && filteredProducts.length > 0 ? (
+                        filteredProducts.map((p) => <ProductCard key={p.id} product={p} />)
+                    ) : (
+                        <div className="col-span-full text-center text-muted-foreground py-12">
+                            Không tìm thấy sản phẩm nào.
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
