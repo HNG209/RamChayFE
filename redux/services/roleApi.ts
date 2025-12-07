@@ -58,6 +58,14 @@ export const managerApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ["Role"], // cập nhật lại danh sách role sau khi xoá
         }),
+        //pagin
+        paginRole: builder.query<any, { page: number; pageSize: number; keyWord: string }>({
+            query: ({ page, pageSize, keyWord }) => ({
+                url: `/roles/page?page=${page}&pageSize=${pageSize}&keyWord=${keyWord}`,
+                method: "GET",
+            }),
+            providesTags: ["Role"],
+        }),
     }),
     overrideExisting: false,
 });
@@ -68,5 +76,6 @@ export const {
     useCreateRoleMutation,
     useUpdateRoleMutation,
     useGetRoleByIdQuery,
-    useDeleteRoleMutation
+    useDeleteRoleMutation,
+    usePaginRoleQuery
 } = managerApi;

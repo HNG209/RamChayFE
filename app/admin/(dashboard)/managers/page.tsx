@@ -466,6 +466,27 @@ export default function Home() {
             </table>
           )}
         </div>
+
+        {/* Pagination */}
+        {totalItems > 0 && totalPages > 1 && (
+          <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+            />
+          </div>
+        )}
+
+        {/* Empty State */}
+        {totalItems === 0 && !isLoading && (
+          <div className="text-center py-12">
+            <p className="text-gray-500">Không tìm thấy nhân sự nào phù hợp{searchQuery && ` cho "${searchQuery}"`}</p>
+          </div>
+        )}
+
       </div>
 
       {/* Delete Modal */}

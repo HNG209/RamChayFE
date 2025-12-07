@@ -8,6 +8,7 @@ import {
   Package,
   Users,
   ShoppingBag,
+  ShieldCheck,
   LogOut,
   ChevronRight, // Thêm icon này để trang trí
 } from "lucide-react";
@@ -46,7 +47,7 @@ const ADMIN_MENU = [
   {
     label: "Quyền hạn",
     href: "/admin/roles",
-    icon: Users,
+    icon: ShieldCheck,
     allowedRoles: ["ROLE_ADMIN"],
   }
 ];
@@ -135,8 +136,8 @@ export default function AdminSidebar() {
               key={item.href}
               href={item.href}
               className={`group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${isActive
-                  ? "bg-lime-primary/10 text-lime-400 font-semibold shadow-[0_0_15px_rgba(163,230,53,0.1)]"
-                  : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                ? "bg-lime-primary/10 text-lime-400 font-semibold shadow-[0_0_15px_rgba(163,230,53,0.1)]"
+                : "text-gray-400 hover:bg-gray-800 hover:text-white"
                 }`}
             >
               <item.icon
