@@ -1,45 +1,43 @@
-"use client"
+"use client";
 
-import { useState, useCallback, useEffect } from "react"
-import { Plus, Search, X, Pencil, Trash2, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
-import { usePaginManagerQuery, useDeleteManagerMutation } from "@/redux/services/managerApi"
-import { useRouter } from "next/navigation"
-import { createPortal } from "react-dom"
-import { date } from "yup"
+import { useState, useCallback, useEffect } from "react";
+import { Plus, Search, X, Pencil, Trash2, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { usePaginManagerQuery, useDeleteManagerMutation } from "@/redux/services/managerApi";
+import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
 
 interface Item {
-  id: number
-  name: string
-  email: string
-  status: string
-  createdAt: string
+  id: number;
+  name: string;
+  email: string;
+  status: string;
+  createdAt: string;
 }
-
 
 function SearchBar({
   onSearch,
   placeholder = "Tìm kiếm...",
 }: {
-  onSearch: (query: string) => void
-  placeholder?: string
+  onSearch: (query: string) => void;
+  placeholder?: string;
 }) {
-  const [query, setQuery] = useState("")
-  const [debouncedQuery, setDebouncedQuery] = useState("")
+  const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedQuery(query)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [query])
+      setDebouncedQuery(query);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   useEffect(() => {
-    onSearch(debouncedQuery)
-  }, [debouncedQuery, onSearch])
+    onSearch(debouncedQuery);
+  }, [debouncedQuery, onSearch]);
 
   const handleClear = useCallback(() => {
-    setQuery("")
-  }, [])
+    setQuery("");
+  }, []);
 
   return (
     <div className="relative flex-1">
@@ -59,7 +57,7 @@ function SearchBar({
         )}
       </div>
     </div>
-  )
+  );
 }
 
 // ---------------------------
@@ -71,14 +69,13 @@ function ItemTable({
   onEdit,
   onDelete,
 }: {
-  items: Item[]
-  isLoading: boolean
-  onEdit: (item: Item) => void
-  onDelete: (item: Item) => void
+  items: Item[];
+  isLoading: boolean;
+  onEdit: (item: Item) => void;
+  onDelete: (item: Item) => void;
 }) {
   return (
     <div className="bg-card rounded-xl shadow-md shadow-black/5 dark:shadow-white/5 overflow-hidden mb-6 relative">
-
       <table className="w-full">
         <thead className="bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700">
           <tr>
@@ -136,7 +133,7 @@ function ItemTable({
         </tbody>
       </table>
     </div>
-  )
+  );
 }
 
 // ---------------------------
@@ -149,30 +146,30 @@ function Pagination({
   totalItems,
   itemsPerPage,
 }: {
-  currentPage: number
-  totalPages: number
-  onPageChange: (page: number) => void
-  totalItems: number
-  itemsPerPage: number
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  totalItems: number;
+  itemsPerPage: number;
 }) {
-  const pages: (string | number)[] = []
-  const maxPagesToShow = 5
+  const pages: (string | number)[] = [];
+  const maxPagesToShow = 5;
 
   if (totalPages <= maxPagesToShow) {
     for (let i = 1; i <= totalPages; i++) {
-      pages.push(i)
+      pages.push(i);
     }
   } else {
     if (currentPage <= 3) {
-      pages.push(1, 2, 3, "...")
-      pages.push(totalPages)
+      pages.push(1, 2, 3, "...");
+      pages.push(totalPages);
     } else if (currentPage >= totalPages - 2) {
-      pages.push(1, "...")
+      pages.push(1, "...");
       for (let i = totalPages - 2; i <= totalPages; i++) {
-        pages.push(i)
+        pages.push(i);
       }
     } else {
-      pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages)
+      pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
     }
   }
 
@@ -217,7 +214,7 @@ function Pagination({
         </button>
       </div>
     </div>
-  )
+  );
 }
 
 // ---------------------------
@@ -230,30 +227,29 @@ function ConfirmDeleteModal({
   onConfirm,
   onCancel,
 }: {
-  isOpen: boolean
-  item: Item | null
-  isDeleting: boolean
-  onConfirm: () => void
-  onCancel: () => void
+  isOpen: boolean;
+  item: Item | null;
+  isDeleting: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
 }) {
-  if (!isOpen || !item) return null
+  if (!isOpen || !item) return null;
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/90">
-      <div className="bg-card rounded-xl border border-border shadow-xl w-full max-w-sm mx-4 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-xl w-full max-w-sm mx-4 overflow-hidden">
         <div className="p-6">
-          <h2 className="text-lg font-semibold text-foreground mb-2">Confirm Delete</h2>
-          <p className="text-muted-foreground mb-6">
-            Are you sure you want to delete <strong className="text-foreground">"{item.name}"</strong>? This action
-            cannot be undone.
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">Xác nhận xóa</h2>
+          <p className="text-gray-500 mb-6">
+            Bạn có chắc muốn xóa <strong className="text-gray-900">"{item.name}"</strong>? Hành động này không thể hoàn tác.
           </p>
           <div className="flex gap-3">
             <button
               onClick={onCancel}
               disabled={isDeleting}
-              className="flex-1 px-4 py-2 border border-border rounded-lg text-foreground hover:bg-muted transition-colors font-medium disabled:opacity-50"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors font-medium disabled:opacity-50"
             >
-              Cancel
+              Hủy
             </button>
             <button
               onClick={onConfirm}
@@ -261,37 +257,37 @@ function ConfirmDeleteModal({
               className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isDeleting && <Loader2 size={16} className="animate-spin" />}
-              Delete
+              Xóa
             </button>
           </div>
         </div>
       </div>
     </div>,
-    document.body,
-  )
+    document.body
+  );
 }
 
 // ---------------------------
 // Main Home Component
 // ---------------------------
 export default function Home() {
-  const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [deleteConfirmItem, setDeleteConfirmItem] = useState<Item | null>(null)
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [deleteConfirmItem, setDeleteConfirmItem] = useState<Item | null>(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
-  const itemsPerPage = 6
+  const itemsPerPage = 6;
 
   const { data, isLoading, isFetching } = usePaginManagerQuery({
     page: currentPage - 1,
     pageSize: itemsPerPage,
     keyWord: searchQuery,
-  })
+  });
 
-  const [deleteManager, { isLoading: isDeleting }] = useDeleteManagerMutation()
+  const [deleteManager, { isLoading: isDeleting }] = useDeleteManagerMutation();
 
-  const apiItems = data?.items || []
+  const apiItems = data?.items || [];
 
   const items: Item[] = apiItems.map((u: any) => ({
     id: u.id,
@@ -299,93 +295,181 @@ export default function Home() {
     email: u.phones?.[0] ?? u.email ?? "—",
     status: u.active ? "Active" : "Inactive",
     createdAt: new Date(u.createdAt).toLocaleDateString("vi-VN"),
-  }))
+  }));
 
-  const totalPages = data?.totalPages || 1
-  const totalItems = data?.totalElements || 0
+  const totalPages = data?.totalPages || 1;
+  const totalItems = data?.totalElements || 0;
 
   const handleSearch = useCallback((query: string) => {
-    setSearchQuery(query)
-    setCurrentPage(1)
-  }, [])
+    setSearchQuery(query);
+    setCurrentPage(1);
+  }, []);
 
   const handlePageChange = useCallback((page: number) => {
-    setCurrentPage(page)
-  }, [])
+    setCurrentPage(page);
+  }, []);
 
   const handleAdd = useCallback(() => {
-    router.push("managers/add")
-  }, [router])
+    router.push("managers/add");
+  }, [router]);
 
   const handleEdit = useCallback(
     (item: Item) => {
-      router.push(`managers/edit/${item.id}`)
+      router.push(`managers/edit/${item.id}`);
     },
     [router],
-  )
+  );
 
   const handleDelete = useCallback((item: Item) => {
-    setDeleteConfirmItem(item)
-    setIsDeleteConfirmOpen(true)
-  }, [])
+    setDeleteConfirmItem(item);
+    setIsDeleteConfirmOpen(true);
+  }, []);
 
   const handleConfirmDelete = useCallback(async () => {
-    if (!deleteConfirmItem) return
+    if (!deleteConfirmItem) return;
     try {
-      await deleteManager(deleteConfirmItem.id).unwrap()
-      setIsDeleteConfirmOpen(false)
-      setDeleteConfirmItem(null)
+      await deleteManager(deleteConfirmItem.id).unwrap();
+      setIsDeleteConfirmOpen(false);
+      setDeleteConfirmItem(null);
     } catch (error) {
-      console.error("Delete failed:", error)
+      console.error("Delete failed:", error);
     }
-  }, [deleteConfirmItem, deleteManager])
+  }, [deleteConfirmItem, deleteManager]);
+
+  // Filtered items
+  const filteredItems = items.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.id.toString().includes(searchQuery)
+  );
 
   if (isLoading)
     return (
-      <main className="min-h-screen flex items-center justify-center">
+      <main className="min-h-screen flex items-center justify-center bg-white">
         <div className="flex items-center gap-2">
-          <Loader2 className="animate-spin" size={24} />
-          <span className="text-foreground">Loading...</span>
+          <Loader2 className="animate-spin text-green-500" size={24} />
+          <span className="text-gray-600">Đang tải dữ liệu...</span>
         </div>
       </main>
-    )
+    );
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <main className="min-h-screen bg-white p-6 md:p-10">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">Quản Lí Nhân Sự</h1>
-          <p className="text-muted-foreground">Manage and track managers in your system</p>
-        </div>
-
-        {/* Search & Add Button */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <div className="flex-1">
-            <SearchBar onSearch={handleSearch} placeholder="Search by name, email, or phone..." />
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-extrabold text-gray-900">
+              <span className="text-indigo-600">👤</span> Quản Lý Nhân Sự (Managers)
+            </h1>
+            <p className="text-md text-gray-500">
+              Tạo và chỉnh sửa thông tin nhân sự trong hệ thống.
+            </p>
           </div>
           <button
             onClick={handleAdd}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors whitespace-nowrap"
+            className="flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-md shadow-green-600/30 font-medium transition"
           >
             <Plus size={20} />
-            Add New
+            Thêm Nhân Sự Mới
           </button>
         </div>
 
+        {/* Search */}
+        <div className="mb-8 relative">
+          <input
+            placeholder="Tìm theo tên, email hoặc ID..."
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 transition"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <Search className="text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" size={20} />
+        </div>
+
         {/* Table */}
-        <div>
-          {isFetching && (
-            <div className="absolute inset-0 bg-white/50 dark:bg-black/50 flex items-center justify-center z-10">
-              <Loader2 className="animate-spin text-primary" size={24} />
+        <div className="bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden">
+          {isFetching ? (
+            <div className="p-10 flex items-center justify-center">
+              <Loader2 className="animate-spin text-green-500" size={24} />
+              <p className="ml-2 text-gray-600">Đang tải dữ liệu...</p>
             </div>
+          ) : (
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                    ID
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                    Tên Nhân Sự
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                    Email/Phone
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                    Trạng thái
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                    Ngày tạo
+                  </th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">
+                    Hành động
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredItems.length ? (
+                  filteredItems.map((item) => (
+                    <tr key={item.id} className="hover:bg-green-50 transition duration-150">
+                      <td className="px-6 py-4 text-sm font-medium text-gray-600">{item.id}</td>
+                      <td className="px-6 py-4 font-semibold text-gray-800">{item.name}</td>
+                      <td className="px-6 py-4 text-sm text-gray-800 break-all">{item.email}</td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`px-2.5 py-1.5 rounded-full text-xs font-medium ${
+                            item.status === "Active"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-gray-100 text-gray-700"
+                          }`}
+                        >
+                          {item.status === "Active" ? "Hoạt động" : "Ngưng hoạt động"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-800">{item.createdAt}</td>
+                      <td className="px-6 py-4 text-center">
+                        <button
+                          onClick={() => handleEdit(item)}
+                          className="p-2 rounded-lg text-gray-500 hover:bg-green-100 hover:text-green-700 transition"
+                          title="Sửa"
+                        >
+                          <Pencil size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item)}
+                          className="p-2 rounded-lg text-red-600 hover:bg-red-100 transition"
+                          title="Xóa"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="text-center p-10 italic text-gray-500">
+                      Không tìm thấy nhân sự nào phù hợp.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           )}
-          <ItemTable items={items} isLoading={isFetching} onEdit={handleEdit} onDelete={handleDelete} />
         </div>
 
         {/* Pagination */}
-        {totalItems > 0 && (
-          <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
+        {totalItems > 0 && totalPages > 1 && (
+          <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 mt-6">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -399,9 +483,10 @@ export default function Home() {
         {/* Empty State */}
         {totalItems === 0 && !isLoading && (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">No managers found{searchQuery && ` for "${searchQuery}"`}</p>
+            <p className="text-gray-500">Không tìm thấy nhân sự nào phù hợp{searchQuery && ` cho "${searchQuery}"`}</p>
           </div>
         )}
+
       </div>
 
       {/* Delete Modal */}
@@ -413,5 +498,5 @@ export default function Home() {
         onCancel={() => setIsDeleteConfirmOpen(false)}
       />
     </main>
-  )
+  );
 }

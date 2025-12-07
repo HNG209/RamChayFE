@@ -9,6 +9,7 @@ import {
   Users,
   ShieldCheck,
   ShoppingBag,
+  ShieldCheck,
   LogOut,
   ChevronRight, // Thêm icon này để trang trí
 } from "lucide-react";
