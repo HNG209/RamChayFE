@@ -1,5 +1,11 @@
 // types/backend.d.ts
 
+export interface ApiResponse<T> {
+  code: number;
+  message: string;
+  result?: T;
+}
+
 // Dữ liệu gửi đi khi Login
 export interface LoginRequest {
   username: string;
@@ -36,12 +42,14 @@ export interface RegisterResponse {
 }
 
 export interface MyProfile {
+  // Thông tin chung
   id: number;
   username: string;
+  fullName: string;
   roles: string[];
   permissions: string[];
 
-  fullName: string;
+  // Nếu là customer, có thêm thông tin liên quan
   phones: string[];
   addresses: string[];
 }
@@ -93,4 +101,46 @@ export interface ProductCreationResponse {
   category?: CategoryCreationResponse;
   mediaList?: MediaUploadResponse[];
 }
+// Cart
+export interface CartProduct {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  quantity: number;
+  stock: number; // Số lượng tồn kho
+}
 
+export interface CartItemCreationRequest {
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+  productId: number;
+}
+
+export interface AddCartItemResponse {
+  cartId?: number;
+}
+
+export interface GetItemsResponse {
+  id: number;
+  productName: string;
+  quantity: number;
+  productId: number;
+  unitPrice: number;
+  indexImage: string;
+}
+
+export interface GetItemsResponseWithSelected extends GetItemsResponse {
+  selected: boolean;
+}
+
+export interface Page<T> {
+  content: T[];
+  page: {
+    size: number;
+    number: number;
+    totalElements: number;
+    totalPages: number;
+  };
+}
