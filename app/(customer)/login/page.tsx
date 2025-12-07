@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 // Import kiểu dữ liệu đã định nghĩa để tái sử dụng
-import { LoginResponse, LoginRequest } from "@/types/backend";
+import { LoginResponse, LoginRequest, ApiResponse } from "@/types/backend";
 import Link from "next/link";
 import { useLoginMutation } from "@/redux/services/authApi";
 
@@ -49,7 +49,8 @@ export default function LoginPage() {
 
         router.push("/");
       } catch (err: any) {
-        setServerError(err.message || "Lỗi hệ thống");
+        const error = err?.data as ApiResponse<null>;
+        setServerError(error.message || "Lỗi hệ thống");
       } finally {
         setSubmitting(false); // Báo cho Formik biết đã xử lý xong
       }
@@ -78,7 +79,7 @@ export default function LoginPage() {
             </label>
             <input
               id="username"
-              name="username" // Quan trọng: phải trùng với initialValues
+              // name="username" // Quan trọng: phải trùng với initialValues
               type="text"
               // Dùng spread syntax của Formik để tự bind value và onChange
               {...formik.getFieldProps("username")}
@@ -105,7 +106,7 @@ export default function LoginPage() {
             </label>
             <input
               id="password"
-              name="password"
+              // name="password"
               type="password"
               {...formik.getFieldProps("password")}
               className={`w-full px-4 py-3 rounded-xl bg-cream-dark border outline-none transition-all

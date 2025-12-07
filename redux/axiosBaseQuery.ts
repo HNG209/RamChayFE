@@ -5,7 +5,6 @@ import type { AxiosRequestConfig, AxiosError } from "axios";
 let isRefreshing = false;
 let failedQueue: any[] = [];
 
-
 const processQueue = (error: any, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
@@ -54,6 +53,7 @@ api.interceptors.response.use(
     return response;
   },
   (error: AxiosError) => {
+    // console.log("123", error.response?.data);
     return Promise.reject(error);
   }
 );

@@ -1,5 +1,11 @@
 // types/backend.d.ts
 
+export interface ApiResponse<T> {
+  code: number;
+  message: string;
+  result?: T;
+}
+
 // Dữ liệu gửi đi khi Login
 export interface LoginRequest {
   username: string;
@@ -36,12 +42,14 @@ export interface RegisterResponse {
 }
 
 export interface MyProfile {
+  // Thông tin chung
   id: number;
   username: string;
+  fullName: string;
   roles: string[];
   permissions: string[];
 
-  fullName: string;
+  // Nếu là customer, có thêm thông tin liên quan
   phones: string[];
   addresses: string[];
 }

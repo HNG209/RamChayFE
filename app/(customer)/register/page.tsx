@@ -5,9 +5,10 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { RegisterRequest } from "@/types/backend"; // Import kiểu dữ liệu
+import { ApiResponse, RegisterRequest } from "@/types/backend"; // Import kiểu dữ liệu
 import Link from "next/link"; // Dùng Link của Next.js để chuyển trang mượt hơn
 import { useRegisterMutation } from "@/redux/services/authApi";
+import { Api } from "@reduxjs/toolkit/query";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -59,7 +60,8 @@ export default function RegisterPage() {
           router.push("/login");
         }, 1500);
       } catch (err: any) {
-        setServerError(err.message || "Đăng ký thất bại. Vui lòng thử lại.");
+        const error = err?.data as ApiResponse<null>;
+        setServerError(error.message || "Đăng ký thất bại. Vui lòng thử lại.");
         setSubmitting(false); // Cho phép bấm lại nút nếu lỗi
       }
     },
@@ -77,7 +79,7 @@ export default function RegisterPage() {
 
         {/* Thông báo Lỗi */}
         {serverError && (
-          <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded border border-red-200">
+          <div className="mb-4 p-3 text-center bg-red-50 text-red-600 text-sm rounded border border-red-200">
             {serverError}
           </div>
         )}
