@@ -97,3 +97,19 @@ export interface Page<T> {
     totalPages: number;
   };
 }
+// Category entity
+export interface Category {
+  categoryName: string;
+  description: string;
+}
+
+// Product entity (matches backend structure)
+export interface Product {
+  id?: number;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  category: Category;
+  images?: string[];
+}
