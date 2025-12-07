@@ -144,7 +144,7 @@ export const axiosBaseQuery =
       return {
         error: {
           status: err.response?.status,
-          data: err.response?.data || err.message,
+          data: (err.response?.data as ApiResponse<unknown>) || err.message,
         },
       };
     }

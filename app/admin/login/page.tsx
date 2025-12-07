@@ -23,8 +23,15 @@ export default function AdminLoginPage() {
         await login(values).unwrap();
         router.push("/admin");
       } catch (err: any) {
-        const error = err?.data as ApiResponse<null>;
-        setErrorMsg(error.message || "Lỗi hệ thống");
+        // err.data là dữ liệu trả về từ axiosBaseQuery
+        const apiError = err?.data as ApiResponse<null> | undefined;
+        if (apiError && typeof apiError.message === "string") {
+          setErrorMsg(apiError.message);
+        } else if (err instanceof Error) {
+          setErrorMsg(err.message);
+        } else {
+          setErrorMsg("Lỗi hệ thống");
+        }
       }
     },
   });

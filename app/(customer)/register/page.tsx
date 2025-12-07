@@ -60,9 +60,17 @@ export default function RegisterPage() {
           router.push("/login");
         }, 1500);
       } catch (err: any) {
-        const error = err?.data as ApiResponse<null>;
-        setServerError(error.message || "Đăng ký thất bại. Vui lòng thử lại.");
-        setSubmitting(false); // Cho phép bấm lại nút nếu lỗi
+        // err.data là dữ liệu trả về từ axiosBaseQuery
+        const apiError = err?.data as ApiResponse<null> | undefined;
+        if (apiError && typeof apiError.message === "string") {
+          setServerError(apiError.message);
+        } else if (err instanceof Error) {
+          setServerError(err.message);
+        } else {
+          setServerError("Lỗi hệ thống");
+        }
+      } finally {
+        setSubmitting(false); // Báo cho Formik biết đã xử lý xong
       }
     },
   });

@@ -49,8 +49,15 @@ export default function LoginPage() {
 
         router.push("/");
       } catch (err: any) {
-        const error = err?.data as ApiResponse<null>;
-        setServerError(error.message || "Lỗi hệ thống");
+        // err.data là dữ liệu trả về từ axiosBaseQuery
+        const apiError = err?.data as ApiResponse<null> | undefined;
+        if (apiError && typeof apiError.message === "string") {
+          setServerError(apiError.message);
+        } else if (err instanceof Error) {
+          setServerError(err.message);
+        } else {
+          setServerError("Lỗi hệ thống");
+        }
       } finally {
         setSubmitting(false); // Báo cho Formik biết đã xử lý xong
       }
