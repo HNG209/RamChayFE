@@ -270,16 +270,16 @@ export default function RoleManagingPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-1/12">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-2/12">
                     ID
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-3/12">
                     Tên Role
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-7/12">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-5/12">
                     Quyền hạn (Permissions)
                   </th>
-                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider w-1/12">
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider w-5/12">
                     Hành động
                   </th>
                 </tr>
@@ -317,20 +317,22 @@ export default function RoleManagingPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <button
-                            onClick={() => handleEdit(role.id)}
-                            className="p-2 rounded-lg text-gray-500 hover:bg-green-100 hover:text-green-700 transition"
-                            title="Sửa Role"
-                          >
-                            <Pencil size={18} />
-                          </button>
-                          <button
-                            onClick={() => openDeleteModal(role)}
-                            className="p-2 rounded-lg text-red-600 hover:bg-red-100 transition"
-                            title="Xóa"
-                          >
-                            <Trash2 size={18} />
-                          </button>
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => handleEdit(role.id)}
+                              className="p-2 rounded-lg text-gray-500 hover:bg-green-100 hover:text-green-700 transition"
+                              title="Sửa Role"
+                            >
+                              <Pencil size={18} />
+                            </button>
+                            <button
+                              onClick={() => openDeleteModal(role)}
+                              className="p-2 rounded-lg text-red-600 hover:bg-red-100 transition"
+                              title="Xóa"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );

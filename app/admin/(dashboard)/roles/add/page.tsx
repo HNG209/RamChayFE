@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useGetAllPermissonQuery } from "@/redux/services/permissionApi";
 import { ChevronLeft, Plus, X, ListChecks } from "lucide-react";
 import { useCreateRoleMutation } from "@/redux/services/roleApi";
-// --- START: Định nghĩa Types và Tags ---
+
+
 type Permission = {
     id: number;
     name: string;
@@ -44,10 +45,13 @@ const PermissionSelectionDropdown: React.FC<{
     onSelectPermission: (p: Permission) => void;
 }> = ({ allPermissions, selectedPermissions, onSelectPermission }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [search, setSearch] = useState("");
 
-    const filteredPermissions = allPermissions.filter(
-        (p) => !selectedPermissions.some((sp) => sp.id === p.id)
-    );
+    const filteredPermissions = allPermissions
+        .filter((p) => !selectedPermissions.some((sp) => sp.id === p.id))
+        .filter((p) =>
+            formatPermissionForDisplay(p.name).toLowerCase().includes(search.toLowerCase())
+        );
 
     return (
         <div className="relative inline-block text-left">
@@ -63,33 +67,40 @@ const PermissionSelectionDropdown: React.FC<{
             {isOpen && (
                 <div
                     className="absolute z-20 mt-2 w-64 origin-top-right rounded-md shadow-2xl bg-white ring-1 ring-black ring-opacity-5 max-h-60 overflow-y-auto"
-                    onBlur={() => setIsOpen(false)}
                     tabIndex={-1}
                 >
-                    {filteredPermissions.length > 0 ? (
-                        <div className="py-1">
-                            <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase">
-                                Chọn quyền để thêm
-                            </div>
-                            {filteredPermissions.map((p) => (
+                    <div className="py-1">
+                        <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase">
+                            Chọn quyền để thêm
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Tìm quyền..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="w-full px-3 py-2 mb-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                        />
+                        {filteredPermissions.length > 0 ? (
+                            filteredPermissions.map((p) => (
                                 <button
                                     key={p.id}
                                     type="button"
                                     onClick={() => {
                                         onSelectPermission(p);
                                         setIsOpen(false);
+                                        setSearch("");
                                     }}
                                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition"
                                 >
                                     {formatPermissionForDisplay(p.name)}
                                 </button>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="py-3 px-4 text-sm text-gray-500 italic">
-                            Tất cả quyền đã được thêm.
-                        </div>
-                    )}
+                            ))
+                        ) : (
+                            <div className="py-3 px-4 text-sm text-gray-500 italic">
+                                Không tìm thấy quyền phù hợp.
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
         </div>

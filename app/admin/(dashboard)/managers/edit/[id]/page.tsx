@@ -1,11 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
-import { ChevronLeft, Save, Eye, EyeOff, Loader2, X, Plus } from "lucide-react";
+import { ChevronLeft, Save, Eye, EyeOff, Loader2, X, ListChecks, Plus } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
-import {
-  useGetManagerByIdQuery,
-  useUpdateManagerMutation,
-} from "@/redux/services/managerApi";
+import { useGetManagerByIdQuery, useUpdateManagerMutation } from "@/redux/services/managerApi";
 import { useGetRoleQuery } from "@/redux/services/roleApi";
 
 // Định nghĩa kiểu dữ liệu cho Role
@@ -37,6 +34,68 @@ const RoleTag: React.FC<{ role: Role; onRemove: (id: number) => void }> = ({
   </span>
 );
 
+const RoleSelectionDropdown: React.FC<{
+  allRoles: Role[];
+  selectedRoles: Role[];
+  onSelectRole: (r: Role) => void;
+}> = ({ allRoles, selectedRoles, onSelectRole }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const filteredRoles = allRoles
+    .filter((r) => !selectedRoles.some((sr) => sr.id === r.id))
+    .filter((r) => r.name.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div className="relative inline-block text-left">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition shadow-md shadow-green-600/30 text-sm"
+      >
+        <Plus size={16} />
+        Thêm Quyền
+      </button>
+      {isOpen && (
+        <div className="absolute z-20 mt-2 w-64 origin-top-right rounded-md shadow-2xl bg-white ring-1 ring-black ring-opacity-5 max-h-60 overflow-y-auto">
+          <div className="py-1">
+            <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase">
+              Chọn quyền để thêm
+            </div>
+            <input
+              type="text"
+              placeholder="Tìm quyền..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full px-3 py-2 mb-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+            />
+            {filteredRoles.length > 0 ? (
+              filteredRoles.map((r) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  onClick={() => {
+                    onSelectRole(r);
+                    setIsOpen(false);
+                    setSearch("");
+                  }}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition"
+                >
+                  {r.name}
+                </button>
+              ))
+            ) : (
+              <div className="py-3 px-4 text-sm text-gray-500 italic">
+                Không tìm thấy quyền phù hợp.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function EditManagerPage() {
   const router = useRouter();
   const params = useParams();
@@ -46,7 +105,6 @@ export default function EditManagerPage() {
   const managerData = data as ManagerData | undefined;
 
   const { data: roles, isLoading: isRolesLoading, isError: isRolesError } = useGetRoleQuery();
-
   const [updateManager, { isLoading: isUpdating }] = useUpdateManagerMutation();
 
   const [formData, setFormData] = useState({
@@ -56,12 +114,12 @@ export default function EditManagerPage() {
     selectedRoleIds: [] as number[],
   });
 
+  const [selectedRoles, setSelectedRoles] = useState<Role[]>([]);
   const [changePassword, setChangePassword] = useState(false);
   const [passwordData, setPasswordData] = useState({
     newPassword: "",
     confirmPassword: "",
   });
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -75,6 +133,7 @@ export default function EditManagerPage() {
         status: managerData.active ? "Active" : "Inactive",
         selectedRoleIds: initialRoleIds,
       });
+      setSelectedRoles(managerData.roles ?? []);
     }
   }, [managerData]);
 
@@ -94,34 +153,27 @@ export default function EditManagerPage() {
     setPasswordData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddRole = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setErrorMessage(null);
-    const newRoleId = Number(e.target.value);
-    if (newRoleId && !formData.selectedRoleIds.includes(newRoleId)) {
+  const handleAddRole = (role: Role) => {
+    if (!formData.selectedRoleIds.includes(role.id)) {
       setFormData((prev) => ({
         ...prev,
-        selectedRoleIds: [...prev.selectedRoleIds, newRoleId],
+        selectedRoleIds: [...prev.selectedRoleIds, role.id],
       }));
+      setSelectedRoles((prev) => [...prev, role]);
     }
-    e.target.value = '';
   };
 
   const handleRemoveRole = (roleIdToRemove: number) => {
-    setErrorMessage(null);
     setFormData((prev) => ({
       ...prev,
-      selectedRoleIds: prev.selectedRoleIds.filter(
-        (id) => id !== roleIdToRemove
-      ),
+      selectedRoleIds: prev.selectedRoleIds.filter((id) => id !== roleIdToRemove),
     }));
+    setSelectedRoles((prev) => prev.filter((r) => r.id !== roleIdToRemove));
   };
 
   const availableRoles = (roles as Role[] | undefined)?.filter(
     (role: Role) => !formData.selectedRoleIds.includes(role.id)
-  );
-  const selectedRoles = (roles as Role[] | undefined)?.filter(
-    (role: Role) => formData.selectedRoleIds.includes(role.id)
-  );
+  ) ?? [];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -248,30 +300,19 @@ export default function EditManagerPage() {
             <div className="mb-8 p-6 border border-gray-300 rounded-xl bg-gray-50">
               <div className="flex justify-between items-center mb-4">
                 <label className="flex items-center gap-2 text-sm font-bold text-gray-800">
-                  <Plus size={20} className="text-green-600" /> Quyền (Roles)
+                  <ListChecks size={20} className="text-green-600" /> Quyền (Roles)
                 </label>
-                <select
-                  name="roleSelector"
-                  onChange={handleAddRole}
-                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition shadow-md shadow-green-600/30 text-sm disabled:bg-green-400"
-                  disabled={isRolesLoading || isUpdating || !availableRoles?.length}
-                  value={''}
-                >
-                  <option value="" disabled>
-                    Thêm Quyền
-                  </option>
-                  {availableRoles?.map((role: Role) => (
-                    <option key={role.id} value={role.id}>
-                      {role.name}
-                    </option>
-                  ))}
-                </select>
+                <RoleSelectionDropdown
+                  allRoles={roles as Role[]}
+                  selectedRoles={selectedRoles}
+                  onSelectRole={handleAddRole}
+                />
               </div>
               <div
-                className={`min-h-[48px] p-3 rounded-lg border ${selectedRoles && selectedRoles.length > 0 ? "border-gray-200" : "border-dashed border-gray-400"
+                className={`min-h-[100px] p-3 rounded-lg border ${selectedRoles.length > 0 ? "border-gray-200" : "border-dashed border-gray-400"
                   } bg-white flex flex-wrap gap-2 content-start overflow-y-auto`}
               >
-                {selectedRoles && selectedRoles.length > 0 ? (
+                {selectedRoles.length > 0 ? (
                   selectedRoles.map((role) => (
                     <RoleTag key={role.id} role={role} onRemove={handleRemoveRole} />
                   ))
