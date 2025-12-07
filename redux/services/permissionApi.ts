@@ -10,11 +10,20 @@ export const managerApi = baseApi.injectEndpoints({
             providesTags: ["Permisson"],
         }),
 
+        createPermisison: builder.mutation<any, any>({
+            query: (body) => ({
+                url: `/permissions`,
+                method: "POST",
+                data: body,
+            }),
+            invalidatesTags: ["Permisson"],
+        }),
     }),
     overrideExisting: false,
 });
 
 export const {
 
-    useGetAllPermissonQuery
+    useGetAllPermissonQuery,
+    useCreatePermisisonMutation
 } = managerApi;

@@ -189,10 +189,13 @@ export default function RoleManagingPage() {
   const handleEdit = (id: number) => router.push(`roles/edit/${id}`);
 
   const handleAdd = () => router.push(`roles/add`);
+
   const openDeleteModal = (role: Role) => {
     setSelectedRole(role);
     setIsDeleteModalOpen(true);
   };
+
+  const handleAddPermision = () => router.push(`roles/addPermission`)
 
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
@@ -237,6 +240,13 @@ export default function RoleManagingPage() {
               Tạo và chỉnh sửa quyền hạn cho các vai trò trong hệ thống.
             </p>
           </div>
+          <button
+            onClick={handleAddPermision}
+            className="flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-md shadow-green-600/30 font-medium transition"
+          >
+            <Plus size={20} />
+            Thêm Permision Mới
+          </button>
           <button
             onClick={handleAdd}
             className="flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-md shadow-green-600/30 font-medium transition"
