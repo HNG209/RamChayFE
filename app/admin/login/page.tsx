@@ -1,17 +1,18 @@
 // app/admin/login/page.tsx
 "use client";
 
-import { useLoginMutation } from "@/redux/services/authApi";
+import { useAdminLoginMutation } from "@/redux/services/authApi";
 import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 // Import thêm icon để trang trí
 import { User, Lock, AlertCircle, Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { ApiResponse } from "@/types/backend";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [login, { isLoading }] = useLoginMutation();
+  const [login, { isLoading }] = useAdminLoginMutation();
   const [errorMsg, setErrorMsg] = useState("");
 
   const formik = useFormik({
@@ -19,22 +20,18 @@ export default function AdminLoginPage() {
     onSubmit: async (values) => {
       setErrorMsg("");
       try {
-        const data = await login(values).unwrap();
+        await login(values).unwrap();
         router.push("/admin");
-
-        // Kiểm tra quyền Admin (Logic của bạn)
-        // const isAdmin = data.roles?.some((r: string) =>
-        //   ["ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"].includes(r)
-        // );
-
-        // if (isAdmin) {
-        //   router.push("/admin");
-        // } else {
-        //   setErrorMsg("Tài khoản này không có quyền truy cập quản trị!");
-        //   // Xử lý logout nếu cần
-        // }
       } catch (err: any) {
-        setErrorMsg("Tài khoản hoặc mật khẩu không chính xác.");
+        // err.data là dữ liệu trả về từ axiosBaseQuery
+        const apiError = err?.data as ApiResponse<null> | undefined;
+        if (apiError && typeof apiError.message === "string") {
+          setErrorMsg(apiError.message);
+        } else if (err instanceof Error) {
+          setErrorMsg(err.message);
+        } else {
+          setErrorMsg("Lỗi hệ thống");
+        }
       }
     },
   });
@@ -138,9 +135,7 @@ export default function AdminLoginPage() {
 
         {/* Footer Text */}
         <div className="mt-8 text-center">
-          <p className="text-xs text-gray-400">
-            © 2024 RamChay System. Bảo mật tuyệt đối.
-          </p>
+          <p className="text-xs text-gray-400">© 2024 RamChay System.</p>
         </div>
       </div>
     </div>

@@ -17,7 +17,16 @@ export const authApi = baseApi.injectEndpoints({
         method: "POST",
         data: credentials,
       }),
-      invalidatesTags: ["User"], // refresh lại cache, tự động gọi lại getMyProfile
+      invalidatesTags: ["User", "Cart"], // refresh lại cache, tự động gọi lại getMyProfile
+    }),
+
+    adminLogin: builder.mutation<LoginResponse, LoginRequest>({
+      query: (credentials: LoginRequest) => ({
+        url: "/auth/admin-login",
+        method: "POST",
+        data: credentials,
+      }),
+      invalidatesTags: ["User"], // admin không có Cart
     }),
 
     logout: builder.mutation<void, void>({
@@ -25,6 +34,7 @@ export const authApi = baseApi.injectEndpoints({
         url: "/auth/logout",
         method: "POST",
       }),
+      invalidatesTags: ["Cart"],
     }),
 
     register: builder.mutation<RegisterResponse, RegisterRequest>({
@@ -50,6 +60,7 @@ export const authApi = baseApi.injectEndpoints({
 // Xuất Hooks riêng từ file này
 export const {
   useLoginMutation,
+  useAdminLoginMutation,
   useRegisterMutation,
   useGetMyProfileQuery,
   useLogoutMutation,
