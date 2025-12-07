@@ -39,6 +39,9 @@ export default function Header() {
 
   // Lấy user từ Redux (ép kiểu MyProfile để gợi ý code)
   const user = useSelector((state: RootState) => state.auth.user);
+  const cartItemsCount = useSelector((state: RootState) =>
+    state.cart.items.reduce((total, item) => total + item.quantity, 0)
+  );
 
   const isActive = (path: string) => pathname === path;
 
@@ -78,11 +81,10 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-sm font-medium transition-colors hover:text-lime-primary ${
-                  isActive(item.href)
+                className={`text-sm font-medium transition-colors hover:text-lime-primary ${isActive(item.href)
                     ? "text-lime-primary font-bold"
                     : "text-gray-600"
-                }`}
+                  }`}
               >
                 {item.label}
               </Link>
@@ -95,11 +97,14 @@ export default function Header() {
             <Link
               href="/cart"
               className="relative p-2 hover:bg-lime-accent/20 rounded-full transition-colors"
+              data-cart-icon
             >
               <ShoppingCart className="w-5 h-5 text-gray-700" />
-              <span className="absolute top-0 right-0 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
-                2
-              </span>
+              {cartItemsCount > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
+                  {cartItemsCount}
+                </span>
+              )}
             </Link>
 
             {/* --- USER SECTION (DESKTOP) --- */}
@@ -204,9 +209,8 @@ export default function Header() {
       )}
 
       <div
-        className={`fixed top-0 right-0 h-full w-[280px] bg-white shadow-2xl z-60 transform transition-transform duration-300 ease-in-out ${
-          isDrawerOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-0 right-0 h-full w-[280px] bg-white shadow-2xl z-60 transform transition-transform duration-300 ease-in-out ${isDrawerOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="flex flex-col h-full">
           {/* Drawer Header: Hiển thị User nếu đã login */}
@@ -245,11 +249,10 @@ export default function Header() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className={`block px-4 py-3 rounded-lg ${
-                      isActive(item.href)
+                    className={`block px-4 py-3 rounded-lg ${isActive(item.href)
                         ? "bg-lime-accent/30 text-lime-primary font-bold"
                         : "text-gray-700 hover:bg-gray-50"
-                    }`}
+                      }`}
                     onClick={() => setIsDrawerOpen(false)}
                   >
                     {item.label}
