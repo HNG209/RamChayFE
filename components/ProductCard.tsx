@@ -1,12 +1,15 @@
 "use client"
+import { useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { ShoppingCart, ChevronRight } from "lucide-react"
+import { useDispatch } from "react-redux"
 import type { Product } from "@/types/backend"
+import { addToCart } from "@/redux/slices/cartSlice"
 
 export default function ProductCard({ product }: { product: Product }) {
-    console.log("ProductCard received product:", product)
-    console.log("Product ID:", product?.id)
+    const dispatch = useDispatch()
+    const buttonRef = useRef<HTMLButtonElement>(null)
 
     if (!product) {
         return (
@@ -18,6 +21,53 @@ export default function ProductCard({ product }: { product: Product }) {
 
     const categoryName = product.category?.categoryName || "Uncategorized"
     const firstImage = product.images?.[0]
+
+    const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault()
+
+        // Add to cart
+        dispatch(addToCart(product))
+
+        // Get button position
+        const button = buttonRef.current
+        if (!button) return
+
+        const buttonRect = button.getBoundingClientRect()
+
+        // Create flying circle animation
+        const flyingCircle = document.createElement('div')
+        flyingCircle.className = 'flying-cart-item'
+        flyingCircle.style.left = `${buttonRect.left + buttonRect.width / 2}px`
+        flyingCircle.style.top = `${buttonRect.top + buttonRect.height / 2}px`
+
+        // Add image to circle if available
+        if (firstImage) {
+            flyingCircle.style.backgroundImage = `url(${firstImage})`
+            flyingCircle.style.backgroundSize = 'cover'
+            flyingCircle.style.backgroundPosition = 'center'
+        }
+
+        document.body.appendChild(flyingCircle)
+
+        // Get cart icon position (top right of header)
+        const cartIcon = document.querySelector('[data-cart-icon]')
+        const cartRect = cartIcon?.getBoundingClientRect()
+
+        if (cartRect) {
+            // Trigger animation
+            requestAnimationFrame(() => {
+                flyingCircle.style.left = `${cartRect.left + cartRect.width / 2}px`
+                flyingCircle.style.top = `${cartRect.top + cartRect.height / 2}px`
+                flyingCircle.style.transform = 'scale(0.2)'
+                flyingCircle.style.opacity = '0'
+            })
+        }
+
+        // Remove element after animation
+        setTimeout(() => {
+            flyingCircle.remove()
+        }, 800)
+    }
 
     return (
         <div className="group h-full flex flex-col overflow-hidden rounded-xl bg-card border border-border shadow-sm hover:shadow-lg transition-all duration-300 ease-out hover:border-chocolate/20">
@@ -75,7 +125,11 @@ export default function ProductCard({ product }: { product: Product }) {
                         <ChevronRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
                     </Link>
 
-                    <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-chocolate text-white rounded-lg text-sm font-semibold hover:bg-chocolate/90 active:scale-95 transition-all">
+                    <button
+                        ref={buttonRef}
+                        onClick={handleAddToCart}
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-chocolate text-white rounded-lg text-sm font-semibold hover:bg-chocolate/90 active:scale-95 transition-all"
+                    >
                         <ShoppingCart className="w-4 h-4" />
                         Thêm
                     </button>
