@@ -1,56 +1,72 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit"
-import type { Product } from "@/types/backend"
 
-export interface CartItem extends Product {
-    quantity: number
-}
+import {
+  GetItemsResponse,
+  GetItemsResponseWithSelected,
+  Page,
+} from "@/types/backend";
+import { cartApi } from "../services/cartApi";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface CartState {
-    items: CartItem[]
-    total: number
+  items: GetItemsResponseWithSelected[];
+  currentPage: number;
 }
 
 const initialState: CartState = {
-    items: [],
-    total: 0,
-}
+  items: [],
+  currentPage: 0,
+};
 
 const cartSlice = createSlice({
-    name: "cart",
-    initialState,
-    reducers: {
-        addToCart: (state, action: PayloadAction<Product>) => {
-            const existingItem = state.items.find(item => item.id === action.payload.id)
-
-            if (existingItem) {
-                existingItem.quantity += 1
-            } else {
-                state.items.push({ ...action.payload, quantity: 1 })
-            }
-
-            // Recalculate total
-            state.total = state.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-        },
-
-        removeFromCart: (state, action: PayloadAction<number>) => {
-            state.items = state.items.filter(item => item.id !== action.payload)
-            state.total = state.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-        },
-
-        updateQuantity: (state, action: PayloadAction<{ id: number; quantity: number }>) => {
-            const item = state.items.find(item => item.id === action.payload.id)
-            if (item) {
-                item.quantity = action.payload.quantity
-                state.total = state.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-            }
-        },
-
-        clearCart: (state) => {
-            state.items = []
-            state.total = 0
-        },
+  name: "cart",
+  initialState,
+  reducers: {
+    // Toggle các item được chọn
+    toggleItemSelected: (state, action: PayloadAction<number[]>) => {
+      const itemIds = action.payload;
+      state.items.forEach((item) => {
+        if (itemIds.includes(item.id)) {
+          item.selected = !item.selected;
+        }
+      });
     },
-})
+  },
+  extraReducers: (builder) => {
+    // Có thể thêm các matcher từ cartApi ở đây nếu cần
+    builder.addMatcher(
+      cartApi.endpoints.getCartItems.matchFulfilled,
+      (state, action: PayloadAction<Page<GetItemsResponse>>) => {
+        // push các item vào state.items khi qua trang mới
+        if (
+          state.currentPage != 0 &&
+          action.payload.page.number <= state.currentPage
+        ) {
+          return; // Nếu trang hiện tại >= trang đã lưu, không làm gì
+        }
+        state.items.push(
+          ...action.payload.content.map((item) => ({
+            ...item,
+            selected: false,
+          }))
+        );
+        state.currentPage = action.payload.page.number;
+      }
+    );
 
-export const { addToCart, removeFromCart, updateQuantity, clearCart } = cartSlice.actions
-export default cartSlice.reducer
+    builder.addMatcher(
+      cartApi.endpoints.updateCartItem.matchFulfilled,
+      (state, action) => {
+        const { itemId, quantity } = action.meta.arg.originalArgs;
+
+        // update state
+        const item = state.items.find((x) => x.id === itemId);
+        if (item) {
+          item.quantity = quantity;
+        }
+      }
+    );
+  },
+});
+
+export const { toggleItemSelected } = cartSlice.actions;
+export default cartSlice.reducer;
