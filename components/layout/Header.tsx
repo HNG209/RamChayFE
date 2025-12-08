@@ -12,6 +12,7 @@ import {
   Settings,
   FileText,
   ChevronDown,
+  Search,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
@@ -36,6 +37,8 @@ export default function Header() {
   // State
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // Menu dropdown desktop
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [logout] = useLogoutMutation();
 
   // Lấy user từ Redux (ép kiểu MyProfile để gợi ý code)
@@ -59,6 +62,15 @@ export default function Header() {
 
   const isActive = (path: string) => pathname === path;
 
+  // Xử lý search
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
+      setSearchTerm("");
+    }
+  };
+
   // Xử lý đăng xuất
   const handleLogout = async () => {
     try {
@@ -74,8 +86,29 @@ export default function Header() {
   return (
     <>
       {/* --- MAIN HEADER --- */}
-      <header className="sticky top-0 z-40 w-full bg-cream-light/80 backdrop-blur-md border-b border-lime-accent">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-40 w-full backdrop-blur-md border-b border-white/20 overflow-hidden">
+        {/* Animated Gradient Background */}
+        <div className="absolute inset-0 bg-linear-to-r from-emerald-100 via-green-100 to-lime-100 animate-gradient-shift"></div>
+
+        {/* Decorative Elements */}
+        <div className="absolute top-0 left-0 w-32 h-32 bg-green-300/30 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-0 w-40 h-40 bg-lime-300/30 rounded-full blur-3xl"></div>
+
+        {/* Grass/Plant Stickers at Bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-8 pointer-events-none flex items-end justify-between px-4 opacity-40">
+          <span className="text-2xl">🌿</span>
+          <span className="text-xl">🌱</span>
+          <span className="text-2xl">🍃</span>
+          <span className="text-xl">🌿</span>
+          <span className="text-2xl">🌱</span>
+          <span className="text-xl">🍃</span>
+          <span className="text-2xl">🌿</span>
+          <span className="text-xl">🌱</span>
+          <span className="text-2xl">🍃</span>
+          <span className="text-xl">🌿</span>
+        </div>
+
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between relative z-10">
           {/* 1. LOGO */}
           <Link href="/" className="flex items-center">
             <Image
@@ -104,6 +137,33 @@ export default function Header() {
               </Link>
             ))}
           </nav>
+
+          {/* 2.5 SEARCH BAR - Desktop */}
+          <form onSubmit={handleSearch} className="hidden lg:flex items-center flex-1 max-w-md mx-8">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+              <input
+                type="text"
+                placeholder="Tìm kiếm sản phẩm..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setIsSearchFocused(false)}
+                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-lime-primary/50 focus:border-lime-primary relative z-10 bg-white"
+              />
+              {/* Sparkle Effect */}
+              {isSearchFocused && (
+                <div className="absolute inset-0 -z-10 pointer-events-none">
+                  <span className="absolute -top-2 left-8 text-xl animate-sparkle-1">🥬</span>
+                  <span className="absolute -top-3 left-20 text-lg animate-sparkle-2">🥕</span>
+                  <span className="absolute -bottom-2 left-16 text-xl animate-sparkle-3">🥦</span>
+                  <span className="absolute -top-2 right-12 text-lg animate-sparkle-4">🍄</span>
+                  <span className="absolute -bottom-3 right-8 text-xl animate-sparkle-5">🌽</span>
+                  <span className="absolute -top-1 right-24 text-lg animate-sparkle-1">🫑</span>
+                </div>
+              )}
+            </div>
+          </form>
 
           {/* 3. ACTIONS */}
           <div className="flex items-center gap-4">
