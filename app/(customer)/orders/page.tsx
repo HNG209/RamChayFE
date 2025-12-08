@@ -2,15 +2,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Package, Loader2, ShoppingBag, Clock, CheckCircle, XCircle, Truck } from "lucide-react";
 import { useGetMyOrdersQuery } from "@/redux/services/orderApi";
 import { useInView } from "react-intersection-observer";
 import { OrderListItem } from "@/types/backend";
+import type { RootState } from "@/redux/store";
 
 export default function MyOrdersPage() {
   const router = useRouter();
+  const user = useSelector((state: RootState) => state.auth.user);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [orders, setOrders] = useState<OrderListItem[]>([]);
@@ -22,6 +25,14 @@ export default function MyOrdersPage() {
     threshold: 0,
     rootMargin: "100px",
   });
+
+  // Reset orders when user changes (fixes cache issue between different users)
+  useEffect(() => {
+    if (!user?.id) return; // Skip if no user
+    setOrders([]);
+    setPage(0);
+    setHasMore(true);
+  }, [user?.id]);
 
   // Merge paginated data
   useEffect(() => {

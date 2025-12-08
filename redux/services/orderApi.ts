@@ -17,7 +17,7 @@ export const orderApi = baseApi.injectEndpoints({
         method: "POST",
         data: data,
       }),
-      invalidatesTags: ["Cart"], // Invalidate cart after order creation
+      invalidatesTags: ["Cart", "Order"], // Invalidate cart and order list
     }),
 
     getOrderById: builder.query<OrderDetail, number>({
@@ -60,8 +60,40 @@ export const orderApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Order"],
     }),
+
+    trackOrder: builder.query<OrderDetail, { orderId: number; phone: string }>({
+      query: ({ orderId, phone }) => ({
+        url: `/orders/track/${orderId}`,
+        method: "GET",
+        params: { phone },
+      }),
+      transformResponse: (response: OrderDetailBackendResponse): OrderDetail => {
+        return {
+          id: response.id,
+          customerId: response.customer.id,
+          customerName: response.customer.fullName || response.customer.username,
+          receiverName: response.receiverName,
+          receiverPhone: response.receiverPhone,
+          shippingAddress: response.shippingAddress,
+          paymentMethod: response.paymentMethod as any,
+          totalAmount: response.total,
+          orderStatus: response.orderStatus as any,
+          createdAt: response.orderDate,
+          updatedAt: response.orderDate,
+          items: response.orderDetails.map((detail) => ({
+            id: detail.id,
+            productId: detail.product.id,
+            productName: detail.product.name,
+            quantity: detail.quantity,
+            unitPrice: detail.unitPrice,
+            subtotal: detail.subtotal,
+            indexImage: detail.product.indexImage,
+          })),
+        };
+      },
+    }),
   }),
   overrideExisting: false,
 });
 
-export const { useCreateOrderMutation, useGetOrderByIdQuery, useGetMyOrdersQuery } = orderApi;
+export const { useCreateOrderMutation, useGetOrderByIdQuery, useGetMyOrdersQuery, useLazyTrackOrderQuery } = orderApi;

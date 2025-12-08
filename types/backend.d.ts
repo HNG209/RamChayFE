@@ -151,7 +151,7 @@ export interface OrderItemRequest {
 }
 
 export interface OrderCreationRequest {
-  customerId: number;
+  customerId?: number; // Optional for guest users
   receiverName: string;
   receiverPhone: string;
   shippingAddress: string;

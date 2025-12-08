@@ -52,14 +52,15 @@ export default function OrderPage() {
 
   // Handle submit order
   const handleSubmitOrder = async () => {
-    if (!user?.id) {
-      alert("Vui lòng đăng nhập để đặt hàng!");
-      router.push("/login");
+    // Validate required fields
+    if (!receiverName || !receiverPhone || !shippingAddress) {
+      alert("Vui lòng điền đầy đủ thông tin giao hàng!");
       return;
     }
 
-    if (!receiverName || !receiverPhone || !shippingAddress) {
-      alert("Vui lòng điền đầy đủ thông tin giao hàng!");
+    // Validate phone format (10-11 digits)
+    if (!/^[0-9]{10,11}$/.test(receiverPhone)) {
+      alert("Số điện thoại phải có 10-11 chữ số!");
       return;
     }
 
@@ -69,8 +70,7 @@ export default function OrderPage() {
     }
 
     try {
-      const orderData = {
-        customerId: user.id,
+      const orderData: any = {
         receiverName,
         receiverPhone,
         shippingAddress,
@@ -80,6 +80,11 @@ export default function OrderPage() {
           quantity: item.quantity,
         })),
       };
+
+      // Add customerId only if user is logged in
+      if (user?.id) {
+        orderData.customerId = user.id;
+      }
 
       const result = await createOrder(orderData).unwrap();
       console.log("Order creation result:", result); // Debug log
