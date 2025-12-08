@@ -8,6 +8,7 @@ import {
   Package,
   Users,
   ShoppingBag,
+  ShieldCheck,
   LogOut,
   ChevronRight, // Thêm icon này để trang trí
 } from "lucide-react";
@@ -17,38 +18,91 @@ import { useRouter } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { MyProfile } from "@/types/backend";
 import Image from "next/image";
+import { useState } from "react";
 
 const ADMIN_MENU = [
   {
     label: "Dashboard",
-    href: "/admin",
     icon: LayoutDashboard,
-    allowedRoles: ["ROLE_ADMIN", "ROLE_MANAGER"],
+    items: [
+      {
+        label: "Trang chủ",
+        href: "/admin",
+        allowedRoles: ["ROLE_ADMIN", "ROLE_MANAGER"],
+      },
+    ],
   },
   {
     label: "Sản phẩm",
-    href: "/admin/products",
     icon: Package,
-    allowedRoles: ["ROLE_MANAGER", "ROLE_ADMIN"],
+    items: [
+      {
+        label: "Danh sách",
+        href: "/admin/products",
+        allowedRoles: ["ROLE_ADMIN", "ROLE_MANAGER"],
+      },
+      {
+        label: "Thêm sản phẩm",
+        href: "/admin/products/add",
+        allowedRoles: ["ROLE_ADMIN"],
+      },
+    ],
+  },
+  {
+    label: "Loại sản phẩm",
+    href: "/admin/categories",
+    icon: Package,
+    items: [
+      {
+        label: "Quản lý loại sản phẩm",
+        href: "/admin/categories",
+        allowedRoles: ["ROLE_ADMIN", "ROLE_MANAGER"],
+      },
+    ],
   },
   {
     label: "Đơn hàng",
-    href: "/admin/orders",
     icon: ShoppingBag,
-    allowedRoles: ["ROLE_MANAGER"],
+    items: [
+      {
+        label: "Quản lý đơn hàng",
+        href: "/admin/orders",
+        allowedRoles: ["ROLE_MANAGER", "ROLE_ADMIN"],
+      },
+    ],
   },
   {
     label: "Nhân sự",
-    href: "/admin/managers",
     icon: Users,
-    allowedRoles: ["ROLE_ADMIN"],
+    items: [
+      {
+        label: "Danh sách nhân viên",
+        href: "/admin/managers",
+        allowedRoles: ["ROLE_ADMIN"],
+      },
+      {
+        label: "Thêm nhân viên",
+        href: "/admin/managers/add",
+        allowedRoles: ["ROLE_ADMIN"],
+      },
+    ],
   },
   {
     label: "Quyền hạn",
-    href: "/admin/roles",
-    icon: Users,
-    allowedRoles: ["ROLE_ADMIN"],
-  }
+    icon: ShieldCheck,
+    items: [
+      {
+        label: "Danh sách quyền hạn",
+        href: "/admin/roles",
+        allowedRoles: ["ROLE_ADMIN"],
+      },
+      {
+        label: "Thêm quyền hạn",
+        href: "/admin/roles/add",
+        allowedRoles: ["ROLE_ADMIN"],
+      },
+    ],
+  },
 ];
 
 const AdminAvatar = ({ fullName }: { fullName?: string }) => {
@@ -64,11 +118,13 @@ export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [logout] = useLogoutMutation();
+  // Đổi openMenu thành mảng để mở nhiều menu cha
+  const [openMenus, setOpenMenus] = useState<string[]>([]);
+
   const user = useSelector(
     (state: RootState) => state.auth.user
   ) as MyProfile | null;
 
-  // Trả về true nếu user có ít nhất 1 role khớp với allowedRoles của menu
   const hasPermission = (allowedRoles: string[]) => {
     if (!user || !user.roles) return false;
     return user.roles.some((userRole) => allowedRoles.includes(userRole));
@@ -81,6 +137,13 @@ export default function AdminSidebar() {
     } catch (e) {
       console.error(e);
     }
+  };
+
+  // Hàm toggle menu cha
+  const toggleMenu = (label: string) => {
+    setOpenMenus((prev) =>
+      prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]
+    );
   };
 
   return (
@@ -127,24 +190,61 @@ export default function AdminSidebar() {
         <p className="px-2 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
           Quản lý chung
         </p>
-        {ADMIN_MENU.map((item) => {
-          if (!hasPermission(item.allowedRoles)) return null;
-          const isActive = pathname === item.href;
+
+        {ADMIN_MENU.map((menu) => {
+          const visibleItems = menu.items.filter((sub) =>
+            hasPermission(sub.allowedRoles)
+          );
+          if (visibleItems.length === 0) return null;
+
+          const isOpen = openMenus.includes(menu.label);
+
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${isActive
-                  ? "bg-lime-primary/10 text-lime-400 font-semibold shadow-[0_0_15px_rgba(163,230,53,0.1)]"
-                  : "text-gray-400 hover:bg-gray-800 hover:text-white"
-                }`}
-            >
-              <item.icon
-                className={`w-5 h-5 transition-colors ${isActive ? "text-lime-400" : "group-hover:text-white"
+            <div key={menu.label}>
+              {/* MENU CHA */}
+              <button
+                onClick={() => toggleMenu(menu.label)}
+                className="flex items-center justify-between w-full px-3 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <menu.icon className="w-5 h-5" />
+                  {menu.label}
+                </div>
+                <ChevronRight
+                  className={`w-4 h-4 transition-transform ${
+                    isOpen ? "rotate-90" : ""
                   }`}
-              />
-              {item.label}
-            </Link>
+                />
+              </button>
+
+              {/* SUBMENU dạng cây với đường kẻ dọc, padding nhỏ hơn */}
+              {isOpen && (
+                <div className="relative mt-1 pl-4">
+                  {/* Đường kẻ dọc */}
+                  <div className="absolute left-1 top-0 bottom-0 w-px bg-gray-700" />
+                  <div className="space-y-1">
+                    {visibleItems.map((sub) => {
+                      const isActive = pathname === sub.href;
+                      return (
+                        <Link
+                          key={sub.href}
+                          href={sub.href}
+                          className={`flex items-center gap-2 px-2 py-2 text-sm rounded-lg relative
+                            ${
+                              isActive
+                                ? "text-lime-400 bg-lime-primary/10 font-semibold"
+                                : "text-gray-400 hover:text-white hover:bg-gray-800"
+                            }`}
+                        >
+                          <span className="w-2 h-2 rounded-full bg-lime-400 mr-2 inline-block" />
+                          {sub.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           );
         })}
       </nav>

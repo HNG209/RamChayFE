@@ -1,22 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
-import type React from "react";
-
-import { ChevronLeft, Save, Eye, EyeOff, Loader2 } from "lucide-react";
+import { ChevronLeft, Save, Eye, EyeOff, Loader2, X, ListChecks, Plus } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
-// DÙNG CÁC IMPORT GỐC CỦA BẠN TỪ REDUX TOOLKIT QUERY
-import {
-  useGetManagerByIdQuery,
-  useUpdateManagerMutation,
-} from "@/redux/services/managerApi";
+import { useGetManagerByIdQuery, useUpdateManagerMutation } from "@/redux/services/managerApi";
 import { useGetRoleQuery } from "@/redux/services/roleApi";
-
 
 // Định nghĩa kiểu dữ liệu cho Role
 type Role = {
   id: number;
   name: string;
-}
+};
 
 // Kiểu dữ liệu cho Manager từ API (giả định)
 type ManagerData = {
@@ -24,61 +17,129 @@ type ManagerData = {
   username: string;
   fullName: string;
   active: number;
-  // Giả định API trả về mảng object Role
   roles: Role[];
 };
 
+const RoleTag: React.FC<{ role: Role; onRemove: (id: number) => void }> = ({
+  role,
+  onRemove,
+}) => (
+  <span className="flex items-center text-xs px-2.5 py-1.5 rounded-full font-medium whitespace-nowrap bg-green-100 text-green-700 transition duration-150">
+    {role.name}
+    <X
+      size={12}
+      className="ml-2 cursor-pointer text-green-700 hover:text-green-900 transition"
+      onClick={() => onRemove(role.id)}
+    />
+  </span>
+);
+
+const RoleSelectionDropdown: React.FC<{
+  allRoles: Role[];
+  selectedRoles: Role[];
+  onSelectRole: (r: Role) => void;
+}> = ({ allRoles, selectedRoles, onSelectRole }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const filteredRoles = allRoles
+    .filter((r) => !selectedRoles.some((sr) => sr.id === r.id))
+    .filter((r) => r.name.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div className="relative inline-block text-left">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition shadow-md shadow-green-600/30 text-sm"
+      >
+        <Plus size={16} />
+        Thêm Quyền
+      </button>
+      {isOpen && (
+        <div className="absolute z-20 mt-2 w-64 origin-top-right rounded-md shadow-2xl bg-white ring-1 ring-black ring-opacity-5 max-h-60 overflow-y-auto">
+          <div className="py-1">
+            <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase">
+              Chọn quyền để thêm
+            </div>
+            <input
+              type="text"
+              placeholder="Tìm quyền..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full px-3 py-2 mb-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+            />
+            {filteredRoles.length > 0 ? (
+              filteredRoles.map((r) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  onClick={() => {
+                    onSelectRole(r);
+                    setIsOpen(false);
+                    setSearch("");
+                  }}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition"
+                >
+                  {r.name}
+                </button>
+              ))
+            ) : (
+              <div className="py-3 px-4 text-sm text-gray-500 italic">
+                Không tìm thấy quyền phù hợp.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function EditManagerPage() {
   const router = useRouter();
   const params = useParams();
   const id = Number(params.id);
 
-  // 1. Lấy dữ liệu Quản lý hiện tại
   const { data, isLoading } = useGetManagerByIdQuery(id);
   const managerData = data as ManagerData | undefined;
 
-  // 2. Lấy danh sách Roles
   const { data: roles, isLoading: isRolesLoading, isError: isRolesError } = useGetRoleQuery();
-
   const [updateManager, { isLoading: isUpdating }] = useUpdateManagerMutation();
 
   const [formData, setFormData] = useState({
     username: "",
     fullName: "",
     status: "Active",
-    selectedRoleIds: [] as number[], // Thêm trạng thái cho Role IDs
+    selectedRoleIds: [] as number[],
   });
 
+  const [selectedRoles, setSelectedRoles] = useState<Role[]>([]);
   const [changePassword, setChangePassword] = useState(false);
   const [passwordData, setPasswordData] = useState({
     newPassword: "",
     confirmPassword: "",
   });
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // State để hiển thị thông báo lỗi
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Khởi tạo dữ liệu khi Manager Data được tải
   useEffect(() => {
     if (managerData) {
-      // Trích xuất ID từ mảng Role object
       const initialRoleIds = managerData.roles?.map((role) => role.id) || [];
-
       setFormData({
         username: managerData.username ?? "",
         fullName: managerData.fullName ?? "",
         status: managerData.active ? "Active" : "Inactive",
-        selectedRoleIds: initialRoleIds, // Thiết lập Role ID ban đầu
+        selectedRoleIds: initialRoleIds,
       });
+      setSelectedRoles(managerData.roles ?? []);
     }
   }, [managerData]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    // Xóa lỗi khi người dùng bắt đầu thay đổi form
     setErrorMessage(null);
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -87,57 +148,37 @@ export default function EditManagerPage() {
   const handlePasswordChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    // Xóa lỗi khi người dùng bắt đầu thay đổi form
     setErrorMessage(null);
     const { name, value } = e.target;
     setPasswordData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // =======================================================
-  // LOGIC XỬ LÝ ROLE 
-  // =======================================================
-
-  // Hàm thêm Role vào danh sách đã chọn
-  const handleAddRole = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setErrorMessage(null);
-    const newRoleId = Number(e.target.value);
-
-    if (newRoleId && !formData.selectedRoleIds.includes(newRoleId)) {
+  const handleAddRole = (role: Role) => {
+    if (!formData.selectedRoleIds.includes(role.id)) {
       setFormData((prev) => ({
         ...prev,
-        selectedRoleIds: [...prev.selectedRoleIds, newRoleId],
+        selectedRoleIds: [...prev.selectedRoleIds, role.id],
       }));
+      setSelectedRoles((prev) => [...prev, role]);
     }
-    e.target.value = '';
   };
 
-  // Hàm xóa Role khỏi danh sách đã chọn
   const handleRemoveRole = (roleIdToRemove: number) => {
-    setErrorMessage(null);
     setFormData((prev) => ({
       ...prev,
-      selectedRoleIds: prev.selectedRoleIds.filter(
-        (id) => id !== roleIdToRemove
-      ),
+      selectedRoleIds: prev.selectedRoleIds.filter((id) => id !== roleIdToRemove),
     }));
+    setSelectedRoles((prev) => prev.filter((r) => r.id !== roleIdToRemove));
   };
 
-  // Danh sách Role có sẵn (chưa được chọn)
-  // Phải đảm bảo `roles` tồn tại trước khi dùng filter
   const availableRoles = (roles as Role[] | undefined)?.filter(
     (role: Role) => !formData.selectedRoleIds.includes(role.id)
-  );
-  // Danh sách Role đã chọn (dùng để hiển thị pill)
-  const selectedRoles = (roles as Role[] | undefined)?.filter(
-    (role: Role) => formData.selectedRoleIds.includes(role.id)
-  );
-  // =======================================================
+  ) ?? [];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage(null); // Reset lỗi trước khi submit
+    setErrorMessage(null);
 
-    // Kiểm tra xem đã chọn ít nhất một Role nào chưa
     if (formData.selectedRoleIds.length === 0) {
       setErrorMessage("Vui lòng chọn ít nhất một Quyền (Role) cho quản lý.");
       return;
@@ -151,90 +192,81 @@ export default function EditManagerPage() {
       return;
     }
 
-    // === FIX LỖI BACKEND: CHUYỂN MẢNG ID SANG MẢNG OBJECT TỐI THIỂU ===
-    // Backend yêu cầu mảng object Role, không phải mảng ID
     const rolesPayload = formData.selectedRoleIds.map(roleId => ({ id: roleId }));
 
     const payload: any = {
       username: formData.username,
       fullName: formData.fullName,
       active: formData.status === "Active" ? 1 : 0,
-      // GỬI MẢNG OBJECT ROLE VỚI CHỈ TRƯỜNG ID
-      roles: rolesPayload, // <--- ĐÃ FIX LỖI Cannot construct instance of `iuh.fit.se.entities.Role`
+      roles: rolesPayload,
     };
 
     if (changePassword && passwordData.newPassword.trim() !== "") {
       payload.password = passwordData.newPassword.trim();
     }
 
-    console.log("Payload sent:", payload);
-
     try {
-      // Dùng unwrap để bắt lỗi từ API response
       await updateManager({ id, body: payload }).unwrap();
       router.push("/admin/managers");
     } catch (err: any) {
-      console.error("Lỗi cập nhật:", err);
-      // Cố gắng trích xuất lỗi cụ thể từ Backend
       const errorMsg = err.data?.message || err.error || "Cập nhật thất bại! Vui lòng kiểm tra console để xem chi tiết lỗi từ Backend.";
       setErrorMessage(errorMsg);
     }
   };
 
-  // Hiển thị trạng thái tải Manager Data hoặc Roles
   if (isLoading || isRolesLoading) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-background text-foreground">
-        <Loader2 size={32} className="animate-spin text-[#5AB66B]" />
-        <p className="ml-2">Đang tải dữ liệu quản lý và quyền...</p>
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center p-10">
+        <Loader2 className="animate-spin text-indigo-600" size={32} />
+        <p className="ml-3 text-lg text-gray-700">Đang tải thông tin Quản lý...</p>
       </main>
     );
   }
 
-  // Hiển thị lỗi nếu không tải được Manager Data hoặc Roles
   if (isRolesError || !roles || roles.length === 0 || !managerData) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-background text-foreground">
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center p-10">
         <p className="text-red-500">
           {isRolesError ? '❌ Đã xảy ra lỗi khi tải danh sách Quyền.' :
             !managerData ? '❌ Không tìm thấy thông tin quản lý.' :
               '⚠️ Không tìm thấy Quyền nào để phân công.'}
         </p>
       </main>
-    )
+    );
   }
 
-
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto max-w-2xl px-6 py-12">
-        <div className="flex items-center gap-4 mb-8">
+    <main className="min-h-screen bg-gray-50 p-6 md:p-10">
+      <div className="max-w-2xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center mb-8">
           <button
             onClick={() => router.push("/admin/managers")}
-            className="p-2 rounded-lg hover:bg-muted transition-colors"
+            className="p-2 mr-4 text-gray-600 hover:bg-gray-200 rounded-full transition"
+            aria-label="Quay lại"
           >
             <ChevronLeft size={24} />
           </button>
           <div>
-            <h1 className="text-3xl font-bold">Chỉnh sửa Quản lý</h1>
-            <p className="text-sm text-muted-foreground">Cập nhật thông tin quản lý</p>
+            <h1 className="text-3xl font-extrabold text-gray-900">Chỉnh sửa Quản lý</h1>
+            <p className="text-md text-gray-500">
+              Cập nhật tên, trạng thái và quyền cho quản lý <b>{managerData.fullName}</b>.
+            </p>
           </div>
         </div>
 
-        <div className="bg-card rounded-lg border border-[#e0e8df]/50 shadow-sm p-8">
-
-          {/* HIỂN THỊ THÔNG BÁO LỖI */}
+        {/* Form Container */}
+        <div className="bg-white p-8 border border-gray-200 rounded-xl shadow-2xl">
           {errorMessage && (
             <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
               <span className="font-bold">Lỗi: </span> {errorMessage}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-
+          <form onSubmit={handleSubmit}>
             {/* Tên đăng nhập */}
-            <div>
-              <label className="block text-sm font-semibold text-foreground mb-2">
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Tên đăng nhập
               </label>
               <input
@@ -243,14 +275,14 @@ export default function EditManagerPage() {
                 value={formData.username}
                 onChange={handleChange}
                 placeholder="Nhập tên đăng nhập"
-                className="w-full px-4 py-2.5 border border-[#e0e8df] rounded-lg bg-input focus:outline-none focus:ring-2 focus:ring-[#5AB66B]/50 transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
                 required
               />
             </div>
 
             {/* Họ và tên */}
-            <div>
-              <label className="block text-sm font-semibold text-foreground mb-2">
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Họ và tên
               </label>
               <input
@@ -259,72 +291,49 @@ export default function EditManagerPage() {
                 value={formData.fullName}
                 onChange={handleChange}
                 placeholder="Nhập họ và tên đầy đủ"
-                className="w-full px-4 py-2.5 border border-[#e0e8df] rounded-lg bg-input focus:outline-none focus:ring-2 focus:ring-[#5AB66B]/50 transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
                 required
               />
             </div>
 
-            {/* TRƯỜNG ROLE MỚI (DROP-DOWN + TAGS) */}
-            <div>
-              <label className="block text-sm font-semibold text-foreground mb-2">Quyền (Role)</label>
-
-              {/* Dropdown để chọn Role */}
-              <select
-                name="roleSelector"
-                onChange={handleAddRole}
-                className="w-full px-4 py-2.5 border border-[#e0e8df] rounded-lg bg-input focus:outline-none focus:ring-2 focus:ring-[#5AB66B]/50 transition-all"
-                disabled={isRolesLoading || isUpdating}
-                value={''}
+            {/* Quyền (Roles) */}
+            <div className="mb-8 p-6 border border-gray-300 rounded-xl bg-gray-50">
+              <div className="flex justify-between items-center mb-4">
+                <label className="flex items-center gap-2 text-sm font-bold text-gray-800">
+                  <ListChecks size={20} className="text-green-600" /> Quyền (Roles)
+                </label>
+                <RoleSelectionDropdown
+                  allRoles={roles as Role[]}
+                  selectedRoles={selectedRoles}
+                  onSelectRole={handleAddRole}
+                />
+              </div>
+              <div
+                className={`min-h-[100px] p-3 rounded-lg border ${selectedRoles.length > 0 ? "border-gray-200" : "border-dashed border-gray-400"
+                  } bg-white flex flex-wrap gap-2 content-start overflow-y-auto`}
               >
-                <option value="" disabled>
-                  Chọn Quyền để thêm
-                </option>
-
-                {/* Chỉ hiển thị các Role CHƯA được chọn */}
-                {availableRoles?.map((role: Role) => (
-                  <option key={role.id} value={role.id}>
-                    {role.name}
-                  </option>
-                ))}
-              </select>
-
-              {/* Khu vực hiển thị Pill/Tag của các Role đã chọn */}
-              <div className="mt-3 flex flex-wrap gap-2 min-h-[36px]">
-                {selectedRoles?.map((role: Role) => (
-                  <div
-                    key={role.id}
-                    className="flex items-center bg-[#5AB66B] text-white text-sm font-medium py-1.5 px-3 rounded-full"
-                  >
-                    {role.name}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveRole(role.id)}
-                      className="ml-2 hover:opacity-80 transition-opacity"
-                      disabled={isUpdating}
-                    >
-                      <span className="font-bold text-xs">x</span>
-                    </button>
-                  </div>
-                ))}
-                {/* Hiển thị thông báo nếu chưa chọn Role nào */}
-                {formData.selectedRoleIds.length === 0 && (
-                  <p className="text-sm text-red-500 italic mt-1">
-                    * Phải chọn ít nhất một Quyền.
+                {selectedRoles.length > 0 ? (
+                  selectedRoles.map((role) => (
+                    <RoleTag key={role.id} role={role} onRemove={handleRemoveRole} />
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-400 italic m-auto">
+                    Quản lý này chưa có quyền nào. Vui lòng thêm bằng nút "Thêm Quyền".
                   </p>
                 )}
               </div>
             </div>
 
             {/* Trạng thái */}
-            <div>
-              <label className="block text-sm font-semibold text-foreground mb-2">
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Trạng thái
               </label>
               <select
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 border border-[#e0e8df] rounded-lg bg-input focus:outline-none focus:ring-2 focus:ring-[#5AB66B]/50 transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
               >
                 <option value="Active">Hoạt động</option>
                 <option value="Inactive">Không hoạt động</option>
@@ -332,25 +341,23 @@ export default function EditManagerPage() {
             </div>
 
             {/* PASSWORD */}
-            <div className="border-t border-[#e0e8df] pt-6">
+            <div className="border-t border-gray-200 pt-6 mb-6">
               <label className="flex items-center gap-3 cursor-pointer mb-4">
                 <input
                   type="checkbox"
                   checked={changePassword}
                   onChange={(e) => {
                     setChangePassword(e.target.checked);
-                    // Reset password fields if checkbox is unchecked
                     if (!e.target.checked) {
                       setPasswordData({ newPassword: "", confirmPassword: "" });
                     }
                   }}
-                  className="w-4 h-4 text-[#5AB66B] focus:ring-[#5AB66B]"
+                  className="w-4 h-4 text-green-600 focus:ring-green-600"
                 />
                 <span className="text-sm font-semibold">
                   Thay đổi mật khẩu
                 </span>
               </label>
-
               {changePassword && (
                 <div className="space-y-4">
                   <div>
@@ -364,13 +371,13 @@ export default function EditManagerPage() {
                         value={passwordData.newPassword}
                         onChange={handlePasswordChange}
                         placeholder="Nhập mật khẩu mới"
-                        className="w-full px-4 py-2.5 border border-[#e0e8df] rounded-lg bg-input focus:outline-none focus:ring-2 focus:ring-[#5AB66B]/50 transition-all pr-10"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition pr-10"
                         required
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
                       >
                         {showPassword ? (
                           <EyeOff size={18} />
@@ -380,7 +387,6 @@ export default function EditManagerPage() {
                       </button>
                     </div>
                   </div>
-
                   <div>
                     <label className="block text-sm font-semibold mb-2">
                       Xác nhận mật khẩu
@@ -392,7 +398,7 @@ export default function EditManagerPage() {
                         value={passwordData.confirmPassword}
                         onChange={handlePasswordChange}
                         placeholder="Xác nhận mật khẩu mới"
-                        className="w-full px-4 py-2.5 border border-[#e0e8df] rounded-lg bg-input focus:outline-none focus:ring-2 focus:ring-[#5AB66B]/50 transition-all pr-10"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition pr-10"
                         required
                       />
                       <button
@@ -400,7 +406,7 @@ export default function EditManagerPage() {
                         onClick={() =>
                           setShowConfirmPassword(!showConfirmPassword)
                         }
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
                       >
                         {showConfirmPassword ? (
                           <EyeOff size={18} />
@@ -415,29 +421,24 @@ export default function EditManagerPage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-3 pt-6 border-t border-[#e0e8df]">
+            <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">
               <button
                 type="button"
                 onClick={() => router.push("/admin/managers")}
                 disabled={isUpdating}
-                className="flex-1 px-4 py-2.5 border border-[#e0e8df] rounded-lg text-foreground hover:bg-[#f0f9eb] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 bg-white border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-100 transition"
               >
                 Hủy
               </button>
-
               <button
                 type="submit"
                 disabled={isUpdating || formData.selectedRoleIds.length === 0}
-                className="flex-1 px-4 py-2.5 bg-[#5AB66B] hover:bg-[#4a9c5a] text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition shadow-md shadow-green-600/30 flex items-center disabled:bg-green-400"
               >
-                {isUpdating ? (
+                {isUpdating && <Loader2 className="animate-spin mr-2" size={20} />}
+                {isUpdating ? 'Đang lưu...' : (
                   <>
-                    <Loader2 size={18} className="animate-spin" />
-                    Đang lưu...
-                  </>
-                ) : (
-                  <>
-                    <Save size={18} /> Lưu
+                    <Save size={18} className="mr-2" /> Lưu thay đổi
                   </>
                 )}
               </button>

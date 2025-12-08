@@ -54,6 +54,53 @@ export interface MyProfile {
   addresses: string[];
 }
 
+export interface CategoryCreationRequest {
+  categoryName: string;
+  description: string;
+}
+
+export interface CategoryCreationResponse {
+  id: number;
+  categoryName: string;
+  description: string;
+}
+
+export interface MediaUploadRequest {
+  publicId: string;
+  secureUrl: string;
+}
+
+export interface MediaUploadResponse {
+  id: number;
+  publicId: string;
+  secureUrl: string;
+}
+
+export interface ProductCreationRequest {
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  unit: string;
+  category: CategoryCreationRequest;
+  indexImage?: string;
+  mediaUploadRequests: MediaUploadRequest[];
+  imageIdsToDelete?: number[]; 
+
+}
+
+export interface ProductCreationResponse {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  unit: string;
+
+  indexImage?: string;
+  category?: CategoryCreationResponse;
+  mediaList?: MediaUploadResponse[];
+}
 // Cart
 export interface CartProduct {
   id: number;
@@ -96,25 +143,4 @@ export interface Page<T> {
     totalElements: number;
     totalPages: number;
   };
-}
-// Category entity
-export interface Category {
-  id?: number;
-  categoryName: string;
-  description: string;
-}
-
-// Product entity (matches backend structure)
-export interface Product {
-  id?: number;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  unit?: string;
-  imageUrl?: string | null;
-  category: Category;
-  mediaList?: string[];
-  // Alias for compatibility
-  images?: string[];
 }
