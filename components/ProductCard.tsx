@@ -3,12 +3,12 @@ import { useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { ShoppingCart, ChevronRight } from "lucide-react"
-import { useDispatch } from "react-redux"
 import type { Product } from "@/types/backend"
+
 // import { addToCart } from "@/redux/slices/cartSlice"
 
 export default function ProductCard({ product }: { product: Product }) {
-    const dispatch = useDispatch()
+    const [addItem] = useAddItemMutation()
     const buttonRef = useRef<HTMLButtonElement>(null)
 
     if (!product) {
@@ -22,12 +22,10 @@ export default function ProductCard({ product }: { product: Product }) {
     const categoryName = product.category?.categoryName || "Uncategorized"
     const firstImage = product.images?.[0]
 
-    const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault()
-
         // Add to cart
         // dispatch(addToCart(product))
-
         // Get button position
         const button = buttonRef.current
         if (!button) return

@@ -42,8 +42,13 @@ export default function CartPage() {
 
     // --- Fix gộp dữ liệu ---
     setCartItems((prev) => {
-      const merged = [...prev, ...newContent];
+      // Nếu page = 0, reset lại (refetch từ đầu)
+      if (page === 0) {
+        return newContent;
+      }
 
+      // Nếu page > 0, gộp dữ liệu
+      const merged = [...prev, ...newContent];
       return Array.from(
         new Map(merged.map((item) => [item.id, item])).values()
       );
@@ -104,21 +109,28 @@ export default function CartPage() {
     dispatch(toggleItemSelected(selectedIds));
   }, [selectedIds, dispatch]);
 
-  // Cập nhật số lượng
+  // Cập nhật số lượng (chỉ update local state, chưa gửi API)
   const updateQuantity = (id: number, newQuantity: number) => {
+    const finalQuantity = Math.max(1, newQuantity);
+
     setCartItems(
       cartItems.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, newQuantity) } : item
+        item.id === id ? { ...item, quantity: finalQuantity } : item
       )
     );
-    updateCartItem({ itemId: id, quantity: newQuantity });
   };
 
   // Xóa sản phẩm
-  const removeItem = (id: number) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
-    setSelectedIds(selectedIds.filter((itemId) => itemId !== id));
-    deleteCartItem({ itemId: id });
+  const removeItem = async (id: number) => {
+    try {
+      await deleteCartItem({ itemId: id }).unwrap();
+      // Reset page về 0 để refetch từ đầu
+      setPage(0);
+      setHasMore(true);
+      setSelectedIds(selectedIds.filter((itemId) => itemId !== id));
+    } catch (error) {
+      console.error("Failed to remove item:", error);
+    }
   };
 
   // Tính toán tổng tiền
@@ -156,11 +168,10 @@ export default function CartPage() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={toggleSelectAll}
-                  className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-                    isAllSelected
-                      ? "bg-lime-primary border-lime-primary text-white"
-                      : "border-gray-300 bg-white"
-                  }`}
+                  className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${isAllSelected
+                    ? "bg-lime-primary border-lime-primary text-white"
+                    : "border-gray-300 bg-white"
+                    }`}
                 >
                   {isAllSelected && <Check className="w-3.5 h-3.5" />}
                 </button>
@@ -314,11 +325,10 @@ export default function CartPage() {
         <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
           <div className="flex items-center gap-2" onClick={toggleSelectAll}>
             <button
-              className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-                isAllSelected
-                  ? "bg-lime-primary border-lime-primary text-white"
-                  : "border-gray-300 bg-white"
-              }`}
+              className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${isAllSelected
+                ? "bg-lime-primary border-lime-primary text-white"
+                : "border-gray-300 bg-white"
+                }`}
             >
               {isAllSelected && <Check className="w-3.5 h-3.5" />}
             </button>

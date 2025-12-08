@@ -76,3 +76,4 @@ export const {
   useGetProductByIdQuery,
   useUpdateProductMutation,
 } = productApi;
+

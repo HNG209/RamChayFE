@@ -37,10 +37,10 @@ export const cartApi = baseApi.injectEndpoints({
     >({
       query: ({ itemId, quantity }) => ({
         url: `/cart-items/${itemId}`,
-        method: "PUT",
+        method: "PATCH",
         data: { quantity },
       }),
-      // invalidatesTags: ["Cart"],
+      invalidatesTags: ["Cart"],
     }),
 
     deleteCartItem: builder.mutation<void, { itemId: number }>({
@@ -48,7 +48,7 @@ export const cartApi = baseApi.injectEndpoints({
         url: `/cart-items/${itemId}`,
         method: "DELETE",
       }),
-      // invalidatesTags: ["Cart"],
+      invalidatesTags: ["Cart"],
     }),
   }),
   overrideExisting: false, // Để tránh ghi đè nếu lỡ import 2 lần
