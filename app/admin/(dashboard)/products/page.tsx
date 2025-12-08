@@ -130,7 +130,7 @@ export default function ProductManagingPage() {
                         {/* TÊN & ẢNH */}
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-4">
-                            <div className="h-12 w-12 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200 relative">
+                            <div className="h-12 w-12 rounded-lg bg-gray-100 shrink-0 overflow-hidden border border-gray-200 relative">
                               {/* --- SỬA Ở ĐÂY: Dùng product.index thay vì product.imageUrl --- */}
                               <img
                                 src={product.indexImage || "https://placehold.co/100x100?text=No+Img"}
@@ -161,12 +161,12 @@ export default function ProductManagingPage() {
                         <td className="px-6 py-4 font-bold text-gray-800">
                           {formatCurrency(product.price)}
                         </td>
-                        
+
                         {/* DATA CỘT ĐƠN VỊ TÍNH */}
                         <td className="px-6 py-4 text-center">
-                            <span className="inline-block px-2 py-1 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600 font-medium">
-                                {product.unit || "-"}
-                            </span>
+                          <span className="inline-block px-2 py-1 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600 font-medium">
+                            {product.unit || "-"}
+                          </span>
                         </td>
 
                         <td className="px-6 py-4 text-center">

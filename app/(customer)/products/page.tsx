@@ -58,11 +58,7 @@ export default function CustomerProductsPage() {
     }, [searchFromUrl])
 
     // Fetch products từ API
-    const { data: productsData, isLoading, error } = useGetProductsQuery({
-        page: 0,
-        size: 100,
-        search: searchTerm
-    })
+    const { data: productsData, isLoading, error } = useGetProductsQuery()
 
     const apiProducts = productsData || []
 
@@ -118,7 +114,7 @@ export default function CustomerProductsPage() {
 
     // Lọc theo category
     if (selectedCategory !== "all") {
-        filteredProducts = filteredProducts.filter(p => p.category.categoryName === selectedCategory)
+        filteredProducts = filteredProducts.filter(p => p.category?.categoryName === selectedCategory)
     }
 
     // Lọc theo giá

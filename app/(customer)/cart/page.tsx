@@ -109,15 +109,34 @@ export default function CartPage() {
     dispatch(toggleItemSelected(selectedIds));
   }, [selectedIds, dispatch]);
 
-  // Cập nhật số lượng (chỉ update local state, chưa gửi API)
-  const updateQuantity = (id: number, newQuantity: number) => {
-    const finalQuantity = Math.max(1, newQuantity);
+  // Cập nhật số lượng
+  const updateQuantity = async (id: number, newQuantity: number) => {
+    if (newQuantity < 1) {
+      return;
+    }
 
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id ? { ...item, quantity: finalQuantity } : item
+    // Cập nhật UI ngay lập tức (optimistic update)
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id ? { ...item, quantity: newQuantity } : item
       )
     );
+
+    // Gửi request lên server
+    try {
+      await updateCartItem({ itemId: id, quantity: newQuantity }).unwrap();
+    } catch (error) {
+      console.error("Failed to update quantity:", error);
+      // Rollback nếu API thất bại
+      setCartItems((prevItems) =>
+        prevItems.map((item) =>
+          item.id === id
+            ? { ...item, quantity: cartItems.find((i) => i.id === id)?.quantity || 1 }
+            : item
+        )
+      );
+      alert("Không thể cập nhật số lượng. Vui lòng thử lại!");
+    }
   };
 
   // Xóa sản phẩm

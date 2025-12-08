@@ -32,11 +32,10 @@ export default function CartItem({
         {/* Custom Checkbox */}
         <button
           onClick={() => onToggleSelect(item.id)}
-          className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-            isSelected
+          className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${isSelected
               ? "bg-lime-primary border-lime-primary text-white"
               : "border-gray-300 bg-white"
-          }`}
+            }`}
         >
           {isSelected && <Check className="w-3.5 h-3.5" />}
         </button>
@@ -71,9 +70,13 @@ export default function CartItem({
           {/* Bộ điều khiển số lượng */}
           <div className="flex items-center border border-gray-200 rounded-lg">
             <button
-              onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+              onClick={() => {
+                if (item.quantity > 1) {
+                  onUpdateQuantity(item.id, item.quantity - 1)
+                }
+              }}
               disabled={item.quantity <= 1}
-              className="p-1.5 hover:bg-gray-100 disabled:opacity-50 text-gray-600"
+              className="p-1.5 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 transition-colors"
             >
               <Minus className="w-3 h-3" />
             </button>
