@@ -165,6 +165,15 @@ export interface OrderCreationResponse {
   message: string;
 }
 
+export interface OrderListItem {
+  id: number;
+  orderDate: string;
+  total: number;
+  orderStatus: string;
+  paymentMethod: string;
+  itemCount: number;
+}
+
 export interface OrderDetailItem {
   id: number;
   productId: number;

@@ -1,6 +1,13 @@
 // redux/services/orderApi.ts
 import { baseApi } from "./baseApi";
-import { OrderCreationRequest, OrderCreationResponse, OrderDetail, OrderDetailBackendResponse } from "@/types/backend";
+import {
+  OrderCreationRequest,
+  OrderCreationResponse,
+  OrderDetail,
+  OrderDetailBackendResponse,
+  OrderListItem,
+  Page,
+} from "@/types/backend";
 
 export const orderApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -44,8 +51,17 @@ export const orderApi = baseApi.injectEndpoints({
       },
       providesTags: (result, error, orderId) => [{ type: "Order", id: orderId }],
     }),
+
+    getMyOrders: builder.query<Page<OrderListItem>, { page?: number; size?: number }>({
+      query: ({ page = 0, size = 10 }) => ({
+        url: "/orders",
+        method: "GET",
+        params: { page, size },
+      }),
+      providesTags: ["Order"],
+    }),
   }),
   overrideExisting: false,
 });
 
-export const { useCreateOrderMutation, useGetOrderByIdQuery } = orderApi;
+export const { useCreateOrderMutation, useGetOrderByIdQuery, useGetMyOrdersQuery } = orderApi;
