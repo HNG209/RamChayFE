@@ -19,7 +19,7 @@ export default function ProductCard({ product }: { product: Product }) {
     }
 
     const categoryName = product.category?.categoryName || "Uncategorized"
-    const firstImage = product.images?.[0]
+    const productImage = product.indexImage || product.images?.[0]
 
     const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault()
@@ -30,12 +30,13 @@ export default function ProductCard({ product }: { product: Product }) {
             // Call API to add item to cart
             const response = await addItem({
                 productId: product.id,
-                quantity: 1
+                quantity: 1,
+                unitPrice: product.price,
+                subtotal: product.price * 1
             }).unwrap()
 
             console.log('Add to cart success:', response)
             console.log('Cart ID from response:', response.cartId)
-            console.log('Message:', response.message)
 
             // Show success feedback (optional - could use toast notification)
             // alert('Đã thêm vào giỏ hàng!')
@@ -53,8 +54,8 @@ export default function ProductCard({ product }: { product: Product }) {
             flyingCircle.style.top = `${buttonRect.top + buttonRect.height / 2}px`
 
             // Add image to circle if available
-            if (firstImage) {
-                flyingCircle.style.backgroundImage = `url(${firstImage})`
+            if (productImage) {
+                flyingCircle.style.backgroundImage = `url(${productImage})`
                 flyingCircle.style.backgroundSize = 'cover'
                 flyingCircle.style.backgroundPosition = 'center'
             }
@@ -106,9 +107,9 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="group h-full flex flex-col overflow-hidden rounded-xl bg-card border border-border shadow-sm hover:shadow-lg transition-all duration-300 ease-out hover:border-chocolate/20">
             {/* Image Container */}
             <div className="relative h-52 w-full bg-linear-to-br from-chocolate to-chocolate/50 overflow-hidden">
-                {firstImage ? (
+                {productImage ? (
                     <Image
-                        src={firstImage}
+                        src={productImage}
                         alt={product.name}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"

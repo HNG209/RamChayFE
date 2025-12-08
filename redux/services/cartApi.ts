@@ -37,10 +37,10 @@ export const cartApi = baseApi.injectEndpoints({
     >({
       query: ({ itemId, quantity }) => ({
         url: `/cart-items/${itemId}`,
-        method: "PATCH",
+        method: "PUT",
         data: { quantity },
       }),
-      invalidatesTags: ["Cart"],
+      // invalidatesTags: ["Cart"],
     }),
 
     deleteCartItem: builder.mutation<void, { itemId: number }>({
