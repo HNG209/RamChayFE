@@ -23,7 +23,14 @@ export const managerApi = baseApi.injectEndpoints({
                 url: `/permissions/page?page=${page}&pageSize=${pageSize}&keyWord=${keyWord}`,
                 method: "GET",
             }),
-            providesTags: ["Role"],
+            providesTags: ["Permisson"],
+        }),
+        deletePermission: builder.mutation<any, number>({
+            query: (id) => ({
+                url: `/permissions/delete/${id}`,
+                method: "POST",
+            }),
+            invalidatesTags: ["Permisson"], // cập nhật lại danh sách role sau khi xoá
         }),
     }),
     overrideExisting: false,
@@ -33,5 +40,6 @@ export const {
 
     useGetAllPermissonQuery,
     useCreatePermisisonMutation,
-    usePaginPermissionQuery
+    usePaginPermissionQuery,
+    useDeletePermissionMutation
 } = managerApi;

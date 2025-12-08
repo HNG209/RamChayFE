@@ -2,9 +2,9 @@
 
 import { useState, useMemo, useEffect } from "react";
 import debounce from "lodash/debounce";
-import { Plus, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Search, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { usePaginPermissionQuery } from "@/redux/services/permissionApi";
+import { usePaginPermissionQuery, useDeletePermissionMutation } from "@/redux/services/permissionApi";
 
 function removeVietnameseTones(str: string) {
     return str
@@ -42,6 +42,39 @@ export default function PermissionListPage() {
 
     const handleAdd = () => {
         router.push("/admin/roles/addPermission");
+    };
+
+    const [deletePermission, { isLoading: isDeleting }] = useDeletePermissionMutation();
+
+    // Modal state
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [permissionToDelete, setPermissionToDelete] = useState<any>(null);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
+
+    const openDeleteModal = (permission: any) => {
+        setPermissionToDelete(permission);
+        setDeleteError(null); // reset error khi mở modal mới
+        setShowDeleteModal(true);
+    };
+
+    const closeDeleteModal = () => {
+        setShowDeleteModal(false);
+        setPermissionToDelete(null);
+        setDeleteError(null);
+    };
+
+    const confirmDelete = async () => {
+        if (!permissionToDelete) return;
+        setDeleteError(null);
+        try {
+            await deletePermission(permissionToDelete.id).unwrap();
+            closeDeleteModal();
+            router.refresh();
+        } catch (err: any) {
+            // Lấy lỗi từ BE nếu có
+            const apiError = err?.data?.message || "Xóa thất bại, vui lòng thử lại!";
+            setDeleteError(apiError);
+        }
     };
 
     // Lấy data phân trang từ API (chỉ truyền 3 tham số)
@@ -116,7 +149,7 @@ export default function PermissionListPage() {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-                            <span className="text-indigo-600">🔑</span> Danh Sách Permission
+                            Danh Sách Permission
                         </h1>
                         <p className="text-sm sm:text-md text-gray-500">
                             Quản lý các quyền hạn sử dụng trong hệ thống.
@@ -156,7 +189,8 @@ export default function PermissionListPage() {
                             <thead className="bg-gray-50">
                                 <tr>
                                     <th className="px-3 sm:px-6 py-2 sm:py-4 text-left text-xs sm:text-sm font-bold text-gray-600 uppercase tracking-wider w-2/12">ID</th>
-                                    <th className="px-3 sm:px-6 py-2 sm:py-4 text-left text-xs sm:text-sm font-bold text-gray-600 uppercase tracking-wider w-8/12">Tên Permission</th>
+                                    <th className="px-3 sm:px-6 py-2 sm:py-4 text-left text-xs sm:text-sm font-bold text-gray-600 uppercase tracking-wider w-6/12">Tên Permission</th>
+                                    <th className="px-3 sm:px-6 py-2 sm:py-4 text-center text-xs sm:text-sm font-bold text-gray-600 uppercase tracking-wider w-4/12">Hành động</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -165,11 +199,21 @@ export default function PermissionListPage() {
                                         <tr key={p.id} className="hover:bg-green-50 transition duration-150">
                                             <td className="px-3 sm:px-6 py-2 sm:py-4 text-sm font-medium text-gray-600">{p.id}</td>
                                             <td className="px-3 sm:px-6 py-2 sm:py-4 font-semibold text-gray-800">{p.name}</td>
+                                            <td className="px-3 sm:px-6 py-2 sm:py-4 text-center">
+                                                <button
+                                                    onClick={() => openDeleteModal(p)}
+                                                    className="p-2 rounded-lg text-red-600 hover:bg-red-100 transition"
+                                                    title="Xóa"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                                
+                                            </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan={2} className="text-center p-10 italic text-gray-500">
+                                        <td colSpan={3} className="text-center p-10 italic text-gray-500">
                                             Không tìm thấy permission nào phù hợp.
                                         </td>
                                     </tr>
@@ -179,6 +223,40 @@ export default function PermissionListPage() {
                     )}
                 </div>
                 <Pagination />
+
+                {/* Modal xác nhận xóa */}
+                {showDeleteModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-30">
+                        <div className="bg-white rounded-xl shadow-2xl p-8 min-w-[320px] max-w-[90vw]">
+                            <h2 className="text-lg font-bold mb-2">Xác nhận xóa</h2>
+                            <p className="mb-4 text-gray-700">
+                                Bạn có chắc muốn xóa <span className="font-bold">"{permissionToDelete?.name}"</span>?<br />
+                                <span className="text-red-500 text-sm">Hành động này không thể hoàn tác.</span>
+                            </p>
+                            {deleteError && (
+                                <div className="mb-3 p-2 bg-red-50 text-red-600 text-sm rounded border border-red-200">
+                                    {deleteError}
+                                </div>
+                            )}
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    onClick={closeDeleteModal}
+                                    className="px-5 py-2 bg-gray-100 rounded-lg font-semibold text-gray-700 hover:bg-gray-200 transition"
+                                    disabled={isDeleting}
+                                >
+                                    Hủy
+                                </button>
+                                <button
+                                    onClick={confirmDelete}
+                                    className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition"
+                                    disabled={isDeleting}
+                                >
+                                    {isDeleting ? "Đang xóa..." : "Xóa"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </main>
     );
