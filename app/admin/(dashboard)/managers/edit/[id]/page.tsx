@@ -179,38 +179,30 @@ export default function EditManagerPage() {
     e.preventDefault();
     setErrorMessage(null);
 
-    if (formData.selectedRoleIds.length === 0) {
-      setErrorMessage("Vui lòng chọn ít nhất một Quyền (Role) cho quản lý.");
-      return;
-    }
-
-    if (
-      changePassword &&
-      passwordData.newPassword !== passwordData.confirmPassword
-    ) {
-      setErrorMessage("Mật khẩu xác nhận không khớp!");
-      return;
-    }
-
-    const rolesPayload = formData.selectedRoleIds.map(roleId => ({ id: roleId }));
-
-    const payload: any = {
-      username: formData.username,
-      fullName: formData.fullName,
-      active: formData.status === "Active" ? 1 : 0,
-      roles: rolesPayload,
-    };
-
-    if (changePassword && passwordData.newPassword.trim() !== "") {
-      payload.password = passwordData.newPassword.trim();
-    }
-
     try {
+      const rolesPayload = formData.selectedRoleIds.map(roleId => ({ id: roleId }));
+      const payload: any = {
+        username: formData.username,
+        fullName: formData.fullName,
+        active: formData.status === "Active" ? 1 : 0,
+        roles: rolesPayload,
+      };
+      if (changePassword && passwordData.newPassword.trim() !== "") {
+        payload.password = passwordData.newPassword.trim();
+      }
+
       await updateManager({ id, body: payload }).unwrap();
       router.push("/admin/managers");
     } catch (err: any) {
-      const errorMsg = err.data?.message || err.error || "Cập nhật thất bại! Vui lòng kiểm tra console để xem chi tiết lỗi từ Backend.";
-      setErrorMessage(errorMsg);
+      // Luôn lấy lỗi từ BE trả về
+      const apiError = err?.data;
+      if (apiError && typeof apiError.message === "string") {
+        setErrorMessage(apiError.message);
+      } else if (apiError && typeof apiError.error === "string") {
+        setErrorMessage(apiError.error);
+      } else {
+        setErrorMessage("Có lỗi xảy ra, vui lòng thử lại!");
+      }
     }
   };
 
@@ -276,7 +268,6 @@ export default function EditManagerPage() {
                 onChange={handleChange}
                 placeholder="Nhập tên đăng nhập"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
-                required
               />
             </div>
 
@@ -432,7 +423,7 @@ export default function EditManagerPage() {
               </button>
               <button
                 type="submit"
-                disabled={isUpdating || formData.selectedRoleIds.length === 0}
+                disabled={isUpdating}
                 className="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition shadow-md shadow-green-600/30 flex items-center disabled:bg-green-400"
               >
                 {isUpdating && <Loader2 className="animate-spin mr-2" size={20} />}

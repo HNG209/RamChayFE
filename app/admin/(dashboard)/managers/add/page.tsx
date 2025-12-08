@@ -91,7 +91,7 @@ export default function AddManagerPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [createManager, { isLoading }] = useCreateManagerMutation();
-
+  const [serverError, setServerError] = useState<string | null>(null);
   // Lấy dữ liệu Role từ API
   const { data: roles, isLoading: isRolesLoading, isError: isRolesError } = useGetRoleQuery();
 
@@ -159,11 +159,7 @@ export default function AddManagerPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (formData.selectedRoleIds.length === 0) {
-      alert("Vui lòng chọn ít nhất một Quyền (Role) cho quản lý.");
-      return;
-    }
+    setServerError(null);
 
     try {
       const managerData = {
@@ -176,11 +172,18 @@ export default function AddManagerPage() {
 
       await createManager(managerData).unwrap();
       router.push("/admin/managers");
-    } catch (error: any) {
-      console.error("Create manager error:", error);
-      alert(`Lỗi: ${error.data?.message || error.message || "Không thể tạo tài khoản quản lý."}`);
+    } catch (err: any) {
+      // Luôn lấy lỗi từ BE trả về
+      const apiError = err?.data;
+      setServerError(JSON.stringify(err)); // Tạm thời để debug
+      if (apiError && typeof apiError.message === "string") {
+        setServerError(apiError.message);
+      } else {
+        setServerError("Có lỗi xảy ra, vui lòng thử lại!");
+      }
     }
   };
+
 
   return (
     <main className="min-h-screen bg-gray-50 p-6 md:p-10">
@@ -199,7 +202,12 @@ export default function AddManagerPage() {
             <p className="text-md text-gray-500">Tạo một tài khoản quản lý mới trong hệ thống</p>
           </div>
         </div>
-
+        {/* Lỗi từ Server trả về (ví dụ: Sai pass) */}
+        {serverError && (
+          <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded border border-red-200">
+            {serverError}
+          </div>
+        )}
         {/* Form Card */}
         <div className="bg-white p-8 border border-gray-200 rounded-xl shadow-2xl">
           <form onSubmit={handleSubmit}>
@@ -213,7 +221,6 @@ export default function AddManagerPage() {
                 onChange={handleChange}
                 placeholder="Nhập họ và tên đầy đủ"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
-                required
               />
             </div>
 
@@ -227,7 +234,7 @@ export default function AddManagerPage() {
                 onChange={handleChange}
                 placeholder="Nhập tên đăng nhập"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
-                required
+              
               />
             </div>
 
@@ -242,7 +249,7 @@ export default function AddManagerPage() {
                   onChange={handleChange}
                   placeholder="Nhập mật khẩu"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition pr-10"
-                  required
+                  
                 />
                 <button
                   type="button"
@@ -308,8 +315,8 @@ export default function AddManagerPage() {
               </button>
               <button
                 type="submit"
-                disabled={isLoading || isRolesLoading || formData.selectedRoleIds.length === 0}
-                className="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition shadow-md shadow-green-600/30 flex items-center disabled:bg-green-400"
+                disabled={isLoading || isRolesLoading}
+                className="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition shadow-md shadow-green-600/30 flex items-center"
               >
                 {isLoading ? (
                   <>

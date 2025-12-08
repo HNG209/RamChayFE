@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
+import debounce from "lodash/debounce";
+import cloneDeep from "lodash/cloneDeep";
 import { Plus, Search, X, Pencil, Trash2, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { usePaginManagerQuery, useDeleteManagerMutation } from "@/redux/services/managerApi";
 import { useRouter } from "next/navigation";
@@ -58,6 +60,15 @@ function SearchBar({
       </div>
     </div>
   );
+}
+
+// Hàm loại bỏ dấu tiếng Việt
+function removeVietnameseTones(str: string) {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D");
 }
 
 // ---------------------------
@@ -197,8 +208,8 @@ function Pagination({
               key={page}
               onClick={() => onPageChange(page as number)}
               className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${currentPage === page
-                  ? "bg-green-600 text-white border-green-600 shadow-sm"
-                  : "border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
+                ? "bg-green-600 text-white border-green-600 shadow-sm"
+                : "border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`}
             >
               {page}
@@ -300,10 +311,16 @@ export default function Home() {
   const totalPages = data?.totalPages || 1;
   const totalItems = data?.totalElements || 0;
 
-  const handleSearch = useCallback((query: string) => {
-    setSearchQuery(query);
+  // Debounce search với lodash
+  const debouncedSetSearchQuery = useMemo(
+    () => debounce((q: string) => setSearchQuery(q), 500),
+    []
+  );
+
+  const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    debouncedSetSearchQuery(e.target.value);
     setCurrentPage(1);
-  }, []);
+  };
 
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
@@ -336,13 +353,20 @@ export default function Home() {
     }
   }, [deleteConfirmItem, deleteManager]);
 
-  // Filtered items
-  const filteredItems = items.filter(
-    (item) =>
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.id.toString().includes(searchQuery)
-  );
+  // Filtered items: search không phân biệt dấu
+  const filteredItems = useMemo(() => {
+    const query = removeVietnameseTones(searchQuery).toLowerCase();
+    return items.filter((item) => {
+      const name = removeVietnameseTones(item.name).toLowerCase();
+      const email = item.email.toLowerCase();
+      const idStr = item.id.toString();
+      return (
+        name.includes(query) ||
+        email.includes(query) ||
+        idStr.includes(query)
+      );
+    });
+  }, [items, searchQuery]);
 
   if (isLoading)
     return (
@@ -355,103 +379,87 @@ export default function Home() {
     );
 
   return (
-    <main className="min-h-screen bg-white p-6 md:p-10">
+    <main className="min-h-screen bg-white p-4 sm:p-6 md:p-10">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
               <span className="text-indigo-600">👤</span> Quản Lý Nhân Sự (Managers)
             </h1>
-            <p className="text-md text-gray-500">
+            <p className="text-sm sm:text-md text-gray-500">
               Tạo và chỉnh sửa thông tin nhân sự trong hệ thống.
             </p>
           </div>
           <button
             onClick={handleAdd}
-            className="flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-md shadow-green-600/30 font-medium transition"
+            className="flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition w-full sm:w-auto"
           >
             <Plus size={20} />
-            Thêm Nhân Sự Mới
+            <span className="hidden sm:inline">Thêm Nhân Sự Mới</span>
+            <span className="sm:hidden">Thêm</span>
           </button>
         </div>
 
         {/* Search */}
-        <div className="mb-8 relative">
+        <div className="mb-6 sm:mb-8 relative">
           <input
             placeholder="Tìm theo tên, email hoặc ID..."
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 transition"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 transition text-sm sm:text-base"
+            onChange={handleSearchInput}
           />
           <Search className="text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" size={20} />
         </div>
 
-        {/* Table */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden">
+        {/* Table Responsive */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-xl overflow-x-auto">
           {isFetching ? (
             <div className="p-10 flex items-center justify-center">
               <Loader2 className="animate-spin text-green-500" size={24} />
               <p className="ml-2 text-gray-600">Đang tải dữ liệu...</p>
             </div>
           ) : (
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-[600px] w-full divide-y divide-gray-200 text-sm sm:text-base">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    ID
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Tên Nhân Sự
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Email/Phone
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Trạng thái
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Ngày tạo
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Hành động
-                  </th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-4 text-left text-xs sm:text-sm font-bold text-gray-600 uppercase tracking-wider">ID</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-4 text-left text-xs sm:text-sm font-bold text-gray-600 uppercase tracking-wider">Tên Nhân Sự</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-4 text-left text-xs sm:text-sm font-bold text-gray-600 uppercase tracking-wider">Email/Phone</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-4 text-left text-xs sm:text-sm font-bold text-gray-600 uppercase tracking-wider">Trạng thái</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-4 text-left text-xs sm:text-sm font-bold text-gray-600 uppercase tracking-wider">Ngày tạo</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-4 text-center text-xs sm:text-sm font-bold text-gray-600 uppercase tracking-wider">Hành động</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredItems.length ? (
                   filteredItems.map((item) => (
                     <tr key={item.id} className="hover:bg-green-50 transition duration-150">
-                      <td className="px-6 py-4 text-sm font-medium text-gray-600">{item.id}</td>
-                      <td className="px-6 py-4 font-semibold text-gray-800">{item.name}</td>
-                      <td className="px-6 py-4 text-sm text-gray-800 break-all">{item.email}</td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-2.5 py-1.5 rounded-full text-xs font-medium ${
-                            item.status === "Active"
-                              ? "bg-green-100 text-green-700"
-                              : "bg-gray-100 text-gray-700"
-                          }`}
-                        >
+                      <td className="px-3 sm:px-6 py-2 sm:py-4 text-sm font-medium text-gray-600">{item.id}</td>
+                      <td className="px-3 sm:px-6 py-2 sm:py-4 font-semibold text-gray-800">{item.name}</td>
+                      <td className="px-3 sm:px-6 py-2 sm:py-4 text-sm text-gray-800 break-all">{item.email}</td>
+                      <td className="px-3 sm:px-6 py-2 sm:py-4">
+                        <span className={`px-2.5 py-1.5 rounded-full text-xs font-medium ${item.status === "Active" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"}`}>
                           {item.status === "Active" ? "Hoạt động" : "Ngưng hoạt động"}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-800">{item.createdAt}</td>
-                      <td className="px-6 py-4 text-center">
-                        <button
-                          onClick={() => handleEdit(item)}
-                          className="p-2 rounded-lg text-gray-500 hover:bg-green-100 hover:text-green-700 transition"
-                          title="Sửa"
-                        >
-                          <Pencil size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(item)}
-                          className="p-2 rounded-lg text-red-600 hover:bg-red-100 transition"
-                          title="Xóa"
-                        >
-                          <Trash2 size={18} />
-                        </button>
+                      <td className="px-3 sm:px-6 py-2 sm:py-4 text-sm text-gray-800">{item.createdAt}</td>
+                      <td className="px-3 sm:px-6 py-2 sm:py-4 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => handleEdit(item)}
+                            className="p-2 rounded-lg text-gray-500 hover:bg-green-100 hover:text-green-700 transition"
+                            title="Sửa"
+                          >
+                            <Pencil size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item)}
+                            className="p-2 rounded-lg text-red-600 hover:bg-red-100 transition"
+                            title="Xóa"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -469,7 +477,7 @@ export default function Home() {
 
         {/* Pagination */}
         {totalItems > 0 && totalPages > 1 && (
-          <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 mt-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-6 mt-4 sm:mt-6">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -482,11 +490,10 @@ export default function Home() {
 
         {/* Empty State */}
         {totalItems === 0 && !isLoading && (
-          <div className="text-center py-12">
-            <p className="text-gray-500">Không tìm thấy nhân sự nào phù hợp{searchQuery && ` cho "${searchQuery}"`}</p>
+          <div className="text-center py-8 sm:py-12">
+            <p className="text-gray-500 text-sm sm:text-base">Không tìm thấy nhân sự nào phù hợp{searchQuery && ` cho "${searchQuery}"`}</p>
           </div>
         )}
-
       </div>
 
       {/* Delete Modal */}

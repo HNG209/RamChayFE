@@ -92,14 +92,24 @@ const ADMIN_MENU = [
     icon: ShieldCheck,
     items: [
       {
-        label: "Danh sách quyền hạn",
+        label: "Danh sách vai trò",
         href: "/admin/roles",
         allowedPermissions: ["VIEW_ROLES"],
       },
       {
-        label: "Thêm quyền hạn",
+        label: "Thêm vai trò",
         href: "/admin/roles/add",
         allowedPermissions: ["CREATE_ROLE"],
+      },
+      {
+        label: "Danh sách quyền hạn",
+        href: "/admin/roles/listPermission",
+        allowedPermissions: ["VIEW_PERMISSIONS"],
+      },
+      {
+        label: "Thêm quyền hạn",
+        href: "/admin/roles/addPermission",
+        allowedPermissions: ["CREATE_PERMISSION"],
       },
     ],
   },

@@ -1,3 +1,5 @@
+"use client";
+
 import { useRouter } from "next/navigation";
 import RoleGuard from "@/components/admin/RoleGuard";
 import { useState } from "react";
@@ -227,6 +229,7 @@ export default function ProductManagingPage() {
                               <Trash2 className="w-4 h-4" />
                             )}
                           </button>
+                        </div>
                       </td>
                     </tr>
                   ))

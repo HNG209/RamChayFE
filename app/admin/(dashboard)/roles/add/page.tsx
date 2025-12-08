@@ -58,7 +58,7 @@ const PermissionSelectionDropdown: React.FC<{
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition shadow-md shadow-indigo-600/30 text-sm"
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition shadow-md shadow-indigo-600/30 text-sm"
             >
                 <Plus size={16} />
                 Thêm Quyền hạn
@@ -113,6 +113,7 @@ export default function RoleForm() {
     const [name, setname] = useState("");
     const [description, setDescription] = useState("");
     const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>([]);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null); // Thêm state lưu lỗi
 
     const handleAddPermission = (permission: Permission) => {
         setSelectedPermissions((prev) => [...prev, permission]);
@@ -127,19 +128,27 @@ export default function RoleForm() {
     const availablePermissions: Permission[] = permissionData ?? [];
     const [createRole, { isLoading: isCreating }] = useCreateRoleMutation();
 
-    const handleSave = (e: React.FormEvent) => {
+    const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
+        setErrorMessage(null); // Reset lỗi trước khi submit
         const payload = {
             name,
             description,
-            permissionIds: selectedPermissions.map((p) => p.id), // gửi id cho backend
+            permissionIds: selectedPermissions.map((p) => p.id),
         };
         try {
-            createRole(payload).unwrap(); // unwrap để catch lỗi
-            alert(`Đã tạo Role: ${name}`);
-            router.back(); // quay lại trang trước
+            await createRole(payload).unwrap();
+            router.back();
         } catch (error: any) {
-            alert(`Tạo Role thất bại: ${error?.data?.message || error.message}`);
+            // Lấy lỗi từ BE trả về
+            const apiError = error?.data;
+            if (apiError && typeof apiError.message === "string") {
+                setErrorMessage(apiError.message);
+            } else if (apiError && typeof apiError.error === "string") {
+                setErrorMessage(apiError.error);
+            } else {
+                setErrorMessage("Có lỗi xảy ra, vui lòng thử lại!");
+            }
         }
     };
 
@@ -171,6 +180,11 @@ export default function RoleForm() {
 
                 {/* Form Container */}
                 <div className="bg-white p-8 border border-gray-200 rounded-xl shadow-2xl">
+                    {errorMessage && (
+                        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+                            <span className="font-bold">Lỗi: </span> {errorMessage}
+                        </div>
+                    )}
                     <form onSubmit={handleSave}>
                         {/* Tên Chức vụ */}
                         <div className="mb-6">
@@ -184,7 +198,6 @@ export default function RoleForm() {
                                 value={name}
                                 onChange={(e) => setname(e.target.value)}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
-                                required
                             />
                         </div>
 
