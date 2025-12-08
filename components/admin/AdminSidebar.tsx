@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { MyProfile } from "@/types/backend";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const ADMIN_MENU = [
   {
@@ -28,7 +28,7 @@ const ADMIN_MENU = [
       {
         label: "Trang chủ",
         href: "/admin",
-        allowedRoles: ["ROLE_ADMIN", "ROLE_MANAGER"],
+        allowedPermissions: ["VIEW_DASHBOARD"],
       },
     ],
   },
@@ -39,12 +39,12 @@ const ADMIN_MENU = [
       {
         label: "Danh sách",
         href: "/admin/products",
-        allowedRoles: ["ROLE_ADMIN", "ROLE_MANAGER"],
+        allowedPermissions: ["VIEW_PRODUCTS"],
       },
       {
         label: "Thêm sản phẩm",
         href: "/admin/products/add",
-        allowedRoles: ["ROLE_ADMIN"],
+        allowedPermissions: ["ADD_PRODUCT"],
       },
     ],
   },
@@ -56,7 +56,7 @@ const ADMIN_MENU = [
       {
         label: "Quản lý loại sản phẩm",
         href: "/admin/categories",
-        allowedRoles: ["ROLE_ADMIN", "ROLE_MANAGER"],
+        allowedPermissions: ["VIEW_CATEGORIES"],
       },
     ],
   },
@@ -67,7 +67,7 @@ const ADMIN_MENU = [
       {
         label: "Quản lý đơn hàng",
         href: "/admin/orders",
-        allowedRoles: ["ROLE_MANAGER", "ROLE_ADMIN"],
+        allowedPermissions: ["VIEW_ORDERS"],
       },
     ],
   },
@@ -78,12 +78,12 @@ const ADMIN_MENU = [
       {
         label: "Danh sách nhân viên",
         href: "/admin/managers",
-        allowedRoles: ["ROLE_ADMIN"],
+        allowedPermissions: ["VIEW_MANAGERS"],
       },
       {
         label: "Thêm nhân viên",
         href: "/admin/managers/add",
-        allowedRoles: ["ROLE_ADMIN"],
+        allowedPermissions: ["ADD_MANAGER"],
       },
     ],
   },
@@ -94,12 +94,12 @@ const ADMIN_MENU = [
       {
         label: "Danh sách quyền hạn",
         href: "/admin/roles",
-        allowedRoles: ["ROLE_ADMIN"],
+        allowedPermissions: ["VIEW_ROLES"],
       },
       {
         label: "Thêm quyền hạn",
         href: "/admin/roles/add",
-        allowedRoles: ["ROLE_ADMIN"],
+        allowedPermissions: ["CREATE_ROLE"],
       },
     ],
   },
@@ -125,9 +125,11 @@ export default function AdminSidebar() {
     (state: RootState) => state.auth.user
   ) as MyProfile | null;
 
-  const hasPermission = (allowedRoles: string[]) => {
-    if (!user || !user.roles) return false;
-    return user.roles.some((userRole) => allowedRoles.includes(userRole));
+  const hasPermission = (allowedPermissions: string[]) => {
+    if (!user || !user.permissions) return false;
+    return user.permissions.some((userPermission) =>
+      allowedPermissions.includes(userPermission)
+    );
   };
 
   const handleLogout = async () => {
@@ -193,7 +195,7 @@ export default function AdminSidebar() {
 
         {ADMIN_MENU.map((menu) => {
           const visibleItems = menu.items.filter((sub) =>
-            hasPermission(sub.allowedRoles)
+            hasPermission(sub.allowedPermissions)
           );
           if (visibleItems.length === 0) return null;
 
