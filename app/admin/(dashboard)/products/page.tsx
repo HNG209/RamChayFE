@@ -1,5 +1,3 @@
-"use client";
-
 import { useRouter } from "next/navigation";
 import RoleGuard from "@/components/admin/RoleGuard";
 import { useState } from "react";
@@ -116,7 +114,6 @@ export default function ProductManagingPage() {
             </p>
           </div>
         )}
-
         {!isLoading && !error && (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
@@ -230,7 +227,6 @@ export default function ProductManagingPage() {
                               <Trash2 className="w-4 h-4" />
                             )}
                           </button>
-                        </div>
                       </td>
                     </tr>
                   ))

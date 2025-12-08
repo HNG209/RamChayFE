@@ -86,16 +86,16 @@ export default function Header() {
   return (
     <>
       {/* --- MAIN HEADER --- */}
-      <header className="sticky top-0 z-40 w-full backdrop-blur-md border-b border-white/20 overflow-hidden">
+      <header className="sticky top-0 z-50 w-full backdrop-blur-md border-b border-white/20 overflow-visible">
         {/* Animated Gradient Background */}
-        <div className="absolute inset-0 bg-linear-to-r from-emerald-100 via-green-100 to-lime-100 animate-gradient-shift"></div>
+        <div className="absolute inset-0 bg-linear-to-r from-emerald-100 via-green-100 to-lime-100 animate-gradient-shift -z-10"></div>
 
         {/* Decorative Elements */}
-        <div className="absolute top-0 left-0 w-32 h-32 bg-green-300/30 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-40 h-40 bg-lime-300/30 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 left-0 w-32 h-32 bg-green-300/30 rounded-full blur-3xl -z-10"></div>
+        <div className="absolute bottom-0 right-0 w-40 h-40 bg-lime-300/30 rounded-full blur-3xl -z-10"></div>
 
         {/* Grass/Plant Stickers at Bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-8 pointer-events-none flex items-end justify-between px-4 opacity-40">
+        <div className="absolute bottom-0 left-0 right-0 h-8 pointer-events-none flex items-end justify-between px-4 opacity-40 -z-10">
           <span className="text-2xl">🌿</span>
           <span className="text-xl">🌱</span>
           <span className="text-2xl">🍃</span>
@@ -202,12 +202,12 @@ export default function Header() {
                     <>
                       {/* Lớp nền trong suốt để click ra ngoài thì đóng menu */}
                       <div
-                        className="fixed inset-0 z-40 cursor-default"
+                        className="fixed inset-0 z-60 cursor-default"
                         onClick={() => setIsUserMenuOpen(false)}
                       />
 
                       {/* Menu content */}
-                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden py-1">
+                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-70 overflow-hidden py-1">
                         {/* Header của menu */}
                         <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50">
                           <p className="text-sm font-bold text-gray-800 truncate">

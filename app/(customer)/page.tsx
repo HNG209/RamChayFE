@@ -8,7 +8,7 @@ import ProductCard from "@/components/ProductCard";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const { data: products = [], isLoading } = useGetProductsQuery({ page: 0, size: 8 });
+  const { data: products = [], isLoading } = useGetProductsQuery();
   const featuredProducts = products.slice(0, 4);
 
   const categories = [
