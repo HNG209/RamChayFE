@@ -48,7 +48,7 @@ export const cartApi = baseApi.injectEndpoints({
         url: `/cart-items/${itemId}`,
         method: "DELETE",
       }),
-      // invalidatesTags: ["Cart"],
+      invalidatesTags: ["Cart"],
     }),
   }),
   overrideExisting: false, // Để tránh ghi đè nếu lỡ import 2 lần

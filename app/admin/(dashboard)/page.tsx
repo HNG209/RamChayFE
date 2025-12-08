@@ -27,143 +27,141 @@ export default function DashboardPage() {
   }, [user]);
 
   return (
-    <RoleGuard allowedRoles={["ROLE_ADMIN"]}>
-      <div className="space-y-6">
-        {/* 1. HEADER: Tiêu đề trang */}
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">
-            Tổng quan kinh doanh
-          </h1>
-          <p className="text-gray-500 text-sm">
-            Chào mừng trở lại! Đây là tình hình hôm nay của RamChay.
-          </p>
-        </div>
+    <div className="space-y-6">
+      {/* 1. HEADER: Tiêu đề trang */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-800">
+          Tổng quan kinh doanh
+        </h1>
+        <p className="text-gray-500 text-sm">
+          Chào mừng trở lại! Đây là tình hình hôm nay của RamChay.
+        </p>
+      </div>
 
-        {/* 2. STAT CARDS: Số liệu thống kê */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard
-            title="Doanh thu hôm nay"
-            value="2.450.000đ"
-            change="+12%"
-            isPositive={true}
-            icon={DollarSign}
-            color="bg-blue-50 text-blue-600"
-          />
-          <StatCard
-            title="Đơn hàng mới"
-            value="15"
-            change="-2%"
-            isPositive={false}
-            icon={ShoppingBag}
-            color="bg-yellow-50 text-yellow-600"
-          />
-          <StatCard
-            title="Khách hàng mới"
-            value="8"
-            change="+5%"
-            isPositive={true}
-            icon={Users}
-            color="bg-purple-50 text-purple-600"
-          />
-          <StatCard
-            title="Sắp hết hàng"
-            value="3"
-            note="Cần nhập thêm"
-            icon={Package}
-            color="bg-red-50 text-red-600"
-          />
-        </div>
+      {/* 2. STAT CARDS: Số liệu thống kê */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard
+          title="Doanh thu hôm nay"
+          value="2.450.000đ"
+          change="+12%"
+          isPositive={true}
+          icon={DollarSign}
+          color="bg-blue-50 text-blue-600"
+        />
+        <StatCard
+          title="Đơn hàng mới"
+          value="15"
+          change="-2%"
+          isPositive={false}
+          icon={ShoppingBag}
+          color="bg-yellow-50 text-yellow-600"
+        />
+        <StatCard
+          title="Khách hàng mới"
+          value="8"
+          change="+5%"
+          isPositive={true}
+          icon={Users}
+          color="bg-purple-50 text-purple-600"
+        />
+        <StatCard
+          title="Sắp hết hàng"
+          value="3"
+          note="Cần nhập thêm"
+          icon={Package}
+          color="bg-red-50 text-red-600"
+        />
+      </div>
 
-        {/* 3. MAIN SECTION: Chia 2 cột (Biểu đồ + Đơn hàng mới) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* CỘT TRÁI (Chiếm 2 phần): Danh sách đơn hàng mới nhất */}
-          <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-gray-800">Đơn hàng vừa đặt</h3>
-              <button className="text-sm text-lime-primary hover:underline">
-                Xem tất cả
-              </button>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-gray-600">
-                <thead className="bg-gray-50 text-gray-700 font-semibold border-b">
-                  <tr>
-                    <th className="p-3">Mã đơn</th>
-                    <th className="p-3">Khách hàng</th>
-                    <th className="p-3">Tổng tiền</th>
-                    <th className="p-3">Trạng thái</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {/* Dữ liệu giả lập */}
-                  <OrderItem
-                    id="#ORD-001"
-                    user="Nguyễn Văn A"
-                    total="150.000đ"
-                    status="pending"
-                  />
-                  <OrderItem
-                    id="#ORD-002"
-                    user="Trần Thị B"
-                    total="320.000đ"
-                    status="shipping"
-                  />
-                  <OrderItem
-                    id="#ORD-003"
-                    user="Lê Văn C"
-                    total="90.000đ"
-                    status="success"
-                  />
-                  <OrderItem
-                    id="#ORD-004"
-                    user="Phạm Văn D"
-                    total="500.000đ"
-                    status="cancelled"
-                  />
-                  <OrderItem
-                    id="#ORD-005"
-                    user="Hoàng Thùy E"
-                    total="210.000đ"
-                    status="pending"
-                  />
-                </tbody>
-              </table>
-            </div>
+      {/* 3. MAIN SECTION: Chia 2 cột (Biểu đồ + Đơn hàng mới) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* CỘT TRÁI (Chiếm 2 phần): Danh sách đơn hàng mới nhất */}
+        <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-bold text-gray-800">Đơn hàng vừa đặt</h3>
+            <button className="text-sm text-lime-primary hover:underline">
+              Xem tất cả
+            </button>
           </div>
 
-          {/* CỘT PHẢI (Chiếm 1 phần): Sản phẩm bán chạy / Cảnh báo */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-6">
-            {/* Top sản phẩm */}
-            <div>
-              <h3 className="font-bold text-gray-800 mb-4">Top bán chạy 🔥</h3>
-              <ul className="space-y-4">
-                <TopProduct name="Chả lụa chay" sold={120} price="45.000đ" />
-                <TopProduct name="Sườn non chay" sold={85} price="30.000đ" />
-                <TopProduct name="Nấm đông cô" sold={60} price="120.000đ" />
-              </ul>
-            </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-gray-600">
+              <thead className="bg-gray-50 text-gray-700 font-semibold border-b">
+                <tr>
+                  <th className="p-3">Mã đơn</th>
+                  <th className="p-3">Khách hàng</th>
+                  <th className="p-3">Tổng tiền</th>
+                  <th className="p-3">Trạng thái</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {/* Dữ liệu giả lập */}
+                <OrderItem
+                  id="#ORD-001"
+                  user="Nguyễn Văn A"
+                  total="150.000đ"
+                  status="pending"
+                />
+                <OrderItem
+                  id="#ORD-002"
+                  user="Trần Thị B"
+                  total="320.000đ"
+                  status="shipping"
+                />
+                <OrderItem
+                  id="#ORD-003"
+                  user="Lê Văn C"
+                  total="90.000đ"
+                  status="success"
+                />
+                <OrderItem
+                  id="#ORD-004"
+                  user="Phạm Văn D"
+                  total="500.000đ"
+                  status="cancelled"
+                />
+                <OrderItem
+                  id="#ORD-005"
+                  user="Hoàng Thùy E"
+                  total="210.000đ"
+                  status="pending"
+                />
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-            <div className="border-t pt-4"></div>
+        {/* CỘT PHẢI (Chiếm 1 phần): Sản phẩm bán chạy / Cảnh báo */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-6">
+          {/* Top sản phẩm */}
+          <div>
+            <h3 className="font-bold text-gray-800 mb-4">Top bán chạy 🔥</h3>
+            <ul className="space-y-4">
+              <TopProduct name="Chả lụa chay" sold={120} price="45.000đ" />
+              <TopProduct name="Sườn non chay" sold={85} price="30.000đ" />
+              <TopProduct name="Nấm đông cô" sold={60} price="120.000đ" />
+            </ul>
+          </div>
 
-            {/* Cảnh báo kho */}
-            <div>
-              <h3 className="font-bold text-gray-800 mb-4">Cảnh báo kho ⚠️</h3>
-              <ul className="space-y-3">
-                <li className="flex justify-between items-center text-sm p-3 bg-red-50 text-red-700 rounded-lg">
-                  <span>Hạt nêm nấm</span>
-                  <span className="font-bold">Còn 2</span>
-                </li>
-                <li className="flex justify-between items-center text-sm p-3 bg-yellow-50 text-yellow-700 rounded-lg">
-                  <span>Tàu hũ ky</span>
-                  <span className="font-bold">Còn 5</span>
-                </li>
-              </ul>
-            </div>
+          <div className="border-t pt-4"></div>
+
+          {/* Cảnh báo kho */}
+          <div>
+            <h3 className="font-bold text-gray-800 mb-4">Cảnh báo kho ⚠️</h3>
+            <ul className="space-y-3">
+              <li className="flex justify-between items-center text-sm p-3 bg-red-50 text-red-700 rounded-lg">
+                <span>Hạt nêm nấm</span>
+                <span className="font-bold">Còn 2</span>
+              </li>
+              <li className="flex justify-between items-center text-sm p-3 bg-yellow-50 text-yellow-700 rounded-lg">
+                <span>Tàu hũ ky</span>
+                <span className="font-bold">Còn 5</span>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
-    </RoleGuard>
+    </div>
   );
 }
 

@@ -1,116 +1,116 @@
-// components/layout/Footer.tsx
-import Link from "next/link";
-import { Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
-import Image from "next/image";
+import Link from "next/link"
+import { Facebook, Instagram, Mail, MapPin, Phone, Leaf } from "lucide-react"
+import Image from "next/image"
 
 export default function Footer() {
   return (
-    <footer className="bg-cream-dark border-t border-lime-accent pt-12 pb-6">
-      <div className="container mx-auto px-4">
+    <footer className="relative border-t-2 border-emerald-300 overflow-visible min-h-[350px]">
+      {/* Background Image */}
+      <div className="absolute inset-0" style={{ zIndex: 0 }}>
+        <Image
+          src="/Background-vegan-footer-2.png"
+          alt="Footer Background"
+          fill
+          sizes="100vw"
+          className="object-cover"
+          priority
+          quality={100}
+        />
+      </div>
+
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-linear-to-b from-white/10 via-white/40 to-white/50" style={{ zIndex: 1 }}></div>
+
+      <div className="container mx-auto px-4 py-10 relative" style={{ zIndex: 2 }}>
+        {/* Main content grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-          {/* Cột 1: Giới thiệu RamChay */}
-          <div className="space-y-4">
-            <Image
-              src="/logo.png" // Next.js tự hiểu bắt đầu từ thư mục public
-              alt="RamChay Logo" // Cần thiết cho SEO
-              width={150} // Chiều rộng gốc của ảnh (để Next.js tính tỉ lệ)
-              height={50} // Chiều cao gốc của ảnh
-              quality={100} // Chất lượng ảnh (1-100)
-              priority={true} // Quan trọng: Báo Next.js tải ngay lập tức (vì là Logo đầu trang)
-              className="h-15 w-auto object-contain" // Tailwind: Cao 40px, rộng tự động co giãn
-            />
-            <p className="text-gray-600 text-sm leading-relaxed text-justify">
-              Tại RamChay, chúng tôi tin rằng mỗi bữa ăn là một sự kết nối giữa
-              con người và thiên nhiên. Mang đến những thực phẩm chay thuần
-              khiết, tươi ngon từ nông trại đến bàn ăn, RamChay mong muốn gieo
-              mầm sức khỏe và nuôi dưỡng lòng trắc ẩn trong từng hương vị. Sống
-              xanh, ăn lành cùng RamChay.
+          {/* Column 1: Brand & Description */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 mb-3">
+              <Leaf className="w-6 h-6 text-emerald-600" />
+              <h3 className="text-xl font-bold text-emerald-700">RamChay</h3>
+            </div>
+            <p className="text-gray-700 text-xs leading-relaxed">
+              Tại RamChay, chúng tôi tin rằng mỗi bữa ăn là một sự kết nối giữa con người và thiên nhiên. Mang đến những
+              thực phẩm chay thuần khiết, tươi ngon từ nông trại đến bàn ăn. Sống xanh, ăn lành cùng RamChay.
             </p>
           </div>
 
-          {/* Cột 2: Liên kết nhanh */}
-          <div className="pl-0 md:pl-10">
-            <h4 className="font-bold text-gray-800 mb-4 text-lg">Khám phá</h4>
-            <ul className="space-y-2 text-sm text-gray-600">
+          {/* Column 2: Quick Links */}
+          <div>
+            <h4 className="font-bold text-gray-800 mb-4 text-base">Khám phá</h4>
+            <ul className="space-y-2 text-xs text-gray-700">
               <li>
-                <Link
-                  href="/products"
-                  className="hover:text-lime-primary transition-colors"
-                >
+                <Link href="/products" className="hover:text-emerald-600 transition-colors font-medium">
                   Sản phẩm mới
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/about"
-                  className="hover:text-lime-primary transition-colors"
-                >
+                <Link href="/about" className="hover:text-emerald-600 transition-colors font-medium">
                   Về chúng tôi
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/recipes"
-                  className="hover:text-lime-primary transition-colors"
-                >
+                <Link href="/recipes" className="hover:text-emerald-600 transition-colors font-medium">
                   Công thức món chay
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/contact"
-                  className="hover:text-lime-primary transition-colors"
-                >
+                <Link href="/contact" className="hover:text-emerald-600 transition-colors font-medium">
                   Liên hệ hợp tác
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Cột 3: Thông tin liên hệ */}
+          {/* Column 3: Contact & Social */}
           <div>
-            <h4 className="font-bold text-gray-800 mb-4 text-lg">Kết nối</h4>
-            <ul className="space-y-3 text-sm text-gray-600">
-              <li className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-lime-primary shrink-0" />
+            <h4 className="font-bold text-gray-800 mb-4 text-base">Kết nối</h4>
+            <ul className="space-y-2 text-xs text-gray-700 mb-6">
+              <li className="flex items-start gap-2">
+                <MapPin className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                 <span>12 Nguyễn Văn Bảo, Phường 4, Gò Vấp, TP.HCM</span>
               </li>
-              <li className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-lime-primary shrink-0" />
+              <li className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>1900 123 456</span>
               </li>
-              <li className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-lime-primary shrink-0" />
+              <li className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>lienhe@ramchay.vn</span>
               </li>
             </ul>
 
             {/* Social Icons */}
-            <div className="flex gap-4 mt-6">
+            <div className="flex gap-2">
               <a
                 href="#"
-                className="bg-white p-2 rounded-full shadow-sm hover:bg-lime-primary hover:text-white transition-all"
+                className="bg-white p-2 rounded-full shadow-md hover:bg-emerald-600 hover:text-white transition-all hover:shadow-lg"
+                aria-label="Facebook"
               >
-                <Facebook className="w-5 h-5" />
+                <Facebook className="w-4 h-4" />
               </a>
               <a
                 href="#"
-                className="bg-white p-2 rounded-full shadow-sm hover:bg-lime-primary hover:text-white transition-all"
+                className="bg-white p-2 rounded-full shadow-md hover:bg-emerald-600 hover:text-white transition-all hover:shadow-lg"
+                aria-label="Instagram"
               >
-                <Instagram className="w-5 h-5" />
+                <Instagram className="w-4 h-4" />
               </a>
             </div>
           </div>
         </div>
 
-        {/* Copyright */}
-        <div className="border-t border-lime-accent/50 pt-6 text-center text-xs text-gray-500">
-          <p>
-            © {new Date().getFullYear()} Công ty TNHH Thực Phẩm RamChay. All
-            rights reserved.
+        {/* Divider */}
+        <div className="border-t border-emerald-300 my-4"></div>
+
+        {/* Footer bottom */}
+        <div className="text-center">
+          <p className="text-xs text-gray-600">
+            © {new Date().getFullYear()} RamChay. All rights reserved.
           </p>
         </div>
       </div>
     </footer>
-  );
+  )
 }

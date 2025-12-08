@@ -72,7 +72,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                 <button
                                     key={index}
                                     onClick={() => setCurrentImageIndex(index)}
-                                    className={`h-20 w-20 flex-shrink-0 rounded-md border-2 overflow-hidden transition-all ${currentImageIndex === index ? "border-primary" : "border-border hover:border-muted-foreground"
+                                    className={`h-20 w-20 shrink-0 rounded-md border-2 overflow-hidden transition-all ${currentImageIndex === index ? "border-primary" : "border-border hover:border-muted-foreground"
                                         }`}
                                 >
                                     <Image

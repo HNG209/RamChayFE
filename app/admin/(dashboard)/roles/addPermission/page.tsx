@@ -12,15 +12,23 @@ export default function AddPermission() {
     const router = useRouter();
     const [name, setName] = useState("");
     const [createPermisison, { isLoading }] = useCreatePermisisonMutation();
+    const [errorMessage, setErrorMessage] = useState<string | null>(null); // Thêm state lỗi
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setErrorMessage(null); // Reset lỗi trước khi submit
         try {
             await createPermisison({ name }).unwrap();
-            alert(`Đã thêm permission: ${name}`);
             router.back();
         } catch (error: any) {
-            alert(error?.data?.message || "Thêm permission thất bại!");
+            const apiError = error?.data;
+            if (apiError && typeof apiError.message === "string") {
+                setErrorMessage(apiError.message);
+            } else if (apiError && typeof apiError.error === "string") {
+                setErrorMessage(apiError.error);
+            } else {
+                setErrorMessage("Thêm permission thất bại!");
+            }
         }
     };
 
@@ -44,6 +52,11 @@ export default function AddPermission() {
                 </div>
                 {/* Form */}
                 <div className="bg-white p-8 border border-gray-200 rounded-xl shadow-2xl">
+                    {errorMessage && (
+                        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+                            <span className="font-bold">Lỗi: </span> {errorMessage}
+                        </div>
+                    )}
                     <form onSubmit={handleSubmit}>
                         <div className="mb-6">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -55,7 +68,6 @@ export default function AddPermission() {
                                 onChange={e => setName(e.target.value)}
                                 placeholder="Nhập tên permission (VD: VIEW_ORDER)"
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
-                                required
                             />
                         </div>
                         <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">

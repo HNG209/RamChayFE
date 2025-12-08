@@ -128,6 +128,7 @@ export default function RoleFormEdit() {
     const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>([]);
 
     const [roleId, setRoleId] = useState<number | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null); // Thêm state lỗi
 
     const {
         data: roleData,
@@ -192,37 +193,38 @@ export default function RoleFormEdit() {
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
+        setErrorMessage(null); // Reset lỗi trước khi submit
 
-        // Sử dụng roleId đã lấy từ API, nếu không có thì dùng id từ URL
         const finalId = roleId ?? id;
 
         if (isUpdating || !finalId || finalId <= 0) {
-            alert("Lỗi: Không có ID Role hợp lệ để cập nhật.");
+            setErrorMessage("Lỗi: Không có ID Role hợp lệ để cập nhật.");
             return;
         }
 
-        // 1. Chuẩn bị dữ liệu gửi đi (BODY)
         const updateBody = {
             name,
             description,
-            permissionIds: selectedPermissions.map((p) => p.id), // Chỉ gửi mảng ID
+            permissionIds: selectedPermissions.map((p) => p.id),
         };
 
-        // 2. Tạo đối tượng DUY NHẤT mà mutation mong đợi: { id: number; body: any }
         const mutationArg = {
             id: finalId,
             body: updateBody
         };
 
         try {
-
             await updateRole(mutationArg).unwrap();
-
-            alert(`✅ Đã cập nhật Role ID ${finalId}: ${name} thành công!`);
             router.back();
         } catch (error: any) {
-            console.error("Lỗi cập nhật Role:", error);
-            alert(`❌ Cập nhật Role thất bại: ${error?.data?.message || "Lỗi không xác định. Vui lòng kiểm tra console."}`);
+            const apiError = error?.data;
+            if (apiError && typeof apiError.message === "string") {
+                setErrorMessage(apiError.message);
+            } else if (apiError && typeof apiError.error === "string") {
+                setErrorMessage(apiError.error);
+            } else {
+                setErrorMessage("Có lỗi xảy ra, vui lòng thử lại!");
+            }
         }
     };
 
@@ -265,6 +267,11 @@ export default function RoleFormEdit() {
 
                 {/* Form Container */}
                 <div className="bg-white p-8 border border-gray-200 rounded-xl shadow-2xl">
+                    {errorMessage && (
+                        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+                            <span className="font-bold">Lỗi: </span> {errorMessage}
+                        </div>
+                    )}
                     <form onSubmit={handleSave}>
                         {/* Tên Chức vụ */}
                         <div className="mb-6">
@@ -278,7 +285,7 @@ export default function RoleFormEdit() {
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
-                                required
+                              
                             />
                         </div>
 

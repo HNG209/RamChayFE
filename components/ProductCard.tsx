@@ -3,12 +3,11 @@ import { useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { ShoppingCart, ChevronRight } from "lucide-react"
-import { useDispatch } from "react-redux"
 import type { Product } from "@/types/backend"
-// import { addToCart } from "@/redux/slices/cartSlice"
+import { useAddItemMutation } from "@/redux/services/cartApi"
 
 export default function ProductCard({ product }: { product: Product }) {
-    const dispatch = useDispatch()
+    const [addItem, { isLoading }] = useAddItemMutation()
     const buttonRef = useRef<HTMLButtonElement>(null)
 
     if (!product) {
@@ -22,51 +21,85 @@ export default function ProductCard({ product }: { product: Product }) {
     const categoryName = product.category?.categoryName || "Uncategorized"
     const firstImage = product.images?.[0]
 
-    const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault()
 
-        // Add to cart
-        // dispatch(addToCart(product))
+        try {
+            console.log('Adding to cart:', { productId: product.id, quantity: 1 })
 
-        // Get button position
-        const button = buttonRef.current
-        if (!button) return
+            // Call API to add item to cart
+            const response = await addItem({
+                productId: product.id,
+                quantity: 1
+            }).unwrap()
 
-        const buttonRect = button.getBoundingClientRect()
+            console.log('Add to cart success:', response)
+            console.log('Cart ID from response:', response.cartId)
+            console.log('Message:', response.message)
 
-        // Create flying circle animation
-        const flyingCircle = document.createElement('div')
-        flyingCircle.className = 'flying-cart-item'
-        flyingCircle.style.left = `${buttonRect.left + buttonRect.width / 2}px`
-        flyingCircle.style.top = `${buttonRect.top + buttonRect.height / 2}px`
+            // Show success feedback (optional - could use toast notification)
+            // alert('Đã thêm vào giỏ hàng!')
 
-        // Add image to circle if available
-        if (firstImage) {
-            flyingCircle.style.backgroundImage = `url(${firstImage})`
-            flyingCircle.style.backgroundSize = 'cover'
-            flyingCircle.style.backgroundPosition = 'center'
+            // Get button position for animation
+            const button = buttonRef.current
+            if (!button) return
+
+            const buttonRect = button.getBoundingClientRect()
+
+            // Create flying circle animation
+            const flyingCircle = document.createElement('div')
+            flyingCircle.className = 'flying-cart-item'
+            flyingCircle.style.left = `${buttonRect.left + buttonRect.width / 2}px`
+            flyingCircle.style.top = `${buttonRect.top + buttonRect.height / 2}px`
+
+            // Add image to circle if available
+            if (firstImage) {
+                flyingCircle.style.backgroundImage = `url(${firstImage})`
+                flyingCircle.style.backgroundSize = 'cover'
+                flyingCircle.style.backgroundPosition = 'center'
+            }
+
+            document.body.appendChild(flyingCircle)
+
+            // Get cart icon position (top right of header)
+            const cartIcon = document.querySelector('[data-cart-icon]')
+            const cartRect = cartIcon?.getBoundingClientRect()
+
+            if (cartRect) {
+                // Trigger animation
+                requestAnimationFrame(() => {
+                    flyingCircle.style.left = `${cartRect.left + cartRect.width / 2}px`
+                    flyingCircle.style.top = `${cartRect.top + cartRect.height / 2}px`
+                    flyingCircle.style.transform = 'scale(0.2)'
+                    flyingCircle.style.opacity = '0'
+                })
+            }
+
+            // Remove element after animation
+            setTimeout(() => {
+                flyingCircle.remove()
+            }, 800)
+        } catch (error: any) {
+            console.error('Failed to add item to cart:', error)
+
+            // Extract error message
+            let errorMessage = 'Không thể thêm sản phẩm vào giỏ hàng.'
+
+            if (error?.data?.message) {
+                errorMessage = error.data.message
+            } else if (error?.message) {
+                errorMessage = error.message
+            }
+
+            // Check for specific error cases
+            if (error?.status === 401 || error?.status === 403) {
+                errorMessage = 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!'
+            } else if (error?.status === 404) {
+                errorMessage = 'Sản phẩm không tồn tại!'
+            }
+
+            alert(errorMessage)
         }
-
-        document.body.appendChild(flyingCircle)
-
-        // Get cart icon position (top right of header)
-        const cartIcon = document.querySelector('[data-cart-icon]')
-        const cartRect = cartIcon?.getBoundingClientRect()
-
-        if (cartRect) {
-            // Trigger animation
-            requestAnimationFrame(() => {
-                flyingCircle.style.left = `${cartRect.left + cartRect.width / 2}px`
-                flyingCircle.style.top = `${cartRect.top + cartRect.height / 2}px`
-                flyingCircle.style.transform = 'scale(0.2)'
-                flyingCircle.style.opacity = '0'
-            })
-        }
-
-        // Remove element after animation
-        setTimeout(() => {
-            flyingCircle.remove()
-        }, 800)
     }
 
     return (
@@ -128,10 +161,11 @@ export default function ProductCard({ product }: { product: Product }) {
                     <button
                         ref={buttonRef}
                         onClick={handleAddToCart}
-                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-chocolate text-white rounded-lg text-sm font-semibold hover:bg-chocolate/90 active:scale-95 transition-all"
+                        disabled={isLoading}
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-chocolate text-white rounded-lg text-sm font-semibold hover:bg-chocolate/90 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <ShoppingCart className="w-4 h-4" />
-                        Thêm
+                        {isLoading ? 'Đang thêm...' : 'Thêm'}
                     </button>
                 </div>
             </div>
