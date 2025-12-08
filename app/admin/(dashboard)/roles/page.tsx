@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
+import _ from "lodash";
 import { Plus, Search, Pencil, Trash2, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useGetAllRoleQuery, useDeleteRoleMutation, usePaginRoleQuery } from "@/redux/services/roleApi";
 import { useRouter } from "next/navigation";
@@ -157,31 +158,47 @@ function Pagination({
   );
 }
 
+// Hàm loại bỏ dấu tiếng Việt
+function removeVietnameseTones(str: string) {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D");
+}
+
 export default function RoleManagingPage() {
   const router = useRouter();
   const { data: roles, isLoading, isError } = useGetAllRoleQuery();
-  // const [searchTerm, setSearchTerm] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteRole, { isLoading: isDeleting }] = useDeleteRoleMutation();
-  const [currentPage, setCurrentPage] = useState(1);
-  // Phân trang
+
   const itemsPerPage = 6;
 
-  const { data, isFetching } = usePaginRoleQuery({
-    page: currentPage - 1,
-    pageSize: itemsPerPage,
-    keyWord: searchQuery,
-  })
-
-
-  // Lọc và phân trang dữ liệu
-  const filteredRoles = (roles || []).filter(
-    (r: Role) =>
-      r.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.id?.toString().includes(searchQuery)
+  // Debounce search với lodash
+  const debouncedSetSearchQuery = useMemo(
+    () => _.debounce((q: string) => setSearchQuery(q), 300),
+    []
   );
+
+  const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    debouncedSetSearchQuery(e.target.value);
+    setCurrentPage(1);
+  };
+
+  // Lọc và phân trang dữ liệu (không phân biệt dấu)
+  const filteredRoles = useMemo(() => {
+    const query = removeVietnameseTones(searchQuery).toLowerCase();
+    return (roles || []).filter(
+      (r: Role) =>
+        removeVietnameseTones(r.name || "").toLowerCase().includes(query) ||
+        r.id?.toString().includes(query)
+    );
+  }, [roles, searchQuery]);
+
   const totalItems = filteredRoles.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
   const pagedRoles = filteredRoles.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -228,70 +245,62 @@ export default function RoleManagingPage() {
     );
 
   return (
-    <main className="min-h-screen bg-white p-6 md:p-10">
+    <main className="min-h-screen bg-white p-4 sm:p-6 md:p-10">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
               <span className="text-indigo-600">👥</span> Quản Lý Chức Vụ (Roles)
             </h1>
-            <p className="text-md text-gray-500">
+            <p className="text-sm sm:text-md text-gray-500">
               Tạo và chỉnh sửa quyền hạn cho các vai trò trong hệ thống.
             </p>
           </div>
-          <button
-            onClick={handleAddPermision}
-            className="flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-md shadow-green-600/30 font-medium transition"
-          >
-            <Plus size={20} />
-            Thêm Permision Mới
-          </button>
-          <button
-            onClick={handleAdd}
-            className="flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-md shadow-green-600/30 font-medium transition"
-          >
-            <Plus size={20} />
-            Thêm Role Mới
-          </button>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <button
+              onClick={handleAddPermision}
+              className="flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition w-full sm:w-auto"
+            >
+              <Plus size={20} />
+              <span className="hidden sm:inline">Thêm Permission Mới</span>
+              <span className="sm:hidden">Thêm Permission</span>
+            </button>
+            <button
+              onClick={handleAdd}
+              className="flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition w-full sm:w-auto"
+            >
+              <Plus size={20} />
+              <span className="hidden sm:inline">Thêm Role Mới</span>
+              <span className="sm:hidden">Thêm Role</span>
+            </button>
+          </div>
         </div>
 
         {/* Search */}
-        <div className="mb-8 relative">
+        <div className="mb-6 sm:mb-8 relative">
           <input
             placeholder="Tìm theo tên Role hoặc ID..."
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 transition"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setCurrentPage(1);
-            }}
+            className="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 transition text-sm sm:text-base"
+            onChange={handleSearchInput}
           />
           <Search className="text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" size={20} />
         </div>
 
-        {/* Table */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden">
+        {/* Table Responsive */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-xl overflow-x-auto">
           {isError ? (
             <div className="p-8 text-center text-red-500 bg-red-50/50">
               ❌ Không thể tải dữ liệu Role từ máy chủ. Vui lòng kiểm tra kết nối API.
             </div>
           ) : (
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-[600px] w-full divide-y divide-gray-200 text-sm sm:text-base">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-2/12">
-                    ID
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-3/12">
-                    Tên Role
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-5/12">
-                    Quyền hạn (Permissions)
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider w-5/12">
-                    Hành động
-                  </th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-4 text-left text-xs sm:text-sm font-bold text-gray-600 uppercase tracking-wider w-2/12">ID</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-4 text-left text-xs sm:text-sm font-bold text-gray-600 uppercase tracking-wider w-3/12">Tên Role</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-4 text-left text-xs sm:text-sm font-bold text-gray-600 uppercase tracking-wider w-5/12">Quyền hạn (Permissions)</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-4 text-center text-xs sm:text-sm font-bold text-gray-600 uppercase tracking-wider w-5/12">Hành động</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -304,9 +313,9 @@ export default function RoleManagingPage() {
                     const remainingCount = permissions.length - MAX_TAGS_DISPLAY;
                     return (
                       <tr key={role.id} className="hover:bg-green-50 transition duration-150">
-                        <td className="px-6 py-4 text-sm font-medium text-gray-600">{role.id}</td>
-                        <td className="px-6 py-4 font-semibold text-gray-800">{role.name}</td>
-                        <td className="px-6 py-4">
+                        <td className="px-3 sm:px-6 py-2 sm:py-4 text-sm font-medium text-gray-600">{role.id}</td>
+                        <td className="px-3 sm:px-6 py-2 sm:py-4 font-semibold text-gray-800">{role.name}</td>
+                        <td className="px-3 sm:px-6 py-2 sm:py-4">
                           <div className="flex flex-wrap items-center gap-2">
                             {permissions.length > 0 ? (
                               <>
@@ -326,7 +335,7 @@ export default function RoleManagingPage() {
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-center">
+                        <td className="px-3 sm:px-6 py-2 sm:py-4 text-center">
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => handleEdit(role.id)}
@@ -361,7 +370,7 @@ export default function RoleManagingPage() {
 
         {/* Pagination */}
         {totalItems > 0 && totalPages > 1 && (
-          <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 mt-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-6 mt-4 sm:mt-6">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -374,8 +383,8 @@ export default function RoleManagingPage() {
 
         {/* Empty State */}
         {totalItems === 0 && !isLoading && (
-          <div className="text-center py-12">
-            <p className="text-gray-500">Không tìm thấy Role nào phù hợp{searchQuery && ` cho "${searchQuery}"`}</p>
+          <div className="text-center py-8 sm:py-12">
+            <p className="text-gray-500 text-sm sm:text-base">Không tìm thấy Role nào phù hợp{searchQuery && ` cho "${searchQuery}"`}</p>
           </div>
         )}
       </div>

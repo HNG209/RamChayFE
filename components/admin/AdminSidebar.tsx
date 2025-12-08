@@ -92,14 +92,24 @@ const ADMIN_MENU = [
     icon: ShieldCheck,
     items: [
       {
-        label: "Danh sách quyền hạn",
+        label: "Danh sách vai trò",
         href: "/admin/roles",
         allowedPermissions: ["VIEW_ROLES"],
       },
       {
-        label: "Thêm quyền hạn",
+        label: "Thêm vai trò",
         href: "/admin/roles/add",
         allowedPermissions: ["CREATE_ROLE"],
+      },
+      {
+        label: "Danh sách quyền hạn",
+        href: "/admin/roles/listPermission",
+        allowedRoles: ["ROLE_ADMIN"],
+      },
+      {
+        label: "Thêm quyền hạn",
+        href: "/admin/roles/addPermission",
+        allowedRoles: ["ROLE_ADMIN"],
       },
     ],
   },
@@ -213,9 +223,8 @@ export default function AdminSidebar() {
                   {menu.label}
                 </div>
                 <ChevronRight
-                  className={`w-4 h-4 transition-transform ${
-                    isOpen ? "rotate-90" : ""
-                  }`}
+                  className={`w-4 h-4 transition-transform ${isOpen ? "rotate-90" : ""
+                    }`}
                 />
               </button>
 
@@ -232,10 +241,9 @@ export default function AdminSidebar() {
                           key={sub.href}
                           href={sub.href}
                           className={`flex items-center gap-2 px-2 py-2 text-sm rounded-lg relative
-                            ${
-                              isActive
-                                ? "text-lime-400 bg-lime-primary/10 font-semibold"
-                                : "text-gray-400 hover:text-white hover:bg-gray-800"
+                            ${isActive
+                              ? "text-lime-400 bg-lime-primary/10 font-semibold"
+                              : "text-gray-400 hover:text-white hover:bg-gray-800"
                             }`}
                         >
                           <span className="w-2 h-2 rounded-full bg-lime-400 mr-2 inline-block" />

@@ -18,6 +18,13 @@ export const managerApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ["Permisson"],
         }),
+        paginPermission: builder.query<any, { page: number; pageSize: number; keyWord: string }>({
+            query: ({ page, pageSize, keyWord }) => ({
+                url: `/permissions/page?page=${page}&pageSize=${pageSize}&keyWord=${keyWord}`,
+                method: "GET",
+            }),
+            providesTags: ["Role"],
+        }),
     }),
     overrideExisting: false,
 });
@@ -25,5 +32,6 @@ export const managerApi = baseApi.injectEndpoints({
 export const {
 
     useGetAllPermissonQuery,
-    useCreatePermisisonMutation
+    useCreatePermisisonMutation,
+    usePaginPermissionQuery
 } = managerApi;
