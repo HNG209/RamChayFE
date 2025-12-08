@@ -102,6 +102,11 @@ const ADMIN_MENU = [
         allowedRoles: ["ROLE_ADMIN"],
       },
       {
+        label: "Danh sách quyền hạn",
+        href: "/admin/roles/listPermission",
+        allowedRoles: ["ROLE_ADMIN"],
+      },
+      {
         label: "Thêm quyền hạn",
         href: "/admin/roles/addPermission",
         allowedRoles: ["ROLE_ADMIN"],
