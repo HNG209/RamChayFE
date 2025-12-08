@@ -25,11 +25,13 @@
     "react-intersection-observer": "^10.0.0",
     "react-redux": "^9.2.0",
     "tailwind-merge": "^3.4.0",
+    "tw-animate": "^1.0.3",
     "yup": "^1.7.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/js-cookie": "^3.0.6",
+    "@types/lodash": "^4.17.21",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
