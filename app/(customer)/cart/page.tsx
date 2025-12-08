@@ -3,13 +3,10 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 import CartItem from "@/components/CartItem";
-import {
-  useDeleteCartItemMutation,
-  useGetCartItemsQuery,
-  useUpdateCartItemMutation,
-} from "@/redux/services/cartApi";
+import { useDeleteCartItemMutation, useGetCartItemsQuery, useUpdateCartItemMutation } from "@/redux/services/cartApi";
 import { GetItemsResponse } from "@/types/backend";
 import { useInView } from "react-intersection-observer";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,6 +14,7 @@ import { AppDispatch, RootState } from "@/redux/store";
 import { toggleItemSelected } from "@/redux/slices/cartSlice";
 
 export default function CartPage() {
+  const router = useRouter();
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true); // Kiểm tra còn dữ liệu để tải không
   const [cartItems, setCartItems] = useState<GetItemsResponse[]>([]);
@@ -44,9 +42,7 @@ export default function CartPage() {
     setCartItems((prev) => {
       const merged = [...prev, ...newContent];
 
-      return Array.from(
-        new Map(merged.map((item) => [item.id, item])).values()
-      );
+      return Array.from(new Map(merged.map((item) => [item.id, item])).values());
     });
 
     // --- Fix append selected ids ---
@@ -106,11 +102,7 @@ export default function CartPage() {
 
   // Cập nhật số lượng
   const updateQuantity = (id: number, newQuantity: number) => {
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, newQuantity) } : item
-      )
-    );
+    setCartItems(cartItems.map((item) => (item.id === id ? { ...item, quantity: Math.max(1, newQuantity) } : item)));
     updateCartItem({ itemId: id, quantity: newQuantity });
   };
 
@@ -128,24 +120,18 @@ export default function CartPage() {
       .reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
   }, [cartItems, selectedIds]);
 
-  const isAllSelected =
-    cartItems.length > 0 && selectedIds.length === cartItems.length;
+  const isAllSelected = cartItems.length > 0 && selectedIds.length === cartItems.length;
 
   return (
     <div className="min-h-screen bg-cream-light pb-32 md:pb-10">
       <div className="container mx-auto px-4 pt-6">
         {/* Header Trang */}
         <div className="flex items-center gap-2 mb-6">
-          <Link
-            href="/products"
-            className="p-2 hover:bg-white rounded-full transition-colors"
-          >
+          <Link href="/products" className="p-2 hover:bg-white rounded-full transition-colors">
             <ArrowLeft className="w-5 h-5 text-gray-600" />
           </Link>
           <h1 className="text-2xl font-bold text-gray-800">Giỏ hàng của bạn</h1>
-          <span className="text-sm text-gray-500 mt-1">
-            ({data?.page.totalElements} sản phẩm)
-          </span>
+          <span className="text-sm text-gray-500 mt-1">({data?.page.totalElements} sản phẩm)</span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -157,21 +143,14 @@ export default function CartPage() {
                 <button
                   onClick={toggleSelectAll}
                   className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-                    isAllSelected
-                      ? "bg-lime-primary border-lime-primary text-white"
-                      : "border-gray-300 bg-white"
+                    isAllSelected ? "bg-lime-primary border-lime-primary text-white" : "border-gray-300 bg-white"
                   }`}
                 >
                   {isAllSelected && <Check className="w-3.5 h-3.5" />}
                 </button>
-                <span className="font-medium text-gray-700">
-                  Chọn tất cả ({data?.page.totalElements})
-                </span>
+                <span className="font-medium text-gray-700">Chọn tất cả ({data?.page.totalElements})</span>
               </div>
-              <button
-                onClick={() => setSelectedIds([])}
-                className="text-sm text-red-500 hover:underline"
-              >
+              <button onClick={() => setSelectedIds([])} className="text-sm text-red-500 hover:underline">
                 Bỏ chọn
               </button>
             </div>
@@ -227,19 +206,14 @@ export default function CartPage() {
                 )}
 
                 {!hasMore && cartItems.length > 5 && (
-                  <p className="text-center text-gray-400 text-xs py-4">
-                    Đã hiển thị tất cả sản phẩm
-                  </p>
+                  <p className="text-center text-gray-400 text-xs py-4">Đã hiển thị tất cả sản phẩm</p>
                 )}
               </>
             ) : (
               !isFetching && ( // Chỉ hiện trống khi không đang tải
                 <div className="text-center py-10">
                   <p className="text-gray-500">Giỏ hàng trống trơn...</p>
-                  <Link
-                    href="/products"
-                    className="text-lime-primary font-bold hover:underline"
-                  >
+                  <Link href="/products" className="text-lime-primary font-bold hover:underline">
                     Đi chợ ngay
                   </Link>
                 </div>
@@ -268,19 +242,14 @@ export default function CartPage() {
           {/* --- CỘT PHẢI: SUMMARY (DESKTOP STICKY) --- */}
           <div className="hidden lg:block lg:col-span-1">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-lime-accent/50 sticky top-24">
-              <h3 className="font-bold text-lg text-gray-800 mb-4">
-                Thông tin đơn hàng
-              </h3>
+              <h3 className="font-bold text-lg text-gray-800 mb-4">Thông tin đơn hàng</h3>
 
               <div className="space-y-3 text-sm text-gray-600 mb-6 border-b border-gray-100 pb-6">
                 <div className="flex justify-between">
                   <span>
-                    Tạm tính ({selectedIds.length}/{data?.page.totalElements}{" "}
-                    món)
+                    Tạm tính ({selectedIds.length}/{data?.page.totalElements} món)
                   </span>
-                  <span className="font-medium">
-                    {formatPrice(totalAmount)}
-                  </span>
+                  <span className="font-medium">{formatPrice(totalAmount)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Giảm giá</span>
@@ -291,16 +260,22 @@ export default function CartPage() {
               <div className="flex justify-between items-end mb-6">
                 <span className="font-bold text-gray-800">Tổng tiền</span>
                 <div className="text-right">
-                  <span className="block text-2xl font-bold text-lime-primary">
-                    {formatPrice(totalAmount)}
-                  </span>
-                  <span className="text-xs text-gray-400">
-                    (Đã bao gồm VAT)
-                  </span>
+                  <span className="block text-2xl font-bold text-lime-primary">{formatPrice(totalAmount)}</span>
+                  <span className="text-xs text-gray-400">(Đã bao gồm VAT)</span>
                 </div>
               </div>
 
-              <button className="w-full bg-lime-primary hover:bg-lime-hover text-white font-bold py-3.5 rounded-xl shadow-lg shadow-lime-primary/30 transition-all active:scale-[0.98]">
+              <button
+                onClick={() => {
+                  if (selectedIds.length === 0) {
+                    alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán!");
+                    return;
+                  }
+                  router.push(`/order?items=${selectedIds.join(",")}`);
+                }}
+                disabled={selectedIds.length === 0}
+                className="w-full bg-lime-primary hover:bg-lime-hover text-white font-bold py-3.5 rounded-xl shadow-lg shadow-lime-primary/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 Thanh toán ngay
               </button>
             </div>
@@ -315,29 +290,33 @@ export default function CartPage() {
           <div className="flex items-center gap-2" onClick={toggleSelectAll}>
             <button
               className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-                isAllSelected
-                  ? "bg-lime-primary border-lime-primary text-white"
-                  : "border-gray-300 bg-white"
+                isAllSelected ? "bg-lime-primary border-lime-primary text-white" : "border-gray-300 bg-white"
               }`}
             >
               {isAllSelected && <Check className="w-3.5 h-3.5" />}
             </button>
             <span className="text-sm text-gray-600">Chọn tất cả</span>
           </div>
-          <span className="text-sm text-gray-500">
-            Đã chọn: {selectedIds.length}
-          </span>
+          <span className="text-sm text-gray-500">Đã chọn: {selectedIds.length}</span>
         </div>
 
         {/* Dòng 2: Tổng tiền & Nút thanh toán */}
         <div className="flex items-center gap-4 justify-between">
           <div>
             <p className="text-xs text-gray-500">Tổng thanh toán:</p>
-            <p className="text-lg font-bold text-lime-primary">
-              {formatPrice(totalAmount)}
-            </p>
+            <p className="text-lg font-bold text-lime-primary">{formatPrice(totalAmount)}</p>
           </div>
-          <button className="flex-1 bg-lime-primary hover:bg-lime-hover text-white font-bold py-3 rounded-xl shadow-md transition-all active:scale-[0.95]">
+          <button
+            onClick={() => {
+              if (selectedIds.length === 0) {
+                alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán!");
+                return;
+              }
+              router.push(`/order?items=${selectedIds.join(",")}`);
+            }}
+            disabled={selectedIds.length === 0}
+            className="flex-1 bg-lime-primary hover:bg-lime-hover text-white font-bold py-3 rounded-xl shadow-md transition-all active:scale-[0.95] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             Thanh toán ({selectedIds.length})
           </button>
         </div>

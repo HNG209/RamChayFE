@@ -85,8 +85,7 @@ export interface ProductCreationRequest {
   category: CategoryCreationRequest;
   indexImage?: string;
   mediaUploadRequests: MediaUploadRequest[];
-  imageIdsToDelete?: number[]; 
-
+  imageIdsToDelete?: number[];
 }
 
 export interface ProductCreationResponse {
@@ -143,4 +142,79 @@ export interface Page<T> {
     totalElements: number;
     totalPages: number;
   };
+}
+
+// Order
+export interface OrderItemRequest {
+  cartItemId: number;
+  quantity: number;
+}
+
+export interface OrderCreationRequest {
+  customerId: number;
+  receiverName: string;
+  receiverPhone: string;
+  shippingAddress: string;
+  paymentMethod: "COD" | "QRPAY";
+  items: OrderItemRequest[];
+}
+
+export interface OrderCreationResponse {
+  id: number;
+  orderId: number;
+  message: string;
+}
+
+export interface OrderDetailItem {
+  id: number;
+  productId: number;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+  indexImage?: string;
+}
+
+export interface OrderDetail {
+  id: number;
+  customerId: number;
+  customerName: string;
+  receiverName: string;
+  receiverPhone: string;
+  shippingAddress: string;
+  paymentMethod: "COD" | "QRPAY";
+  totalAmount: number;
+  orderStatus: "PENDING" | "CONFIRMED" | "SHIPPING" | "DELIVERED" | "CANCELLED" | "PENDING_PAYMENT";
+  createdAt: string;
+  updatedAt: string;
+  items: OrderDetailItem[];
+}
+
+// Backend response structure
+export interface OrderDetailBackendResponse {
+  id: number;
+  orderDate: string;
+  total: number;
+  orderStatus: string;
+  paymentMethod: string;
+  receiverName: string;
+  receiverPhone: string;
+  shippingAddress: string;
+  customer: {
+    id: number;
+    username: string;
+    fullName: string | null;
+  };
+  orderDetails: Array<{
+    id: number;
+    quantity: number;
+    unitPrice: number;
+    subtotal: number;
+    product: {
+      id: number;
+      name: string;
+      price: number;
+      indexImage?: string;
+    };
+  }>;
 }
