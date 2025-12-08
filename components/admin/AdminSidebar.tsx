@@ -43,8 +43,20 @@ const ADMIN_MENU = [
       },
       {
         label: "Thêm sản phẩm",
-        href: "/admin/products/create",
+        href: "/admin/products/add",
         allowedRoles: ["ROLE_ADMIN"],
+      },
+    ],
+  },
+  {
+    label: "Loại sản phẩm",
+    href: "/admin/categories",
+    icon: Package,
+    items: [
+      {
+        label: "Quản lý loại sản phẩm",
+        href: "/admin/categories",
+        allowedRoles: ["ROLE_ADMIN", "ROLE_MANAGER"],
       },
     ],
   },
