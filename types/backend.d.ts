@@ -41,17 +41,27 @@ export interface RegisterResponse {
   phone: string[];
 }
 
+export interface Address {
+  id: number;
+  city: string;
+  ward: string;
+  street?: string;
+  personalAddress: string;
+  fullAddress?: string; // Combined address string for display
+}
+
 export interface MyProfile {
   // Thông tin chung
   id: number;
   username: string;
   fullName: string;
+  email?: string;
   roles: string[];
   permissions: string[];
 
   // Nếu là customer, có thêm thông tin liên quan
   phones: string[];
-  addresses: string[];
+  addresses: Address[];
 }
 
 export interface CategoryCreationRequest {
@@ -150,12 +160,20 @@ export interface OrderItemRequest {
   quantity: number;
 }
 
+export interface AddressCreationRequest {
+  city: string;
+  ward: string;
+  street?: string;
+  personalAddress: string;
+}
+
 export interface OrderCreationRequest {
   customerId?: number; // Optional for guest users
   receiverName: string;
   receiverPhone: string;
   shippingAddress: string;
   paymentMethod: "COD" | "QRPAY";
+  email?: string; // Email for order confirmation (required for guest, optional for logged-in users)
   items: OrderItemRequest[];
 }
 
