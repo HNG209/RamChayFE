@@ -34,13 +34,9 @@ export default function OrderSuccessPage() {
           </div>
 
           {/* Success Message */}
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-            Đặt hàng thành công!
-          </h1>
-          
-          <p className="text-lg text-gray-600 mb-8">
-            Cảm ơn bạn đã tin tưởng và mua hàng tại cửa hàng của chúng tôi
-          </p>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Đặt hàng thành công!</h1>
+
+          <p className="text-lg text-gray-600 mb-8">Cảm ơn bạn đã tin tưởng và mua hàng tại cửa hàng của chúng tôi</p>
 
           {/* Email Notification Box */}
           <div className="bg-linear-to-r from-lime-50 to-lime-100 border-2 border-lime-200 rounded-2xl p-6 mb-8">
@@ -49,12 +45,8 @@ export default function OrderSuccessPage() {
                 <Mail className="w-6 h-6 text-lime-primary" />
               </div>
               <div className="text-left flex-1">
-                <h3 className="font-bold text-gray-800 mb-2">
-                  Thông tin đơn hàng đã được gửi đến email
-                </h3>
-                <p className="text-lime-primary font-semibold text-lg break-all">
-                  {email}
-                </p>
+                <h3 className="font-bold text-gray-800 mb-2">Thông tin đơn hàng đã được gửi đến email</h3>
+                <p className="text-lime-primary font-semibold text-lg break-all">{email}</p>
                 <p className="text-sm text-gray-600 mt-2">
                   Vui lòng kiểm tra hộp thư của bạn (bao gồm cả thư mục spam) để xem chi tiết đơn hàng
                 </p>
@@ -65,7 +57,7 @@ export default function OrderSuccessPage() {
           {/* Next Steps */}
           <div className="space-y-3 mb-8">
             <h3 className="font-bold text-gray-800 text-lg mb-4">Tiếp theo bạn có thể:</h3>
-            
+
             {isGuest ? (
               <Link
                 href="/products"
@@ -81,7 +73,7 @@ export default function OrderSuccessPage() {
                 >
                   🛍️ Tiếp tục mua sắm
                 </Link>
-                
+
                 <Link
                   href="/orders"
                   className="p-4 border-2 border-gray-200 rounded-xl hover:border-lime-primary hover:bg-lime-50 transition-all text-gray-700 hover:text-lime-primary font-medium"
@@ -105,10 +97,7 @@ export default function OrderSuccessPage() {
 
         {/* Back to Home Link */}
         <div className="text-center mt-6">
-          <Link
-            href="/"
-            className="text-gray-600 hover:text-lime-primary transition-colors font-medium"
-          >
+          <Link href="/" className="text-gray-600 hover:text-lime-primary transition-colors font-medium">
             ← Về trang chủ
           </Link>
         </div>
