@@ -3,14 +3,11 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ArrowLeft, Check, Loader2, ShoppingBag, Trash2 } from "lucide-react";
 import CartItem from "@/components/CartItem";
-import {
-  useDeleteCartItemMutation,
-  useGetCartItemsQuery,
-  useUpdateCartItemMutation,
-} from "@/redux/services/cartApi";
+import { useDeleteCartItemMutation, useGetCartItemsQuery, useUpdateCartItemMutation } from "@/redux/services/cartApi";
 import { GetItemsResponse } from "@/types/backend";
 import { useInView } from "react-intersection-observer";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +15,7 @@ import { AppDispatch, RootState } from "@/redux/store";
 import { toggleItemSelected } from "@/redux/slices/cartSlice";
 
 export default function CartPage() {
+  const router = useRouter();
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true); // Kiểm tra còn dữ liệu để tải không
   const [cartItems, setCartItems] = useState<GetItemsResponse[]>([]);
@@ -160,8 +158,7 @@ export default function CartPage() {
       .reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
   }, [cartItems, selectedIds]);
 
-  const isAllSelected =
-    cartItems.length > 0 && selectedIds.length === cartItems.length;
+  const isAllSelected = cartItems.length > 0 && selectedIds.length === cartItems.length;
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden pb-32 md:pb-10">
@@ -336,6 +333,7 @@ export default function CartPage() {
                   <span className="font-bold text-chocolate">
                     {formatPrice(totalAmount)}
                   </span>
+                  <span className="font-medium">{formatPrice(totalAmount)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Giảm giá</span>
@@ -346,17 +344,32 @@ export default function CartPage() {
               <div className="flex justify-between items-end mb-6 bg-linear-to-r from-green-50 to-lime-50 p-4 rounded-xl border-2 border-green-100">
                 <span className="font-bold text-gray-800 text-lg">Tổng tiền</span>
                 <div className="text-right">
-                  <span className="block text-3xl font-bold text-chocolate">
-                    {formatPrice(totalAmount)}
-                  </span>
-                  <span className="text-xs text-gray-500 font-medium">
-                    (Đã bao gồm VAT)
-                  </span>
-                </div>
-              </div>
+<span className="block text-3xl font-bold text-chocolate">
+  {formatPrice(totalAmount)}
+</span>
+<span className="text-xs text-gray-500 font-medium">
+  (Đã bao gồm VAT)
+</span>
+</div>
+</div>
 
-              <button className="w-full bg-chocolate hover:bg-chocolate/90 text-white font-bold py-4 rounded-xl shadow-lg shadow-chocolate/30 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
-                <ShoppingBag className="w-5 h-5" />
+<button
+  onClick={() => {
+    if (selectedIds.length === 0) {
+      alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán!");
+      return;
+    }
+    router.push(`/order?items=${selectedIds.join(",")}`);
+  }}
+  disabled={selectedIds.length === 0}
+  className="
+    w-full bg-chocolate hover:bg-chocolate/90 text-white font-bold 
+    py-4 rounded-xl shadow-lg shadow-chocolate/30 transition-all 
+    hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2
+    disabled:opacity-50 disabled:cursor-not-allowed
+  "
+>
+  <ShoppingBag className="w-5 h-5" />
                 Thanh toán ngay
               </button>
             </div>
@@ -386,14 +399,31 @@ export default function CartPage() {
 
         {/* Dòng 2: Tổng tiền & Nút thanh toán */}
         <div className="flex items-center gap-4 justify-between">
-          <div className="bg-green-400 px-4 py-2 rounded-xl border border-green-200">
-            <p className="text-xs text-gray-600 font-medium mb-0.5">Tổng thanh toán</p>
-            <p className="text-xl font-bold text-chocolate">
-              {formatPrice(totalAmount)}
-            </p>
-          </div>
-          <button className="flex-1 bg-chocolate hover:bg-chocolate/90 text-white font-bold py-4 rounded-xl shadow-lg shadow-chocolate/30 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
-            <ShoppingBag className="w-5 h-5" />
+<div className="bg-green-400 px-4 py-2 rounded-xl border border-green-200">
+  <p className="text-xs text-gray-600 font-medium mb-0.5">Tổng thanh toán</p>
+  <p className="text-xl font-bold text-chocolate">
+    {formatPrice(totalAmount)}
+  </p>
+</div>
+
+<button
+  onClick={() => {
+    if (selectedIds.length === 0) {
+      alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán!");
+      return;
+    }
+    router.push(`/order?items=${selectedIds.join(",")}`);
+  }}
+  disabled={selectedIds.length === 0}
+  className="
+    flex-1 bg-chocolate hover:bg-chocolate/90 text-white font-bold 
+    py-4 rounded-xl shadow-lg shadow-chocolate/30 
+    transition-all hover:scale-[1.02] active:scale-[0.98] 
+    flex items-center justify-center gap-2 
+    disabled:opacity-50 disabled:cursor-not-allowed
+  "
+>
+  <ShoppingBag className="w-5 h-5" />
             Thanh toán ({selectedIds.length})
           </button>
         </div>

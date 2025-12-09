@@ -1,12 +1,6 @@
 // redux/services/authApi.ts
 import { baseApi } from "./baseApi";
-import {
-  LoginRequest,
-  LoginResponse,
-  MyProfile,
-  RegisterRequest,
-  RegisterResponse,
-} from "@/types/backend";
+import { LoginRequest, LoginResponse, MyProfile, RegisterRequest, RegisterResponse } from "@/types/backend";
 
 // Sử dụng injectEndpoints để thêm vào gốc
 export const authApi = baseApi.injectEndpoints({
@@ -17,7 +11,7 @@ export const authApi = baseApi.injectEndpoints({
         method: "POST",
         data: credentials,
       }),
-      invalidatesTags: ["User", "Cart"], // refresh lại cache, tự động gọi lại getMyProfile
+      invalidatesTags: ["User", "Cart", "Order"], // Clear cache for new user
     }),
 
     adminLogin: builder.mutation<LoginResponse, LoginRequest>({
@@ -34,7 +28,7 @@ export const authApi = baseApi.injectEndpoints({
         url: "/auth/logout",
         method: "POST",
       }),
-      invalidatesTags: ["Cart"],
+      invalidatesTags: ["Cart", "Order"],
     }),
 
     register: builder.mutation<RegisterResponse, RegisterRequest>({
@@ -58,10 +52,5 @@ export const authApi = baseApi.injectEndpoints({
 });
 
 // Xuất Hooks riêng từ file này
-export const {
-  useLoginMutation,
-  useAdminLoginMutation,
-  useRegisterMutation,
-  useGetMyProfileQuery,
-  useLogoutMutation,
-} = authApi;
+export const { useLoginMutation, useAdminLoginMutation, useRegisterMutation, useGetMyProfileQuery, useLogoutMutation } =
+  authApi;
