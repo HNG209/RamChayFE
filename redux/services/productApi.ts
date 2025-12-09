@@ -69,10 +69,13 @@ export const productApi = baseApi.injectEndpoints({
     // 6. AI Semantic Search
     searchProductsAI: builder.query<ProductCreationResponse[], string>({
       query: (searchTerm) => ({
-        url: `/products/ai-search`,
+        url: `/products/search`,
         method: "GET",
         params: { query: searchTerm },
       }),
+      transformResponse: (response: { code: number; message: string; result: ProductCreationResponse[] }) => {
+        return response.result || [];
+      },
       providesTags: ["Product"],
     }),
   }),
