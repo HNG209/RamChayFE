@@ -275,7 +275,7 @@ export default function Header() {
 
                         {/* Các mục menu */}
                         <Link
-                          href="/profile"
+                          href="/account"
                           className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-lime-50 hover:text-lime-primary transition-colors"
                         >
                           <User className="w-4 h-4" /> Tài khoản của tôi

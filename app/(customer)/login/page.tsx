@@ -31,13 +31,13 @@ export default function LoginPage() {
   // Generate floating stickers on mount
   useEffect(() => {
     const stickers: FloatingSticker[] = [];
-    for (let i = 0; i < 35; i++) {
+    for (let i = 0; i < 20; i++) {
       stickers.push({
         id: i,
         emoji: veganEmojis[Math.floor(Math.random() * veganEmojis.length)],
         left: `${Math.random() * 100}%`,
-        animationDuration: `${10 + Math.random() * 15}s`,
-        animationDelay: `${Math.random() * 8}s`,
+        animationDuration: `${12 + Math.random() * 18}s`,
+        animationDelay: `${Math.random() * 10}s`,
         size: `${1.5 + Math.random() * 2.5}rem`
       });
     }
@@ -97,8 +97,8 @@ export default function LoginPage() {
       className="min-h-screen flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat relative"
       style={{ backgroundImage: "url('/background-vegan-footer.png')" }}
     >
-      {/* Floating Veggie Stickers */}
-      <div className="fixed inset-0 pointer-events-none z-9999">
+      {/* Floating Veggie Stickers - Behind everything */}
+      <div className="fixed inset-0 pointer-events-none z-0">
         {floatingStickers.map((sticker) => (
           <div
             key={sticker.id}
@@ -116,7 +116,7 @@ export default function LoginPage() {
       </div>
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-white/60 backdrop-blur-sm"></div>
+      <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] z-1"></div>
 
       <div className="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-2xl w-full max-w-md border-2 border-green-200 relative z-10">
         {/* Decorative elements */}
@@ -125,8 +125,8 @@ export default function LoginPage() {
 
         <div className="relative z-10">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-linear-to-br from-chocolate to-amber-700 text-white mb-4 shadow-lg">
-              <span className="text-3xl">🌿</span>
+            <div className="inline-flex items-center justify-center px-6 py-3 rounded-2xl bg-linear-to-br from-chocolate to-amber-700 text-white mb-4 shadow-lg">
+              <span className="text-2xl font-bold">RamChay</span>
             </div>
             <h2 className="text-3xl font-bold bg-linear-to-r from-chocolate to-amber-700 bg-clip-text text-transparent mb-2">
               Đăng Nhập
