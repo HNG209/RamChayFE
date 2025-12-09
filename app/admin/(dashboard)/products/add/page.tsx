@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Thêm useEffect nếu muốn tự tắt lỗi sau vài giây
 import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
@@ -10,20 +10,18 @@ import {
   Loader2,
   Package,
   ImageIcon,
-  Scale, // Icon cho Đơn vị tính
+  Scale,
   ListFilter,
   DollarSign,
+  AlertCircle, // <--- Thêm icon cảnh báo
 } from "lucide-react";
 import { useCreateProductMutation } from "@/redux/services/productApi";
 import { useGetCategoriesQuery } from "@/redux/services/categoryApi";
-// import { ProductCreationRequest } from "@/types/backend"; // Import interface của bạn nếu cần type strict
 
 export default function CreateProductPage() {
   const router = useRouter();
 
-  // Gọi API lấy danh sách danh mục
   const { data: categories = [], isLoading: isLoadingCategories } = useGetCategoriesQuery();
-
   const [createProduct, { isLoading }] = useCreateProductMutation();
 
   // State form
@@ -38,10 +36,15 @@ export default function CreateProductPage() {
 
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  
+  // --- THÊM STATE LỖI ---
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // (Tùy chọn) Xóa lỗi khi người dùng bắt đầu nhập lại
+    if (errorMessage) setErrorMessage(null);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,61 +53,66 @@ export default function CreateProductPage() {
       const newPreviewUrls = filesArray.map((file) => URL.createObjectURL(file));
       setSelectedImages((prev) => [...prev, ...filesArray]);
       setPreviewUrls((prev) => [...prev, ...newPreviewUrls]);
+      if (errorMessage) setErrorMessage(null); // Xóa lỗi khi chọn ảnh
     }
   };
 
   const removeImage = (index: number) => {
     const newImages = [...selectedImages];
     const newUrls = [...previewUrls];
-    
-    // Revoke URL để tránh memory leak
     URL.revokeObjectURL(newUrls[index]);
-
     newImages.splice(index, 1);
     newUrls.splice(index, 1);
-    
     setSelectedImages(newImages);
     setPreviewUrls(newUrls);
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Hàm helper để scroll lên đầu trang khi có lỗi
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-    // Validate cơ bản
-    if (!formData.categoryId) {
-      alert("Vui lòng chọn danh mục!");
-      return;
-    }
-    if (selectedImages.length === 0) {
-      alert("Vui lòng tải lên ít nhất 1 hình ảnh sản phẩm!");
-      return;
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null); // Reset lỗi cũ
 
     try {
-      // --- LOGIC MỚI: ĐƠN GIẢN HÓA ---
-      // Vì productApi.ts đã lo việc tạo FormData rồi,
-      // ở đây ta chỉ cần gom dữ liệu vào 1 object JS bình thường.
-      
       const payload = {
         name: formData.name,
         description: formData.description,
         price: parseFloat(formData.price),
         stock: parseInt(formData.stock),
         unit: formData.unit,
-        categoryId: Number(formData.categoryId), // Quan trọng: Convert sang số
+        categoryId: Number(formData.categoryId),
         images: selectedImages,
         mediaUploadRequests: [],
       };
 
-      // Gọi API: RTK Query sẽ tự động tách `images` ra và stringify phần còn lại
       await createProduct(payload).unwrap();
 
-      alert("Thêm sản phẩm thành công!");
-      router.push("/admin/products"); // Chuyển trang
-      
+      // Thành công
+      alert("Thêm sản phẩm thành công!"); // Có thể thay bằng Toast message đẹp hơn nếu muốn
+      router.push("/admin/products");
+
     } catch (error: any) {
       console.error("Lỗi:", error);
-      alert("Lỗi: " + (error?.data?.message || "Không thể tạo sản phẩm"));
+      
+      // --- XỬ LÝ LỖI TỪ BACKEND TRẢ VỀ ---
+      // Backend của bạn trả về cấu trúc error.data.message hoặc error.data.code
+      let msg = "Đã xảy ra lỗi không xác định. Vui lòng thử lại.";
+      
+      if (error?.data) {
+        // Giả sử backend trả về: { code: 1001, message: "Tên sản phẩm trùng" }
+        // Bạn có thể format giống ảnh: [CODE] Message
+        const serverMsg = error.data.message || JSON.stringify(error.data);
+        const serverCode = error.data.code ? `[${error.data.code}] ` : ""; 
+        msg = `${serverCode}${serverMsg}`;
+      } else if (error?.status === "FETCH_ERROR") {
+        msg = "Không thể kết nối đến máy chủ (Backend offline?)";
+      }
+
+      setErrorMessage(msg);
+      scrollToTop();
     }
   };
 
@@ -112,8 +120,8 @@ const handleSubmit = async (e: React.FormEvent) => {
     <div className="min-h-screen bg-gray-50/50 pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        {/* HEADER - Bỏ các nút bấm ở đây */}
-        <div className="flex items-center gap-4 mb-8">
+        {/* HEADER */}
+        <div className="flex items-center gap-4 mb-6">
             <button 
               onClick={() => router.back()} 
               className="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-100 text-gray-600 transition-all shadow-sm"
@@ -126,9 +134,25 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* --- KHUNG HIỂN THỊ LỖI (VALIDATION ERROR BANNER) --- */}
+        {errorMessage && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+            <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+            <div className="flex-1">
+              <h3 className="text-sm font-bold text-red-800">Yêu cầu không hợp lệ</h3>
+              <p className="text-sm text-red-600 mt-1">
+                {errorMessage}
+              </p>
+            </div>
+            <button onClick={() => setErrorMessage(null)} className="text-red-400 hover:text-red-600">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} noValidate className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          {/* CỘT TRÁI: THÔNG TIN CHÍNH (Chiếm 8/12 cột) */}
+          {/* CỘT TRÁI: THÔNG TIN CHÍNH */}
           <div className="lg:col-span-8 space-y-8">
             
             {/* Card 1: Thông tin chung */}
@@ -149,6 +173,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     value={formData.name}
                     onChange={handleInputChange}
                     placeholder="Ví dụ: Gạo Lứt Huyết Rồng"
+                    // Thêm class highlight đỏ nếu cần khi có lỗi cụ thể trường này (nâng cao)
                     className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all placeholder-gray-400 text-gray-900 bg-gray-50/30 focus:bg-white"
                     required
                   />
@@ -159,7 +184,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       Danh mục <span className="text-red-500">*</span>
                     </label>
-                    {/* Đã xóa nút + và wrapper flex để select full width */}
                     <div className="relative w-full">
                         <ListFilter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                         <select
@@ -265,7 +289,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
           </div>
 
-          {/* CỘT PHẢI: ẢNH (Chiếm 4/12 cột) */}
+          {/* CỘT PHẢI: ẢNH */}
           <div className="lg:col-span-4 space-y-6">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-full">
               <h2 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2 pb-4 border-b border-gray-100">
@@ -326,7 +350,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
           </div>
 
-          {/* FOOTER BUTTONS (Đã thêm mới ở đây) */}
+          {/* FOOTER BUTTONS */}
           <div className="lg:col-span-12 flex justify-end gap-3 pt-6 border-t border-gray-200">
              <button 
                 type="button" 
@@ -337,7 +361,6 @@ const handleSubmit = async (e: React.FormEvent) => {
               </button>
               <button 
                 type="submit" 
-                onClick={handleSubmit} 
                 disabled={isLoading} 
                 className="flex items-center gap-2 px-8 py-2.5 rounded-xl bg-green-600 text-white hover:bg-green-700 disabled:opacity-70 font-medium shadow-sm transition-all hover:shadow-md"
               >

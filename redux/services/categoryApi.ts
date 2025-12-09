@@ -25,15 +25,16 @@ export const categoryApi = baseApi.injectEndpoints({
       query: () => ({
         url: "/categories",
         method: "GET",
-      }),      providesTags: ["Category"],
+      }),      
+      providesTags: ["Category"],
     }),
 
     // 3. Tạo danh mục
     createCategory: builder.mutation<Category, { categoryName: string; description: string }>({
-      query: (body) => ({
+      query: (payload) => ({
         url: "/categories",
         method: "POST",
-        body,
+        data: payload,
       }),
       invalidatesTags: ["Category"], // Reset lại cache để load lại danh sách mới
     }),
@@ -47,6 +48,7 @@ export const categoryApi = baseApi.injectEndpoints({
       invalidatesTags: ["Category"],
     }),
   }),
+  overrideExisting: true,
 });
 
 export const {
