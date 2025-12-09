@@ -2,15 +2,26 @@
 
 import { useState, useRef, useEffect } from "react"
 import { MessageCircle, X, Send, Loader2 } from "lucide-react"
+import Image from "next/image"
+import { useRouter } from "next/navigation"
+
+interface ProductItem {
+    id: number
+    name: string
+    price: number
+    indexImage: string
+}
 
 interface Message {
     id: number
     text: string
     sender: "user" | "bot"
     timestamp: Date
+    products?: ProductItem[] // Danh sách sản phẩm từ backend
 }
 
 export default function ChatBot() {
+    const router = useRouter()
     const [isOpen, setIsOpen] = useState(false)
     const [messages, setMessages] = useState<Message[]>([
         {
@@ -48,13 +59,32 @@ export default function ChatBot() {
         setInputText("")
         setIsTyping(true)
 
-        // Simulate bot response (replace with actual API call)
+        // TODO: Replace with actual API call to chatbot backend
+        // Expected response format from backend:
+        // {
+        //   "answer": string,
+        //   "responseList": [{ id, name, indexImage, price }]
+        // }
         setTimeout(() => {
+            // Mock response với responseList (demo theo format backend)
+            const mockResponse = {
+                answer: "Có thật và mì Xào Giòn Chay (Món ăn số 1) là một món ăn chay...",
+                responseList: [
+                    {
+                        id: 1,
+                        name: "Bắp cải",
+                        indexImage: "https://res.cloudinary.com/dqoallgsf/image/upload/v1765191181/opwabxdx0gncv0tx37ik.png",
+                        price: 25000
+                    }
+                ]
+            }
+
             const botMessage: Message = {
                 id: Date.now() + 1,
-                text: "Cảm ơn bạn đã nhắn tin! Tôi đang xử lý yêu cầu của bạn...",
+                text: mockResponse.answer,
                 sender: "bot",
-                timestamp: new Date()
+                timestamp: new Date(),
+                products: mockResponse.responseList // Nếu responseList rỗng [] thì chỉ hiện text
             }
             setMessages(prev => [...prev, botMessage])
             setIsTyping(false)
@@ -65,7 +95,7 @@ export default function ChatBot() {
         <>
             {/* Chat Modal */}
             {isOpen && (
-                <div className="fixed bottom-24 right-4 md:right-8 w-[90vw] md:w-96 h-[32rem] bg-white rounded-2xl shadow-2xl border-2 border-green-200 z-50 flex flex-col overflow-hidden">
+                <div className="fixed bottom-24 right-4 md:right-8 w-[90vw] md:w-96 h-128 bg-white rounded-2xl shadow-2xl border-2 border-green-200 z-50 flex flex-col overflow-hidden">
                     {/* Header */}
                     <div className="bg-linear-to-r from-green-500 to-lime-500 p-4 flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -88,21 +118,56 @@ export default function ChatBot() {
                     {/* Messages */}
                     <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-green-50/30">
                         {messages.map((message) => (
-                            <div
-                                key={message.id}
-                                className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
-                            >
-                                <div
-                                    className={`max-w-[75%] rounded-2xl px-4 py-2 ${message.sender === "user"
+                            <div key={message.id}>
+                                {/* Text Message */}
+                                <div className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
+                                    <div
+                                        className={`max-w-[75%] rounded-2xl px-4 py-2 ${message.sender === "user"
                                             ? "bg-chocolate text-white rounded-br-sm"
                                             : "bg-white border border-green-200 text-gray-800 rounded-bl-sm"
-                                        }`}
-                                >
-                                    <p className="text-sm">{message.text}</p>
-                                    <p className={`text-xs mt-1 ${message.sender === "user" ? "text-white/70" : "text-gray-400"}`}>
-                                        {message.timestamp.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}
-                                    </p>
+                                            }`}
+                                    >
+                                        <p className="text-sm">{message.text}</p>
+                                        <p className={`text-xs mt-1 ${message.sender === "user" ? "text-white/70" : "text-gray-400"}`}>
+                                            {message.timestamp.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}
+                                        </p>
+                                    </div>
                                 </div>
+
+                                {/* Product Cards (chỉ hiện khi có products) */}
+                                {message.products && message.products.length > 0 && (
+                                    <div className="mt-3 space-y-2">
+                                        {message.products.map((product) => (
+                                            <div
+                                                key={product.id}
+                                                onClick={() => router.push(`/products/${product.id}`)}
+                                                className="bg-white border border-green-200 rounded-lg p-3 hover:shadow-md hover:border-chocolate transition-all cursor-pointer group"
+                                            >
+                                                <div className="flex gap-3">
+                                                    {/* Product Image */}
+                                                    <div className="relative w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                                                        <Image
+                                                            src={product.indexImage}
+                                                            alt={product.name}
+                                                            fill
+                                                            className="object-cover group-hover:scale-110 transition-transform"
+                                                        />
+                                                    </div>
+
+                                                    {/* Product Info */}
+                                                    <div className="flex-1 min-w-0">
+                                                        <h4 className="text-sm font-semibold text-gray-800 line-clamp-2 group-hover:text-chocolate transition-colors">
+                                                            {product.name}
+                                                        </h4>
+                                                        <p className="text-chocolate font-bold mt-1">
+                                                            {product.price.toLocaleString()}đ
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         ))}
 

@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Menu,
   X,
@@ -42,6 +42,7 @@ export default function Header() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isAISearch, setIsAISearch] = useState(false);
   const [logout] = useLogoutMutation();
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load AI search preference from localStorage
   useEffect(() => {
@@ -57,6 +58,29 @@ export default function Header() {
     setIsAISearch(newValue);
     localStorage.setItem('aiSearchEnabled', String(newValue));
   };
+
+  // Debounced search effect
+  useEffect(() => {
+    // Clear previous timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // Only trigger if searchTerm has value and on products page
+    if (searchTerm.trim() && pathname === '/products') {
+      debounceTimerRef.current = setTimeout(() => {
+        const searchUrl = `/products?search=${encodeURIComponent(searchTerm.trim())}&aiSearch=${isAISearch}`;
+        router.push(searchUrl);
+      }, 500); // 500ms debounce
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [searchTerm, isAISearch, router, pathname]);
 
   // Lấy user từ Redux (ép kiểu MyProfile để gợi ý code)
   const user = useSelector((state: RootState) => state.auth.user);
