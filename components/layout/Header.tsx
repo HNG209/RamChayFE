@@ -99,8 +99,6 @@ export default function Header() {
   );
   const cartItemsCount = cartData?.content.reduce((total, item) => total + item.quantity, 0) || 0;
 
-  console.log('Cart data in Header:', cartData, 'Count:', cartItemsCount);
-
   const isActive = (path: string) => pathname === path;
 
   // Xử lý search

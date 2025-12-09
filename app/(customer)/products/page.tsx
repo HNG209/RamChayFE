@@ -310,16 +310,16 @@ export default function CustomerProductsPage() {
                                 <LayoutGrid className="w-5 h-5" />
                             </button>
                         </div>
-
-                        {/* Filter Toggle Button */}
-                        <button
-                            onClick={() => setIsFilterOpen(!isFilterOpen)}
-                            className="flex items-center gap-2 px-4 py-2 bg-chocolate text-white rounded-lg hover:bg-chocolate/90 transition-colors"
-                        >
-                            <SlidersHorizontal className="w-5 h-5" />
-                            Bộ lọc
-                        </button>
                     </div>
+
+                    {/* Filter Toggle Button - Right side */}
+                    <button
+                        onClick={() => setIsFilterOpen(!isFilterOpen)}
+                        className="flex items-center gap-2 px-4 py-2 bg-chocolate text-white rounded-lg hover:bg-chocolate/90 transition-colors"
+                    >
+                        <SlidersHorizontal className="w-5 h-5" />
+                        Bộ lọc
+                    </button>
                 </div>
 
                 {/* Active Filters Display */}

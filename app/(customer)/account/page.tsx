@@ -11,9 +11,12 @@ export default function AccountPage() {
     const router = useRouter()
     const user = useSelector((state: RootState) => state.auth.user)
     const [isEditing, setIsEditing] = useState(false)
+
+    console.log('User data from Redux:', user)
+
     const [formData, setFormData] = useState({
         fullName: user?.fullName || "",
-        phone: user?.phone || "",
+        phone: user?.phones?.[0] || "",
         email: user?.email || "",
         address: ""
     })
@@ -34,7 +37,7 @@ export default function AccountPage() {
     const handleCancel = () => {
         setFormData({
             fullName: user?.fullName || "",
-            phone: user?.phone || "",
+            phone: user?.phones?.[0] || "",
             email: user?.email || "",
             address: ""
         })
@@ -61,7 +64,7 @@ export default function AccountPage() {
                                 <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-linear-to-br from-chocolate to-amber-700 text-white mb-4">
                                     <User className="w-12 h-12" />
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-800">{user.fullName}</h3>
+                                <h3 className="text-xl font-bold text-gray-800">{user.fullName || user.username}</h3>
                                 <p className="text-sm text-gray-500">@{user.username}</p>
                             </div>
 
@@ -74,13 +77,13 @@ export default function AccountPage() {
                                     <User className="w-5 h-5" />
                                     Thông tin tài khoản
                                 </Link>
-                                <Link
+                                {/* <Link
                                     href="/orders"
                                     className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-green-50 text-gray-700 font-medium transition-colors"
                                 >
                                     <ShoppingBag className="w-5 h-5" />
                                     Đơn hàng của tôi
-                                </Link>
+                                </Link> */}
                                 <Link
                                     href="/wishlist"
                                     className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-green-50 text-gray-700 font-medium transition-colors"
@@ -152,7 +155,7 @@ export default function AccountPage() {
                                             className="w-full px-4 py-3 border-2 border-green-200 rounded-xl focus:border-chocolate focus:ring-4 focus:ring-chocolate/20 outline-none transition-all"
                                         />
                                     ) : (
-                                        <p className="text-gray-800 text-lg font-medium">{user.fullName}</p>
+                                        <p className="text-gray-800 text-lg font-medium">{user.fullName || "Chưa cập nhật"}</p>
                                     )}
                                 </div>
 
@@ -180,7 +183,7 @@ export default function AccountPage() {
                                             className="w-full px-4 py-3 border-2 border-green-200 rounded-xl focus:border-chocolate focus:ring-4 focus:ring-chocolate/20 outline-none transition-all"
                                         />
                                     ) : (
-                                        <p className="text-gray-800 text-lg font-medium">{user.phone}</p>
+                                        <p className="text-gray-800 text-lg font-medium">{user.phones?.[0] || "Chưa cập nhật"}</p>
                                     )}
                                 </div>
 

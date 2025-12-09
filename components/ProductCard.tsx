@@ -25,7 +25,13 @@ export default function ProductCard({ product }: { product: Product }) {
         e.preventDefault()
 
         try {
-            console.log('Adding to cart:', { productId: product.id, quantity: 1 })
+            console.log('Product data:', product)
+            console.log('Adding to cart:', {
+                productId: product.id,
+                quantity: 1,
+                unitPrice: product.price,
+                subtotal: product.price * 1
+            })
 
             // Call API to add item to cart
             const response = await addItem({

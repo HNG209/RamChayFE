@@ -193,9 +193,15 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={formik.isSubmitting}
-              className="w-full bg-linear-to-r from-chocolate via-amber-700 to-chocolate bg-size-200 hover:bg-pos-100 text-white font-bold py-4 px-4 rounded-xl shadow-lg shadow-chocolate/40 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2"
+              className="w-full bg-linear-to-r from-chocolate via-amber-700 to-chocolate bg-size-200 hover:bg-pos-100 text-white font-bold py-4 px-4 rounded-xl shadow-lg shadow-chocolate/40 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2 relative overflow-hidden group"
             >
-              {isLoggingIn ? "Đang kiểm tra..." : "Đăng nhập"}
+              {/* Sticker effects on hover */}
+              <span className="absolute -top-2 -left-2 text-2xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300">🥬</span>
+              <span className="absolute -top-1 left-1/4 text-xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-75">🥕</span>
+              <span className="absolute -bottom-2 left-1/3 text-2xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-150">🥦</span>
+              <span className="absolute -top-2 right-1/4 text-xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-100">🍄</span>
+              <span className="absolute -bottom-1 -right-2 text-2xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-200">🌽</span>
+              <span className="relative z-10">{isLoggingIn ? "Đang kiểm tra..." : "Đăng nhập"}</span>
             </button>
           </form>
           <div className="mt-8 text-center">
@@ -203,9 +209,11 @@ export default function LoginPage() {
               Chưa có tài khoản?{" "}
               <Link
                 href="/register"
-                className="text-chocolate font-bold hover:underline"
+                className="text-chocolate font-bold hover:underline relative inline-block group"
               >
-                Đăng ký ngay
+                <span className="absolute -top-3 -left-3 text-lg opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300">🥬</span>
+                <span className="absolute -top-4 -right-3 text-base opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-100">🥕</span>
+                <span className="relative z-10">Đăng ký ngay</span>
               </Link>
             </p>
           </div>

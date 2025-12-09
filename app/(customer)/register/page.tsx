@@ -51,6 +51,7 @@ export default function RegisterPage() {
       password: "",
       fullName: "",
       phone: "",
+      email: "",
     },
     validationSchema: Yup.object({
       fullName: Yup.string().required("Vui lòng nhập họ và tên"),
@@ -65,6 +66,9 @@ export default function RegisterPage() {
         .min(10, "Số điện thoại không hợp lệ (ít nhất 10 số)")
         .max(11, "Số điện thoại không hợp lệ")
         .required("Vui lòng nhập số điện thoại"),
+      email: Yup.string()
+        .email("Email không hợp lệ")
+        .required("Vui lòng nhập email"),
     }),
     onSubmit: async (values, { setSubmitting }) => {
       setServerError(null);
@@ -135,14 +139,16 @@ export default function RegisterPage() {
         <div className="absolute bottom-0 left-0 w-20 h-20 bg-linear-to-tr from-chocolate/10 to-transparent rounded-tr-full"></div>
 
         <div className="relative z-10">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center px-6 py-3 rounded-2xl bg-linear-to-br from-chocolate to-amber-700 text-white mb-4 shadow-lg">
-              <span className="text-2xl font-bold">RamChay</span>
+          <div className="mb-8">
+            <div className="flex justify-center mb-4">
+              <div className="inline-flex items-center justify-center px-6 py-3 rounded-2xl bg-linear-to-br from-chocolate to-amber-700 text-white shadow-lg">
+                <span className="text-2xl font-bold">RamChay</span>
+              </div>
             </div>
-            <h2 className="text-3xl font-bold bg-linear-to-r from-chocolate to-amber-700 bg-clip-text text-transparent mb-2">
+            <h2 className="text-3xl font-bold bg-linear-to-r from-chocolate to-amber-700 bg-clip-text text-transparent mb-2 text-center">
               Tạo tài khoản mới
             </h2>
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-600 text-sm text-center">
               Tham gia cùng chúng tôi ngay hôm nay
             </p>
           </div>
@@ -204,6 +210,27 @@ export default function RegisterPage() {
               )}
             </div>
 
+            {/* 2.5. Email */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                {...formik.getFieldProps("email")}
+                className={`w-full px-4 py-3.5 rounded-xl border-2 outline-none transition-all ${formik.touched.email && formik.errors.email
+                  ? "border-red-500 bg-red-50 focus:ring-4 focus:ring-red-200"
+                  : "border-green-200 bg-green-50/30 focus:border-chocolate focus:ring-4 focus:ring-chocolate/20 focus:bg-white"
+                  }`}
+                placeholder="example@gmail.com"
+              />
+              {formik.touched.email && formik.errors.email && (
+                <p className="text-red-500 text-xs mt-1 ml-1">
+                  {formik.errors.email}
+                </p>
+              )}
+            </div>
+
             {/* 3. Username */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -250,9 +277,15 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={formik.isSubmitting || !!successMessage}
-              className="w-full bg-linear-to-r from-chocolate via-amber-700 to-chocolate bg-size-200 hover:bg-pos-100 text-white font-bold py-4 px-4 rounded-xl shadow-lg shadow-chocolate/40 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-4"
+              className="w-full bg-linear-to-r from-chocolate via-amber-700 to-chocolate bg-size-200 hover:bg-pos-100 text-white font-bold py-4 px-4 rounded-xl shadow-lg shadow-chocolate/40 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-4 relative overflow-hidden group"
             >
-              {formik.isSubmitting ? "Đang xử lý..." : "Đăng ký tài khoản"}
+              {/* Sticker effects on hover */}
+              <span className="absolute -top-2 -left-2 text-2xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300">🥬</span>
+              <span className="absolute -top-1 left-1/4 text-xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-75">🥕</span>
+              <span className="absolute -bottom-2 left-1/3 text-2xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-150">🥦</span>
+              <span className="absolute -top-2 right-1/4 text-xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-100">🍄</span>
+              <span className="absolute -bottom-1 -right-2 text-2xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-200">🌽</span>
+              <span className="relative z-10">{formik.isSubmitting ? "Đang xử lý..." : "Đăng ký tài khoản"}</span>
             </button>
           </form>
 
@@ -261,9 +294,11 @@ export default function RegisterPage() {
               Đã có tài khoản?{" "}
               <Link
                 href="/login"
-                className="text-chocolate font-bold hover:underline"
+                className="text-chocolate font-bold hover:underline relative inline-block group"
               >
-                Đăng nhập ngay
+                <span className="absolute -top-3 -left-3 text-lg opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300">🥬</span>
+                <span className="absolute -top-4 -right-3 text-base opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-100">🥕</span>
+                <span className="relative z-10">Đăng nhập ngay</span>
               </Link>
             </p>
           </div>

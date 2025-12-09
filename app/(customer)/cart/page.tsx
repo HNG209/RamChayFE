@@ -5,7 +5,7 @@ import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { ArrowLeft, Check, Loader2, ShoppingBag, Trash2 } from "lucide-react";
+import { ArrowLeft, Check, Loader2, ShoppingBag, Trash2, ShoppingBasket } from "lucide-react";
 import CartItem from "@/components/CartItem";
 import { useDeleteCartItemMutation, useGetCartItemsQuery, useUpdateCartItemMutation } from "@/redux/services/cartApi";
 import { GetItemsResponse } from "@/types/backend";
@@ -204,7 +204,7 @@ export default function CartPage() {
                   onClick={toggleSelectAll}
                   className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${isAllSelected
                     ? "bg-chocolate border-chocolate text-white scale-110"
-                    : "border-green-300 bg-green-400 hover:border-chocolate"
+                    : "border-green-100 bg-green-50 hover:border-chocolate"
                     }`}
                 >
                   {isAllSelected && <Check className="w-4 h-4" />}
@@ -281,8 +281,10 @@ export default function CartPage() {
               </>
             ) : (
               !isFetching && (
-                <div className="text-center py-16 bg-green-100 backdrop-blur-sm rounded-2xl border-2 border-green-200 shadow-lg">
-                  <div className="mb-4 text-6xl">🛒</div>
+                <div className="text-center py-16 bg-green-50 backdrop-blur-sm rounded-2xl border-2 border-green-200 shadow-lg">
+                  <div className="mb-4 flex justify-center">
+                    <ShoppingBasket className="w-24 h-24 text-chocolate/40" strokeWidth={1.5} />
+                  </div>
                   <p className="text-xl font-bold text-chocolate mb-2">Giỏ hàng trống trơn...</p>
                   <p className="text-gray-600 mb-6">Thêm sản phẩm vào giỏ hàng để bắt đầu mua sắm!</p>
                   <Link
