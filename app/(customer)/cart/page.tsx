@@ -168,10 +168,10 @@ export default function CartPage() {
           src="/Background-vegan-product.jpg"
           alt="Cart Background"
           fill
-          className="object-cover"
+          className="object-cover opacity-80 blur-sm"
           quality={100}
         />
-        <div className="absolute inset-0 bg-white/50"></div>
+        <div className="absolute inset-0 bg-green/80"></div>
       </div>
 
       <div className="container mx-auto px-4 pt-8 relative" style={{ zIndex: 1 }}>
@@ -221,7 +221,6 @@ export default function CartPage() {
                 Bỏ chọn
               </button>
             </div>
-
             {/* List Items */}
             {/* {cartItems.length > 0 ? (
               cartItems.map((item) => (
@@ -265,7 +264,7 @@ export default function CartPage() {
                     ref={ref}
                     className="flex justify-center py-6"
                   >
-                    <div className="flex items-center gap-3 text-chocolate text-sm bg-green-400 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg border-2 border-green-200 font-semibold">
+                    <div className="flex items-center gap-3 text-chocolate text-sm bg-green-100 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg border-2 border-green-200 font-semibold">
                       <Loader2 className="w-5 h-5 animate-spin" />
                       Đang tải thêm sản phẩm...
                     </div>
@@ -274,7 +273,7 @@ export default function CartPage() {
 
                 {!hasMore && cartItems.length > 5 && (
                   <div className="text-center py-4">
-                    <p className="text-gray-500 text-sm bg-green-400 inline-block px-4 py-2 rounded-full">
+                    <p className="text-gray-500 text-sm bg-green-100 inline-block px-4 py-2 rounded-full">
                       Đã hiển thị tất cả sản phẩm
                     </p>
                   </div>
@@ -282,7 +281,7 @@ export default function CartPage() {
               </>
             ) : (
               !isFetching && (
-                <div className="text-center py-16 bg-green-400 backdrop-blur-sm rounded-2xl border-2 border-green-200 shadow-lg">
+                <div className="text-center py-16 bg-green-100 backdrop-blur-sm rounded-2xl border-2 border-green-200 shadow-lg">
                   <div className="mb-4 text-6xl">🛒</div>
                   <p className="text-xl font-bold text-chocolate mb-2">Giỏ hàng trống trơn...</p>
                   <p className="text-gray-600 mb-6">Thêm sản phẩm vào giỏ hàng để bắt đầu mua sắm!</p>

@@ -281,18 +281,14 @@ export default function CustomerProductsPage() {
                     src="/Background-vegan-product.jpg"
                     alt="Products Background"
                     fill
-                    className="object-cover"
+                    className="object-cover opacity-80 blur-sm"
                     quality={100}
                 />
-                <div className="absolute inset-0 bg-white/40"></div>
+                <div className="absolute inset-0 bg-green/80"></div>
             </div>
 
             <div className="container mx-auto px-4 py-8 relative" style={{ zIndex: 1 }}>
                 <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-3xl font-bold text-chocolate bg-white/90 px-6 py-3 rounded-xl shadow-lg border-2 border-green-200">
-                        Sản phẩm
-                    </h1>
-
                     <div className="flex items-center gap-3">
                         {/* Grid Columns Toggle (Desktop only) */}
                         <div className="hidden md:flex items-center gap-2 px-3 py-2 bg-muted rounded-lg">

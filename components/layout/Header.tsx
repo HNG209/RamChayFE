@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Menu,
   X,
@@ -42,6 +42,7 @@ export default function Header() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isAISearch, setIsAISearch] = useState(false);
   const [logout] = useLogoutMutation();
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load AI search preference from localStorage
   useEffect(() => {
@@ -57,6 +58,29 @@ export default function Header() {
     setIsAISearch(newValue);
     localStorage.setItem('aiSearchEnabled', String(newValue));
   };
+
+  // Debounced search effect
+  useEffect(() => {
+    // Clear previous timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // Only trigger if searchTerm has value and on products page
+    if (searchTerm.trim() && pathname === '/products') {
+      debounceTimerRef.current = setTimeout(() => {
+        const searchUrl = `/products?search=${encodeURIComponent(searchTerm.trim())}&aiSearch=${isAISearch}`;
+        router.push(searchUrl);
+      }, 500); // 500ms debounce
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [searchTerm, isAISearch, router, pathname]);
 
   // Lấy user từ Redux (ép kiểu MyProfile để gợi ý code)
   const user = useSelector((state: RootState) => state.auth.user);
@@ -186,8 +210,8 @@ export default function Header() {
               type="button"
               onClick={toggleAISearch}
               className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${isAISearch
-                  ? 'bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               title={isAISearch ? "Sử dụng AI Semantic Search" : "Sử dụng tìm kiếm thường"}
             >
@@ -349,6 +373,34 @@ export default function Header() {
 
           {/* Drawer Links */}
           <div className="flex-1 overflow-y-auto py-4">
+            {/* Mobile Search Bar */}
+            <div className="px-4 mb-4">
+              <form onSubmit={handleSearch} className="space-y-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder={isAISearch ? "Tìm kiếm với AI..." : "Tìm kiếm sản phẩm..."}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-lime-primary/50 focus:border-lime-primary bg-white"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={toggleAISearch}
+                  className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all ${isAISearch
+                    ? 'bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                >
+                  <Sparkles className={`w-4 h-4 ${isAISearch ? 'animate-pulse' : ''}`} />
+                  {isAISearch ? 'Đang dùng AI Search' : 'Dùng AI Search'}
+                </button>
+              </form>
+              <div className="mt-3 border-t border-gray-100"></div>
+            </div>
+
             <ul className="space-y-1 px-4">
               {NAV_ITEMS.map((item) => (
                 <li key={item.href}>
