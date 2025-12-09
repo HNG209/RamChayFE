@@ -32,6 +32,7 @@ export interface RegisterRequest {
   password: string;
   fullName: string;
   phone: string;
+  email?: string;
 }
 
 export interface RegisterResponse {

@@ -5,7 +5,7 @@ import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { ArrowLeft, Check, Loader2, ShoppingBag, Trash2 } from "lucide-react";
+import { ArrowLeft, Check, Loader2, ShoppingBag, Trash2, ShoppingBasket } from "lucide-react";
 import CartItem from "@/components/CartItem";
 import { useDeleteCartItemMutation, useGetCartItemsQuery, useUpdateCartItemMutation } from "@/redux/services/cartApi";
 import { GetItemsResponse } from "@/types/backend";
@@ -204,7 +204,7 @@ export default function CartPage() {
                   onClick={toggleSelectAll}
                   className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${isAllSelected
                     ? "bg-chocolate border-chocolate text-white scale-110"
-                    : "border-green-300 bg-green-400 hover:border-chocolate"
+                    : "border-green-100 bg-green-50 hover:border-chocolate"
                     }`}
                 >
                   {isAllSelected && <Check className="w-4 h-4" />}
@@ -281,8 +281,10 @@ export default function CartPage() {
               </>
             ) : (
               !isFetching && (
-                <div className="text-center py-16 bg-green-100 backdrop-blur-sm rounded-2xl border-2 border-green-200 shadow-lg">
-                  <div className="mb-4 text-6xl">🛒</div>
+                <div className="text-center py-16 bg-green-50 backdrop-blur-sm rounded-2xl border-2 border-green-200 shadow-lg">
+                  <div className="mb-4 flex justify-center">
+                    <ShoppingBasket className="w-24 h-24 text-chocolate/40" strokeWidth={1.5} />
+                  </div>
                   <p className="text-xl font-bold text-chocolate mb-2">Giỏ hàng trống trơn...</p>
                   <p className="text-gray-600 mb-6">Thêm sản phẩm vào giỏ hàng để bắt đầu mua sắm!</p>
                   <Link
@@ -329,9 +331,6 @@ export default function CartPage() {
                   <span className="text-gray-700">
                     Tạm tính ({selectedIds.length}/{data?.page.totalElements} món)
                   </span>
-                  <span className="font-bold text-chocolate">
-                    {formatPrice(totalAmount)}
-                  </span>
                   <span className="font-medium">{formatPrice(totalAmount)}</span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -343,32 +342,32 @@ export default function CartPage() {
               <div className="flex justify-between items-end mb-6 bg-linear-to-r from-green-50 to-lime-50 p-4 rounded-xl border-2 border-green-100">
                 <span className="font-bold text-gray-800 text-lg">Tổng tiền</span>
                 <div className="text-right">
-<span className="block text-3xl font-bold text-chocolate">
-  {formatPrice(totalAmount)}
-</span>
-<span className="text-xs text-gray-500 font-medium">
-  (Đã bao gồm VAT)
-</span>
-</div>
-</div>
+                  <span className="block text-3xl font-bold text-chocolate">
+                    {formatPrice(totalAmount)}
+                  </span>
+                  <span className="text-xs text-gray-500 font-medium">
+                    (Đã bao gồm VAT)
+                  </span>
+                </div>
+              </div>
 
-<button
-  onClick={() => {
-    if (selectedIds.length === 0) {
-      alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán!");
-      return;
-    }
-    router.push(`/order?items=${selectedIds.join(",")}`);
-  }}
-  disabled={selectedIds.length === 0}
-  className="
+              <button
+                onClick={() => {
+                  if (selectedIds.length === 0) {
+                    alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán!");
+                    return;
+                  }
+                  router.push(`/order?items=${selectedIds.join(",")}`);
+                }}
+                disabled={selectedIds.length === 0}
+                className="
     w-full bg-chocolate hover:bg-chocolate/90 text-white font-bold 
     py-4 rounded-xl shadow-lg shadow-chocolate/30 transition-all 
     hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2
     disabled:opacity-50 disabled:cursor-not-allowed
   "
->
-  <ShoppingBag className="w-5 h-5" />
+              >
+                <ShoppingBag className="w-5 h-5" />
                 Thanh toán ngay
               </button>
             </div>
@@ -398,31 +397,31 @@ export default function CartPage() {
 
         {/* Dòng 2: Tổng tiền & Nút thanh toán */}
         <div className="flex items-center gap-4 justify-between">
-<div className="bg-green-400 px-4 py-2 rounded-xl border border-green-200">
-  <p className="text-xs text-gray-600 font-medium mb-0.5">Tổng thanh toán</p>
-  <p className="text-xl font-bold text-chocolate">
-    {formatPrice(totalAmount)}
-  </p>
-</div>
+          <div className="bg-green-400 px-4 py-2 rounded-xl border border-green-200">
+            <p className="text-xs text-gray-600 font-medium mb-0.5">Tổng thanh toán</p>
+            <p className="text-xl font-bold text-chocolate">
+              {formatPrice(totalAmount)}
+            </p>
+          </div>
 
-<button
-  onClick={() => {
-    if (selectedIds.length === 0) {
-      alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán!");
-      return;
-    }
-    router.push(`/order?items=${selectedIds.join(",")}`);
-  }}
-  disabled={selectedIds.length === 0}
-  className="
+          <button
+            onClick={() => {
+              if (selectedIds.length === 0) {
+                alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán!");
+                return;
+              }
+              router.push(`/order?items=${selectedIds.join(",")}`);
+            }}
+            disabled={selectedIds.length === 0}
+            className="
     flex-1 bg-chocolate hover:bg-chocolate/90 text-white font-bold 
     py-4 rounded-xl shadow-lg shadow-chocolate/30 
     transition-all hover:scale-[1.02] active:scale-[0.98] 
     flex items-center justify-center gap-2 
     disabled:opacity-50 disabled:cursor-not-allowed
   "
->
-  <ShoppingBag className="w-5 h-5" />
+          >
+            <ShoppingBag className="w-5 h-5" />
             Thanh toán ({selectedIds.length})
           </button>
         </div>

@@ -39,7 +39,7 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-chocolate via-amber-800 to-orange-900 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-amber-100 via-orange-100 to-amber-200 relative overflow-hidden">
         {/* Decorative Elements */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-20 w-64 h-64 bg-white rounded-full blur-3xl"></div>
@@ -47,34 +47,32 @@ export default function AdminLoginPage() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col justify-center px-16 text-white">
+        <div className="relative z-10 flex flex-col justify-center px-16 text-chocolate">
           <div className="mb-8">
-            <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
-              <span className="text-4xl">🌿</span>
+            <div className="w-20 h-20 bg-chocolate/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
+              <Lock className="w-10 h-10 text-chocolate" />
             </div>
             <h1 className="text-5xl font-bold mb-4">RamChay Admin</h1>
-            <p className="text-xl text-white/80">
+            <p className="text-xl text-chocolate/70">
               Hệ thống quản trị thực phẩm chay
             </p>
           </div>
 
           <div className="space-y-4 mt-8">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0 mt-1">
-                <span className="text-xl">📊</span>
+              <div className="w-10 h-10 rounded-lg bg-chocolate/20 backdrop-blur-sm flex items-center justify-center shrink-0 mt-1">
               </div>
               <div>
                 <h3 className="font-semibold text-lg">Quản lý toàn diện</h3>
-                <p className="text-white/70 text-sm">Theo dõi sản phẩm, đơn hàng và khách hàng</p>
+                <p className="text-chocolate/60 text-sm">Theo dõi sản phẩm, đơn hàng và khách hàng</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0 mt-1">
-                <span className="text-xl">🔒</span>
+              <div className="w-10 h-10 rounded-lg bg-chocolate/20 backdrop-blur-sm flex items-center justify-center shrink-0 mt-1">
               </div>
               <div>
                 <h3 className="font-semibold text-lg">Bảo mật cao</h3>
-                <p className="text-white/70 text-sm">Phân quyền chi tiết và mã hóa dữ liệu</p>
+                <p className="text-chocolate/60 text-sm">Phân quyền chi tiết và mã hóa dữ liệu</p>
               </div>
             </div>
           </div>
