@@ -3,6 +3,8 @@ import "../globals.css";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import ChatBot from "@/components/ChatBot";
+import { Toaster } from "sonner";
 
 export default function CustomerLayout({
   children,
@@ -19,6 +21,12 @@ export default function CustomerLayout({
 
       {/* Footer luôn nằm dưới cùng */}
       <Footer />
+
+      {/* ChatBot - Floating button */}
+      <ChatBot />
+
+      {/* Toast Notifications */}
+      <Toaster position="top-right" richColors closeButton />
     </>
   );
 }

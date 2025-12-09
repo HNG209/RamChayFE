@@ -96,6 +96,16 @@ export const productApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: (result, error, { id }) => [{ type: "Product", id }, "Product"],
     }),
+
+    // 6. AI Semantic Search
+    searchProductsAI: builder.query<ProductCreationResponse[], string>({
+      query: (searchTerm) => ({
+        url: `/products/ai-search`,
+        method: "GET",
+        params: { query: searchTerm },
+      }),
+      providesTags: ["Product"],
+    }),
   }),
   overrideExisting: true,
 });
@@ -108,4 +118,6 @@ export const {
   useDeleteProductMutation,
   useGetProductByIdQuery,
   useUpdateProductMutation,
+  useSearchProductsAIQuery,
 } = productApi;
+
