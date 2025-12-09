@@ -226,7 +226,13 @@ export interface OrderDetail {
   shippingAddress: string;
   paymentMethod: "COD" | "QRPAY";
   totalAmount: number;
-  orderStatus: "PENDING" | "CONFIRMED" | "SHIPPING" | "DELIVERED" | "CANCELLED" | "PENDING_PAYMENT";
+  orderStatus:
+    | "PENDING"
+    | "CONFIRMED"
+    | "SHIPPING"
+    | "DELIVERED"
+    | "CANCELLED"
+    | "PENDING_PAYMENT";
   createdAt: string;
   updatedAt: string;
   items: OrderDetailItem[];
@@ -259,4 +265,16 @@ export interface OrderDetailBackendResponse {
       indexImage?: string;
     };
   }>;
+}
+
+export interface RagProductResponse {
+  id: number;
+  name: string;
+  indexImage: string;
+  price: number;
+}
+
+export interface RagResponse {
+  answer: string;
+  responseList: RagProductResponse[];
 }
