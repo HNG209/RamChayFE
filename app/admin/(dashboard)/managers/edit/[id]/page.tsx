@@ -51,7 +51,7 @@ const RoleSelectionDropdown: React.FC<{
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition shadow-md shadow-green-600/30 text-sm"
+        className="flex items-center gap-2 px-4 py-2 !bg-green-600 !hover:bg-green-700 text-white rounded-lg font-medium transition shadow-md shadow-green-600/30 text-sm"
       >
         <Plus size={16} />
         Thêm Quyền

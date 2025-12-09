@@ -257,16 +257,7 @@ export default function RoleManagingPage() {
               Tạo và chỉnh sửa quyền hạn cho các vai trò trong hệ thống.
             </p>
           </div>
-          <div className="flex gap-2 w-full sm:w-auto">
-
-            <button
-              onClick={handleAdd}
-              className="flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition w-full sm:w-auto"
-            >
-              <Plus size={20} />
-              <span className="hidden sm:inline">Thêm Role Mới</span>
-              <span className="sm:hidden">Thêm Role</span>
-            </button>
+          <div className="flex gap-2 w-full sm:w-auto">  
           </div>
         </div>
 

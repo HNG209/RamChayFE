@@ -155,14 +155,7 @@ export default function PermissionListPage() {
                             Quản lý các quyền hạn sử dụng trong hệ thống.
                         </p>
                     </div>
-                    <button
-                        onClick={handleAdd}
-                        className="flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition w-full sm:w-auto"
-                    >
-                        <Plus size={20} />
-                        <span className="hidden sm:inline">Thêm Permission Mới</span>
-                        <span className="sm:hidden">Thêm</span>
-                    </button>
+                    
                 </div>
 
                 {/* Search */}
