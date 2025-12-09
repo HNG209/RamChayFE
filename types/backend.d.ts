@@ -110,6 +110,21 @@ export interface ProductCreationResponse {
   category?: CategoryCreationResponse;
   mediaList?: MediaUploadResponse[];
 }
+
+// Product type for display
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  unit: string;
+  indexImage?: string;
+  images?: string[];
+  category?: CategoryCreationResponse;
+  mediaList?: MediaUploadResponse[];
+}
+
 // Cart
 export interface CartProduct {
   id: number;
