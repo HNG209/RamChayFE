@@ -4,17 +4,45 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 // Import kiểu dữ liệu đã định nghĩa để tái sử dụng
 import { LoginResponse, LoginRequest, ApiResponse } from "@/types/backend";
 import Link from "next/link";
 import { useLoginMutation } from "@/redux/services/authApi";
 
+interface FloatingSticker {
+  id: number;
+  emoji: string;
+  left: string;
+  animationDuration: string;
+  animationDelay: string;
+  size: string;
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
+  const [floatingStickers, setFloatingStickers] = useState<FloatingSticker[]>([]);
 
   const [login, { isLoading: isLoggingIn }] = useLoginMutation();
+
+  const veganEmojis = ['🥬', '🥦', '🥕', '🍄', '🌽', '🫑', '🥒', '🍅', '🥑', '🪭', '🌶️', '🧅', '🍆', '🧄', '🪸', '🥗'];
+
+  // Generate floating stickers on mount
+  useEffect(() => {
+    const stickers: FloatingSticker[] = [];
+    for (let i = 0; i < 35; i++) {
+      stickers.push({
+        id: i,
+        emoji: veganEmojis[Math.floor(Math.random() * veganEmojis.length)],
+        left: `${Math.random() * 100}%`,
+        animationDuration: `${10 + Math.random() * 15}s`,
+        animationDelay: `${Math.random() * 8}s`,
+        size: `${1.5 + Math.random() * 2.5}rem`
+      });
+    }
+    setFloatingStickers(stickers);
+  }, []);
 
   // Cấu hình Formik
   const formik = useFormik<LoginRequest>({
@@ -65,91 +93,122 @@ export default function LoginPage() {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-cream-light p-4">
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-lime-accent">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          Đăng Nhập
-        </h2>
-
-        {/* Lỗi từ Server trả về (ví dụ: Sai pass) */}
-        {serverError && (
-          <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded border border-red-200">
-            {serverError}
-          </div>
-        )}
-
-        <form onSubmit={formik.handleSubmit} className="space-y-5">
-          {/* USERNAME FIELD */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Tên đăng nhập
-            </label>
-            <input
-              id="username"
-              // name="username" // Quan trọng: phải trùng với initialValues
-              type="text"
-              // Dùng spread syntax của Formik để tự bind value và onChange
-              {...formik.getFieldProps("username")}
-              className={`w-full px-4 py-3 rounded-xl bg-cream-dark border outline-none transition-all
-                ${
-                  formik.touched.username && formik.errors.username
-                    ? "border-red-500 focus:ring-red-200"
-                    : "border-lime-accent focus:border-lime-primary focus:ring-2 focus:ring-lime-primary/20"
-                }`}
-              placeholder="Nhập username..."
-            />
-            {/* Hiển thị lỗi validate ngay dưới input */}
-            {formik.touched.username && formik.errors.username && (
-              <p className="text-red-500 text-xs mt-1 ml-1">
-                {formik.errors.username}
-              </p>
-            )}
-          </div>
-
-          {/* PASSWORD FIELD */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Mật khẩu
-            </label>
-            <input
-              id="password"
-              // name="password"
-              type="password"
-              {...formik.getFieldProps("password")}
-              className={`w-full px-4 py-3 rounded-xl bg-cream-dark border outline-none transition-all
-                ${
-                  formik.touched.password && formik.errors.password
-                    ? "border-red-500 focus:ring-red-200"
-                    : "border-lime-accent focus:border-lime-primary focus:ring-2 focus:ring-lime-primary/20"
-                }`}
-              placeholder="••••••••"
-            />
-            {formik.touched.password && formik.errors.password && (
-              <p className="text-red-500 text-xs mt-1 ml-1">
-                {formik.errors.password}
-              </p>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            disabled={formik.isSubmitting}
-            className="w-full bg-lime-primary hover:bg-lime-hover text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2"
+    <div
+      className="min-h-screen flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat relative"
+      style={{ backgroundImage: "url('/background-vegan-footer.png')" }}
+    >
+      {/* Floating Veggie Stickers */}
+      <div className="fixed inset-0 pointer-events-none z-9999">
+        {floatingStickers.map((sticker) => (
+          <div
+            key={sticker.id}
+            className="absolute will-change-transform"
+            style={{
+              left: sticker.left,
+              bottom: '-5rem',
+              fontSize: sticker.size,
+              animation: `float-up ${sticker.animationDuration} linear ${sticker.animationDelay} infinite`,
+            }}
           >
-            {/* {formik.isSubmitting ? "Đang kiểm tra..." : "Đăng nhập"} */}
-            {isLoggingIn ? "Đang kiểm tra..." : "Đăng nhập"}
-          </button>
-        </form>
-        <div className="mt-8 text-center">
-          <p className="text-gray-500 text-sm">
-            Chưa có tài khoản? {/* Sử dụng Link thay vì thẻ a href */}
-            <Link
-              href="/register"
-              className="text-lime-primary font-bold hover:underline"
+            {sticker.emoji}
+          </div>
+        ))}
+      </div>
+
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-white/60 backdrop-blur-sm"></div>
+
+      <div className="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-2xl w-full max-w-md border-2 border-green-200 relative z-10">
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-24 h-24 bg-linear-to-br from-green-200/40 to-transparent rounded-bl-full"></div>
+        <div className="absolute bottom-0 left-0 w-20 h-20 bg-linear-to-tr from-chocolate/10 to-transparent rounded-tr-full"></div>
+
+        <div className="relative z-10">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-linear-to-br from-chocolate to-amber-700 text-white mb-4 shadow-lg">
+              <span className="text-3xl">🌿</span>
+            </div>
+            <h2 className="text-3xl font-bold bg-linear-to-r from-chocolate to-amber-700 bg-clip-text text-transparent mb-2">
+              Đăng Nhập
+            </h2>
+            <p className="text-gray-600 text-sm">
+              Chào mừng bạn trở lại RamChay
+            </p>
+          </div>
+
+          {/* Lỗi từ Server trả về (ví dụ: Sai pass) */}
+          {serverError && (
+            <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded border border-red-200">
+              {serverError}
+            </div>
+          )}
+
+          <form onSubmit={formik.handleSubmit} className="space-y-5">
+            {/* USERNAME FIELD */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Tên đăng nhập
+              </label>
+              <input
+                id="username"
+                type="text"
+                {...formik.getFieldProps("username")}
+                className={`w-full px-4 py-3.5 rounded-xl border-2 outline-none transition-all
+                ${formik.touched.username && formik.errors.username
+                    ? "border-red-500 bg-red-50 focus:ring-4 focus:ring-red-200"
+                    : "border-green-200 bg-green-50/30 focus:border-chocolate focus:ring-4 focus:ring-chocolate/20 focus:bg-white"
+                  }`}
+                placeholder="Nhập username..."
+              />
+              {formik.touched.username && formik.errors.username && (
+                <p className="text-red-500 text-xs mt-1 ml-1">
+                  {formik.errors.username}
+                </p>
+              )}
+            </div>
+
+            {/* PASSWORD FIELD */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Mật khẩu
+              </label>
+              <input
+                id="password"
+                type="password"
+                {...formik.getFieldProps("password")}
+                className={`w-full px-4 py-3.5 rounded-xl border-2 outline-none transition-all
+                ${formik.touched.password && formik.errors.password
+                    ? "border-red-500 bg-red-50 focus:ring-4 focus:ring-red-200"
+                    : "border-green-200 bg-green-50/30 focus:border-chocolate focus:ring-4 focus:ring-chocolate/20 focus:bg-white"
+                  }`}
+                placeholder="••••••••"
+              />
+              {formik.touched.password && formik.errors.password && (
+                <p className="text-red-500 text-xs mt-1 ml-1">
+                  {formik.errors.password}
+                </p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={formik.isSubmitting}
+              className="w-full bg-linear-to-r from-chocolate via-amber-700 to-chocolate bg-size-200 hover:bg-pos-100 text-white font-bold py-4 px-4 rounded-xl shadow-lg shadow-chocolate/40 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2"
             >
-              Đăng ký ngay
-            </Link>
-          </p>
+              {isLoggingIn ? "Đang kiểm tra..." : "Đăng nhập"}
+            </button>
+          </form>
+          <div className="mt-8 text-center">
+            <p className="text-gray-500 text-sm">
+              Chưa có tài khoản?{" "}
+              <Link
+                href="/register"
+                className="text-chocolate font-bold hover:underline"
+              >
+                Đăng ký ngay
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
