@@ -251,21 +251,14 @@ export default function RoleManagingPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-              <span className="text-indigo-600">👥</span> Quản Lý Chức Vụ (Roles)
+              Quản Lý Chức Vụ (Roles)
             </h1>
             <p className="text-sm sm:text-md text-gray-500">
               Tạo và chỉnh sửa quyền hạn cho các vai trò trong hệ thống.
             </p>
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
-            <button
-              onClick={handleAddPermision}
-              className="flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition w-full sm:w-auto"
-            >
-              <Plus size={20} />
-              <span className="hidden sm:inline">Thêm Permission Mới</span>
-              <span className="sm:hidden">Thêm Permission</span>
-            </button>
+
             <button
               onClick={handleAdd}
               className="flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition w-full sm:w-auto"

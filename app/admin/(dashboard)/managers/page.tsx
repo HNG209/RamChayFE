@@ -385,7 +385,7 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-              <span className="text-indigo-600">👤</span> Quản Lý Nhân Sự (Managers)
+              Quản Lý Nhân Sự (Managers)
             </h1>
             <p className="text-sm sm:text-md text-gray-500">
               Tạo và chỉnh sửa thông tin nhân sự trong hệ thống.

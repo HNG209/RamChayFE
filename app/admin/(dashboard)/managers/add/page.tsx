@@ -183,6 +183,9 @@ export default function AddManagerPage() {
       }
     }
   };
+  const handleCancel = () => {
+    router.back();
+  };
 
 
   return (
@@ -234,7 +237,7 @@ export default function AddManagerPage() {
                 onChange={handleChange}
                 placeholder="Nhập tên đăng nhập"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
-              
+
               />
             </div>
 
@@ -249,7 +252,7 @@ export default function AddManagerPage() {
                   onChange={handleChange}
                   placeholder="Nhập mật khẩu"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition pr-10"
-                  
+
                 />
                 <button
                   type="button"
@@ -307,7 +310,7 @@ export default function AddManagerPage() {
             <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">
               <button
                 type="button"
-                onClick={() => router.push("/admin/managers")}
+                onClick={handleCancel}
                 disabled={isLoading}
                 className="px-6 py-2.5 bg-white border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-100 transition"
               >
