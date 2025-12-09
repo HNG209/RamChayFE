@@ -92,7 +92,7 @@ export interface ProductCreationRequest {
   price: number;
   stock: number;
   unit: string;
-  category: CategoryCreationRequest;
+  categoryId: number;
   indexImage?: string;
   mediaUploadRequests: MediaUploadRequest[];
   imageIdsToDelete?: number[];
@@ -169,6 +169,12 @@ export interface Page<T> {
   };
 }
 
+export interface PageResponse<T> {
+    content: T[];
+    currentPage: number;
+    pageSize: number;
+    totalPages: number;
+    totalElements: number;
 // Order
 export interface OrderItemRequest {
   cartItemId: number;
