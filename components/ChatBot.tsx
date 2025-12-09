@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useMemo, useCallback } from "react"
 import { MessageCircle, X, Send, Loader2 } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -36,9 +36,9 @@ export default function ChatBot() {
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
     // Auto scroll to bottom
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    }
+    const scrollToBottom = useCallback(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "auto" })
+    }, [])
 
     useEffect(() => {
         scrollToBottom()
@@ -59,36 +59,42 @@ export default function ChatBot() {
         setInputText("")
         setIsTyping(true)
 
-        // TODO: Replace with actual API call to chatbot backend
-        // Expected response format from backend:
-        // {
-        //   "answer": string,
-        //   "responseList": [{ id, name, indexImage, price }]
-        // }
-        setTimeout(() => {
-            // Mock response với responseList (demo theo format backend)
-            const mockResponse = {
-                answer: "Có thật và mì Xào Giòn Chay (Món ăn số 1) là một món ăn chay...",
-                responseList: [
-                    {
-                        id: 1,
-                        name: "Bắp cải",
-                        indexImage: "https://res.cloudinary.com/dqoallgsf/image/upload/v1765191181/opwabxdx0gncv0tx37ik.png",
-                        price: 25000
-                    }
-                ]
+        try {
+            // Call chatbot API
+            const response = await fetch(`http://localhost:8081/api/chat/ask?q=${encodeURIComponent(inputText)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+
+            if (!response.ok) {
+                throw new Error('API call failed')
             }
+
+            const data = await response.json()
+            // Expected format: { answer: string, responseList: [{ id, name, indexImage, price }] }
 
             const botMessage: Message = {
                 id: Date.now() + 1,
-                text: mockResponse.answer,
+                text: data.answer || "Xin lỗi, tôi không hiểu câu hỏi của bạn.",
                 sender: "bot",
                 timestamp: new Date(),
-                products: mockResponse.responseList // Nếu responseList rỗng [] thì chỉ hiện text
+                products: data.responseList || [] // Nếu responseList rỗng hoặc undefined thì chỉ hiện text
             }
             setMessages(prev => [...prev, botMessage])
+        } catch (error) {
+            console.error('Chatbot API error:', error)
+            const errorMessage: Message = {
+                id: Date.now() + 1,
+                text: "Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau.",
+                sender: "bot",
+                timestamp: new Date()
+            }
+            setMessages(prev => [...prev, errorMessage])
+        } finally {
             setIsTyping(false)
-        }, 1000)
+        }
     }
 
     return (
@@ -141,7 +147,7 @@ export default function ChatBot() {
                                             <div
                                                 key={product.id}
                                                 onClick={() => router.push(`/products/${product.id}`)}
-                                                className="bg-white border border-green-200 rounded-lg p-3 hover:shadow-md hover:border-chocolate transition-all cursor-pointer group"
+                                                className="bg-white border border-green-200 rounded-lg p-3 hover:border-chocolate cursor-pointer"
                                             >
                                                 <div className="flex gap-3">
                                                     {/* Product Image */}
@@ -150,13 +156,14 @@ export default function ChatBot() {
                                                             src={product.indexImage}
                                                             alt={product.name}
                                                             fill
-                                                            className="object-cover group-hover:scale-110 transition-transform"
+                                                            loading="lazy"
+                                                            className="object-cover"
                                                         />
                                                     </div>
 
                                                     {/* Product Info */}
                                                     <div className="flex-1 min-w-0">
-                                                        <h4 className="text-sm font-semibold text-gray-800 line-clamp-2 group-hover:text-chocolate transition-colors">
+                                                        <h4 className="text-sm font-semibold text-gray-800 line-clamp-2">
                                                             {product.name}
                                                         </h4>
                                                         <p className="text-chocolate font-bold mt-1">
