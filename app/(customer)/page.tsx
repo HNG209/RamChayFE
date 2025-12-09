@@ -131,13 +131,13 @@ export default function Home() {
                 </Link>
               </div>
             </div>
-            <div className="relative hidden md:block">
+            <div className="relative hidden md:flex items-center justify-center rounded-3xl border-4 border-white/30 shadow-2xl p-6 bg-white/20 backdrop-blur-sm">
               <Image
                 src="/vegan-food-1.png"
                 alt="Fresh vegetables"
                 width={600}
                 height={600}
-                className="drop-shadow-2xl"
+                className="drop-shadow-2xl rounded-2xl object-contain"
                 priority
               />
             </div>
@@ -146,7 +146,10 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section className="relative py-16 overflow-hidden">
+      <section className="relative py-20 overflow-hidden mt-8">
+        {/* Separator Line */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-linear-to-r from-transparent via-green-300 to-transparent"></div>
+
         {/* Background Image */}
         <div className="absolute inset-0" style={{ zIndex: 0 }}>
           <Image
@@ -179,7 +182,10 @@ export default function Home() {
       </section>
 
       {/* Categories */}
-      <section className="relative py-16 overflow-hidden">
+      <section className="relative py-20 overflow-hidden mt-8">
+        {/* Separator Line */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-linear-to-r from-transparent via-green-300 to-transparent"></div>
+
         {/* Background Image */}
         <div className="absolute inset-0" style={{ zIndex: 0 }}>
           <Image
@@ -202,7 +208,7 @@ export default function Home() {
               <Link
                 key={i}
                 href="/products"
-                className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2"
+                className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-2 border-gray-200"
               >
                 <div className="aspect-square relative">
                   <Image src={cat.image} alt={cat.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -219,7 +225,10 @@ export default function Home() {
       </section>
 
       {/* Featured Products */}
-      <section className="relative py-16 overflow-hidden">
+      <section className="relative py-20 overflow-hidden mt-8">
+        {/* Separator Line */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-linear-to-r from-transparent via-green-300 to-transparent"></div>
+
         {/* Background Image */}
         <div className="absolute inset-0" style={{ zIndex: 0 }}>
           <Image
@@ -255,7 +264,10 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="relative py-20 text-white overflow-hidden">
+      <section className="relative py-24 text-white overflow-hidden mt-8">
+        {/* Separator Line */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-linear-to-r from-transparent via-green-300 to-transparent"></div>
+
         {/* Background Image */}
         <div className="absolute inset-0" style={{ zIndex: 0 }}>
           <Image

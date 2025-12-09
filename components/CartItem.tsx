@@ -26,15 +26,15 @@ export default function CartItem({
     }).format(price);
 
   return (
-    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4 transition-all hover:shadow-md">
+    <div className="bg-green-50 p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4 transition-all hover:shadow-md">
       {/* 1. Checkbox & Image */}
       <div className="flex items-center gap-3">
         {/* Custom Checkbox */}
         <button
           onClick={() => onToggleSelect(item.id)}
           className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${isSelected
-              ? "bg-lime-primary border-lime-primary text-white"
-              : "border-gray-300 bg-white"
+            ? "bg-lime-primary border-lime-primary text-white"
+            : "border-gray-300 bg-white"
             }`}
         >
           {isSelected && <Check className="w-3.5 h-3.5" />}
