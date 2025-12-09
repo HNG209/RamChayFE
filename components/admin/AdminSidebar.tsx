@@ -27,7 +27,7 @@ const ADMIN_MENU = [
     items: [
       {
         label: "Trang chủ",
-        href: "/admin",
+        href: "/admin/dashboard",
         allowedPermissions: ["VIEW_DASHBOARD"],
       },
     ],

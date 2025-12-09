@@ -1,274 +1,210 @@
-"use client";
+"use client"
 
-import { RootState } from "@/redux/store";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { useSelector } from "react-redux";
-import {
-  DollarSign,
-  ShoppingBag,
-  Users,
-  Package,
-  ArrowUpRight,
-  ArrowDownRight,
-  Clock,
-  CheckCircle,
-  XCircle,
-} from "lucide-react";
-import RoleGuard from "@/components/admin/RoleGuard";
+import type React from "react"
+import type { RootState } from "@/redux/store"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { useSelector } from "react-redux"
+import { Package, ShoppingCart, Users, TrendingUp, BarChart3, Leaf, Settings, Sparkles } from "lucide-react"
+import "./welcome.css"
 
-export default function DashboardPage() {
-  const user = useSelector((state: RootState) => state.auth.user);
-  const router = useRouter();
+export default function AdminWelcomePage() {
+  const user = useSelector((state: RootState) => state.auth.user)
+  const router = useRouter()
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    if (user?.roles.includes("ROLE_CUSTOMER")) router.push("/");
-    // if (!user) router.push("/admin/login");
-  }, [user]);
+    if (user?.roles.includes("ROLE_CUSTOMER")) router.push("/")
+    setMounted(true)
+  }, [user, router])
+
+  const getGreeting = () => {
+    const hour = new Date().getHours()
+    if (hour < 12) return "Chào buổi sáng"
+    if (hour < 18) return "Chào buổi chiều"
+    return "Chào buổi tối"
+  }
+
+  const floatingStickers = [
+    { emoji: "🥗", delay: 0 },
+    { emoji: "🥕", delay: 0.2 },
+    { emoji: "🌱", delay: 0.4 },
+    { emoji: "🍅", delay: 0.6 },
+    { emoji: "🥦", delay: 0.8 },
+    { emoji: "🌿", delay: 1 },
+    { emoji: "🥒", delay: 1.2 },
+    { emoji: "🍃", delay: 1.4 },
+  ]
+
+  if (!mounted) return null
 
   return (
-    <div className="space-y-6">
-      {/* 1. HEADER: Tiêu đề trang */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-800">
-          Tổng quan kinh doanh
-        </h1>
-        <p className="text-gray-500 text-sm">
-          Chào mừng trở lại! Đây là tình hình hôm nay của RamChay.
-        </p>
+    <div className="relative min-h-screen flex items-center justify-center p-4 md:p-6 overflow-hidden bg-white">
+      <div className="absolute inset-0 bg-gradient-to-br from-lime-50 via-white to-green-50 -z-20" />
+
+      <div className="absolute inset-0 opacity-40 -z-10 pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-lime-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
+        <div className="absolute top-40 right-10 w-72 h-72 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
+        <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
       </div>
 
-      {/* 2. STAT CARDS: Số liệu thống kê */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title="Doanh thu hôm nay"
-          value="2.450.000đ"
-          change="+12%"
-          isPositive={true}
-          icon={DollarSign}
-          color="bg-blue-50 text-blue-600"
-        />
-        <StatCard
-          title="Đơn hàng mới"
-          value="15"
-          change="-2%"
-          isPositive={false}
-          icon={ShoppingBag}
-          color="bg-yellow-50 text-yellow-600"
-        />
-        <StatCard
-          title="Khách hàng mới"
-          value="8"
-          change="+5%"
-          isPositive={true}
-          icon={Users}
-          color="bg-purple-50 text-purple-600"
-        />
-        <StatCard
-          title="Sắp hết hàng"
-          value="3"
-          note="Cần nhập thêm"
-          icon={Package}
-          color="bg-red-50 text-red-600"
-        />
+      <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+        {floatingStickers.map((sticker, index) => (
+          <div
+            key={index}
+            className="floating-sticker"
+            style={
+              {
+                "--delay": `${sticker.delay}s`,
+                "--duration": `${15 + index * 2}s`,
+                "--offset": `${(index * 45) % 360}deg`,
+              } as React.CSSProperties
+            }
+          >
+            <span className="text-4xl select-none">{sticker.emoji}</span>
+          </div>
+        ))}
       </div>
 
-      {/* 3. MAIN SECTION: Chia 2 cột (Biểu đồ + Đơn hàng mới) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* CỘT TRÁI (Chiếm 2 phần): Danh sách đơn hàng mới nhất */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-gray-800">Đơn hàng vừa đặt</h3>
-            <button className="text-sm text-lime-primary hover:underline">
-              Xem tất cả
-            </button>
+      <div className="max-w-5xl w-full space-y-8 md:space-y-12 relative z-10">
+        <div className="text-center space-y-6 animate-fade-in-up">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-lime-200 to-green-200 rounded-full shadow-xl animate-bounce-slow">
+              <Leaf className="w-12 h-12 text-lime-700" />
+            </div>
+            <div className="animate-pulse">
+              <Sparkles className="w-8 h-8 text-yellow-400" />
+            </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-gray-600">
-              <thead className="bg-gray-50 text-gray-700 font-semibold border-b">
-                <tr>
-                  <th className="p-3">Mã đơn</th>
-                  <th className="p-3">Khách hàng</th>
-                  <th className="p-3">Tổng tiền</th>
-                  <th className="p-3">Trạng thái</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {/* Dữ liệu giả lập */}
-                <OrderItem
-                  id="#ORD-001"
-                  user="Nguyễn Văn A"
-                  total="150.000đ"
-                  status="pending"
-                />
-                <OrderItem
-                  id="#ORD-002"
-                  user="Trần Thị B"
-                  total="320.000đ"
-                  status="shipping"
-                />
-                <OrderItem
-                  id="#ORD-003"
-                  user="Lê Văn C"
-                  total="90.000đ"
-                  status="success"
-                />
-                <OrderItem
-                  id="#ORD-004"
-                  user="Phạm Văn D"
-                  total="500.000đ"
-                  status="cancelled"
-                />
-                <OrderItem
-                  id="#ORD-005"
-                  user="Hoàng Thùy E"
-                  total="210.000đ"
-                  status="pending"
-                />
-              </tbody>
-            </table>
+          <div className="space-y-3">
+            <h1 className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-lime-600 via-green-600 to-lime-600 animate-text-shimmer">
+              {getGreeting()}, {user?.fullName || user?.username}!
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-700 font-medium">Chào mừng đến với RamChay Admin</p>
+          </div>
+
+          <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+            Quản lý cửa hàng chay của bạn một cách hiệu quả. Chọn một chức năng bên dưới để bắt đầu
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          <div style={{ "--card-delay": "0s" } as React.CSSProperties}>
+            <FeatureCard
+              title="Quản lý sản phẩm"
+              description="Thêm, chỉnh sửa và quản lý danh mục sản phẩm chay"
+              icon={Package}
+              color="from-lime-400 to-lime-600"
+              href="/admin/products"
+              emoji="📦"
+            />
+          </div>
+          <div style={{ "--card-delay": "0.1s" } as React.CSSProperties}>
+            <FeatureCard
+              title="Quản lý đơn hàng"
+              description="Xử lý và theo dõi đơn hàng của khách hàng"
+              icon={ShoppingCart}
+              color="from-orange-400 to-orange-600"
+              href="/admin/orders"
+              emoji="🛒"
+            />
+          </div>
+          <div style={{ "--card-delay": "0.2s" } as React.CSSProperties}>
+            <FeatureCard
+              title="Quản lý người dùng"
+              description="Xem và quản lý danh sách khách hàng"
+              icon={Users}
+              color="from-blue-400 to-blue-600"
+              href="/admin/users"
+              emoji="👥"
+            />
+          </div>
+          <div style={{ "--card-delay": "0.3s" } as React.CSSProperties}>
+            <FeatureCard
+              title="Tổng quan kinh doanh"
+              description="Xem thống kê và báo cáo chi tiết"
+              icon={BarChart3}
+              color="from-purple-400 to-purple-600"
+              href="/admin/dashboard"
+              emoji="📊"
+            />
+          </div>
+          <div style={{ "--card-delay": "0.4s" } as React.CSSProperties}>
+            <FeatureCard
+              title="Phân tích doanh thu"
+              description="Theo dõi doanh thu và xu hướng bán hàng"
+              icon={TrendingUp}
+              color="from-green-400 to-green-600"
+              href="/admin/reports"
+              emoji="📈"
+            />
+          </div>
+          <div style={{ "--card-delay": "0.5s" } as React.CSSProperties}>
+            <FeatureCard
+              title="Cài đặt hệ thống"
+              description="Cấu hình và tùy chỉnh cửa hàng"
+              icon={Settings}
+              color="from-gray-400 to-gray-600"
+              href="/admin/settings"
+              emoji="⚙️"
+            />
           </div>
         </div>
 
-        {/* CỘT PHẢI (Chiếm 1 phần): Sản phẩm bán chạy / Cảnh báo */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-6">
-          {/* Top sản phẩm */}
-          <div>
-            <h3 className="font-bold text-gray-800 mb-4">Top bán chạy 🔥</h3>
-            <ul className="space-y-4">
-              <TopProduct name="Chả lụa chay" sold={120} price="45.000đ" />
-              <TopProduct name="Sườn non chay" sold={85} price="30.000đ" />
-              <TopProduct name="Nấm đông cô" sold={60} price="120.000đ" />
-            </ul>
-          </div>
-
-          <div className="border-t pt-4"></div>
-
-          {/* Cảnh báo kho */}
-          <div>
-            <h3 className="font-bold text-gray-800 mb-4">Cảnh báo kho ⚠️</h3>
-            <ul className="space-y-3">
-              <li className="flex justify-between items-center text-sm p-3 bg-red-50 text-red-700 rounded-lg">
-                <span>Hạt nêm nấm</span>
-                <span className="font-bold">Còn 2</span>
-              </li>
-              <li className="flex justify-between items-center text-sm p-3 bg-yellow-50 text-yellow-700 rounded-lg">
-                <span>Tàu hũ ky</span>
-                <span className="font-bold">Còn 5</span>
-              </li>
-            </ul>
-          </div>
+        <div className="text-center pt-12 border-t border-gray-200 animate-fade-in-up animation-delay-300">
+          <p className="text-sm text-gray-500">
+            Hệ thống quản trị RamChay © 2025 | Chuyên cung cấp thực phẩm chay sạch
+          </p>
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-// --- CÁC COMPONENT CON (Viết chung file cho gọn, sau này có thể tách ra) ---
+// --- COMPONENT CON ---
 
-function StatCard({
-  title,
-  value,
-  change,
-  isPositive,
-  icon: Icon,
-  color,
-  note,
-}: any) {
-  return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-gray-500 text-sm font-medium">{title}</p>
-          <h3 className="text-2xl font-bold text-gray-800 mt-1">{value}</h3>
-        </div>
-        <div className={`p-3 rounded-full ${color}`}>
-          <Icon className="w-6 h-6" />
-        </div>
-      </div>
-      <div className="mt-4 flex items-center text-sm">
-        {note ? (
-          <span className="text-gray-500">{note}</span>
-        ) : (
-          <>
-            <span
-              className={`flex items-center font-medium ${
-                isPositive ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {isPositive ? (
-                <ArrowUpRight className="w-4 h-4 mr-1" />
-              ) : (
-                <ArrowDownRight className="w-4 h-4 mr-1" />
-              )}
-              {change}
-            </span>
-            <span className="text-gray-400 ml-2">so với hôm qua</span>
-          </>
-        )}
-      </div>
-    </div>
-  );
+interface FeatureCardProps {
+  title: string
+  description: string
+  icon: any
+  color: string
+  href: string
+  emoji: string
 }
 
-function OrderItem({ id, user, total, status }: any) {
-  const statusStyles: any = {
-    pending: {
-      label: "Chờ duyệt",
-      color: "bg-yellow-100 text-yellow-700",
-      icon: Clock,
-    },
-    shipping: {
-      label: "Đang giao",
-      color: "bg-blue-100 text-blue-700",
-      icon: Package,
-    },
-    success: {
-      label: "Hoàn thành",
-      color: "bg-green-100 text-green-700",
-      icon: CheckCircle,
-    },
-    cancelled: {
-      label: "Đã hủy",
-      color: "bg-red-100 text-red-700",
-      icon: XCircle,
-    },
-  };
-
-  const currentStatus = statusStyles[status];
-  const StatusIcon = currentStatus.icon;
-
+function FeatureCard({ title, description, icon: Icon, color, href, emoji }: FeatureCardProps) {
   return (
-    <tr className="hover:bg-gray-50 transition-colors">
-      <td className="p-3 font-medium text-lime-primary">{id}</td>
-      <td className="p-3 font-semibold text-gray-700">{user}</td>
-      <td className="p-3 font-bold text-gray-800">{total}</td>
-      <td className="p-3">
-        <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${currentStatus.color}`}
+    <a
+      href={href}
+      className="feature-card group relative h-full bg-white/80 backdrop-blur-lg p-6 md:p-8 rounded-2xl shadow-lg border border-white/50 hover:shadow-2xl hover:border-lime-200 transition-all duration-300 hover:-translate-y-2 hover:bg-white/95 overflow-hidden"
+    >
+      <div
+        className={`absolute -top-1/2 -right-1/2 w-96 h-96 bg-gradient-to-br ${color} opacity-0 group-hover:opacity-5 transition-opacity duration-300 rounded-full blur-3xl`}
+      />
+
+      <div className="relative flex flex-col items-center text-center space-y-4 h-full justify-between">
+        <div className="text-5xl group-hover:scale-125 transition-transform duration-300 group-hover:rotate-12">
+          {emoji}
+        </div>
+
+        <div
+          className={`p-4 rounded-2xl bg-gradient-to-br ${color} text-white group-hover:scale-110 transition-transform duration-300 shadow-lg`}
         >
-          <StatusIcon className="w-3 h-3 mr-1" />
-          {currentStatus.label}
-        </span>
-      </td>
-    </tr>
-  );
-}
-
-function TopProduct({ name, sold, price }: any) {
-  return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
-          <Package className="w-5 h-5" />
+          <Icon className="w-8 h-8" />
         </div>
-        <div>
-          <p className="text-sm font-semibold text-gray-800">{name}</p>
-          <p className="text-xs text-gray-500">Đã bán: {sold}</p>
+
+        <div className="flex-1 flex flex-col justify-center">
+          <h3 className="font-bold text-lg md:text-xl text-gray-800 group-hover:text-lime-700 transition-colors mb-2">
+            {title}
+          </h3>
+          <p className="text-sm md:text-base text-gray-600 leading-relaxed">{description}</p>
+        </div>
+
+        <div className="text-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-2 group-hover:translate-y-0">
+          →
         </div>
       </div>
-      <span className="text-sm font-bold text-lime-primary">{price}</span>
-    </div>
-  );
+    </a>
+  )
 }
