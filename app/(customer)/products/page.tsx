@@ -68,7 +68,7 @@ export default function CustomerProductsPage() {
                 setIsAISearch(saved === 'true')
             }
         }
-    }, [])
+    }, [aiSearchFromUrl, searchParams]) // Re-sync when URL changes
 
     // Infinite scroll state
     const [displayedCount, setDisplayedCount] = useState(12) // Hiển thị 12 sản phẩm ban đầu

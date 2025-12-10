@@ -57,6 +57,12 @@ export default function Header() {
     const newValue = !isAISearch;
     setIsAISearch(newValue);
     localStorage.setItem('aiSearchEnabled', String(newValue));
+
+    // Nếu đang ở trang products và có search term, update URL ngay
+    if (pathname === '/products' && searchTerm.trim()) {
+      const searchUrl = `/products?search=${encodeURIComponent(searchTerm.trim())}&aiSearch=${newValue}`;
+      router.push(searchUrl);
+    }
   };
 
   // Debounced search effect
