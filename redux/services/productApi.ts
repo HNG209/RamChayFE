@@ -51,18 +51,18 @@ export const productApi = baseApi.injectEndpoints({
         const formData = new FormData();
         // Backend yêu cầu @RequestPart("product") là JSON string
         formData.append("product", JSON.stringify(productData));
-        
+
         // Backend yêu cầu @RequestPart("image") là List<File>
         if (images && images.length > 0) {
           images.forEach((file) => formData.append("image", file));
         }
-        
-        return { 
-          url: "/products", 
-          method: "POST", 
-          data: formData, 
+
+        return {
+          url: "/products",
+          method: "POST",
+          data: formData,
           // Để undefined để browser tự set boundary cho multipart
-          headers: { "Content-Type": undefined } 
+          headers: { "Content-Type": undefined }
         };
       },
       invalidatesTags: ["Product"],
@@ -70,29 +70,29 @@ export const productApi = baseApi.injectEndpoints({
 
     // 5. Xóa sản phẩm
     deleteProduct: builder.mutation<void, number>({
-      query: (id) => ({ 
-        url: `/products/${id}`, 
-        method: "DELETE" 
+      query: (id) => ({
+        url: `/products/${id}`,
+        method: "DELETE"
       }),
       invalidatesTags: ["Product"],
     }),
 
     // 6. Lấy chi tiết 1 sản phẩm
     getProductById: builder.query<ProductCreationResponse, number>({
-      query: (id) => ({ 
-        url: `/products/${id}`, 
-        method: "GET" 
+      query: (id) => ({
+        url: `/products/${id}`,
+        method: "GET"
       }),
       providesTags: (result, error, id) => [{ type: "Product", id }],
     }),
 
     // 7. Cập nhật sản phẩm
     updateProduct: builder.mutation<ProductCreationResponse, { id: number; data: FormData }>({
-      query: ({ id, data }) => ({ 
-        url: `/products/${id}`, 
-        method: "PUT", 
-        data: data, 
-        headers: { "Content-Type": undefined } 
+      query: ({ id, data }) => ({
+        url: `/products/${id}`,
+        method: "PUT",
+        data: data,
+        headers: { "Content-Type": undefined }
       }),
       invalidatesTags: (result, error, { id }) => [{ type: "Product", id }, "Product"],
     }),

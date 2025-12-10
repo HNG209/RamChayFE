@@ -93,6 +93,19 @@ export default function CustomerProductsPage() {
         skip: !searchTerm || !isAISearch
     })
 
+    // Debug logs
+    useEffect(() => {
+        console.log('🔍 Products Page Debug:', {
+            searchTerm,
+            isAISearch,
+            searchFromUrl,
+            aiSearchFromUrl,
+            willSkipAI: !searchTerm || !isAISearch,
+            aiSearchData,
+            regularProductsData: regularProductsData?.length
+        })
+    }, [searchTerm, isAISearch, searchFromUrl, aiSearchFromUrl, aiSearchData, regularProductsData])
+
     // Xác định data nào được sử dụng
     const apiProducts = (searchTerm && isAISearch)
         ? (aiSearchData || [])
