@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 // Map route → permission required
 const PERMISSION_MAP: Record<string, string> = {
-  "/admin": "VIEW_DASHBOARD",
+  "/admin/dashboard": "VIEW_DASHBOARD",
   "/admin/products": "VIEW_PRODUCTS",
   "/admin/products/add": "ADD_PRODUCT",
   "/admin/categories": "VIEW_CATEGORIES",
@@ -46,6 +46,12 @@ export function proxy(req: NextRequest) {
   }
 
   const userPermissions: string[] = payload.permissions || [];
+  const userRoles: string[] = payload.roles || [];
+
+  // Nếu là Customer → quay về trang chủ
+  if (userRoles.includes("ROLE_CUSTOMER")) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
 
   // 3. Xác định permission cần kiểm tra
   const basePath = Object.keys(PERMISSION_MAP)
@@ -63,7 +69,7 @@ export function proxy(req: NextRequest) {
   const hasPermission = userPermissions.includes(requiredPermission);
 
   if (!hasPermission) {
-    return NextResponse.redirect(new URL("/403", req.url));
+    return NextResponse.redirect(new URL("/admin", req.url));
   }
 
   return NextResponse.next();

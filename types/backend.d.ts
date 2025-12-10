@@ -171,11 +171,13 @@ export interface Page<T> {
 }
 
 export interface PageResponse<T> {
-    content: T[];
-    currentPage: number;
-    pageSize: number;
-    totalPages: number;
-    totalElements: number;
+  content: T[];
+  currentPage: number;
+  pageSize: number;
+  totalPages: number;
+  totalElements: number;
+}
+
 // Order
 export interface OrderItemRequest {
   cartItemId: number;
