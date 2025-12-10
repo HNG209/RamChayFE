@@ -68,7 +68,7 @@ export default function CustomerProductsPage() {
                 setIsAISearch(saved === 'true')
             }
         }
-    }, [])
+    }, [aiSearchFromUrl, searchParams]) // Re-sync when URL changes
 
     // Infinite scroll state
     const [displayedCount, setDisplayedCount] = useState(12) // Hiển thị 12 sản phẩm ban đầu
@@ -92,6 +92,19 @@ export default function CustomerProductsPage() {
     const { data: aiSearchData, isLoading: isLoadingAI } = useSearchProductsAIQuery(searchTerm, {
         skip: !searchTerm || !isAISearch
     })
+
+    // Debug logs
+    useEffect(() => {
+        console.log('🔍 Products Page Debug:', {
+            searchTerm,
+            isAISearch,
+            searchFromUrl,
+            aiSearchFromUrl,
+            willSkipAI: !searchTerm || !isAISearch,
+            aiSearchData,
+            regularProductsData: regularProductsData?.length
+        })
+    }, [searchTerm, isAISearch, searchFromUrl, aiSearchFromUrl, aiSearchData, regularProductsData])
 
     // Xác định data nào được sử dụng
     const apiProducts = (searchTerm && isAISearch)
