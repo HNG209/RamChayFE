@@ -104,8 +104,12 @@ export const productApi = baseApi.injectEndpoints({
         method: "GET",
         params: { query: searchTerm },
       }),
-      transformResponse: (response: { code: number; message: string; result: ProductCreationResponse[] }) => {
-        return response.result || [];
+      transformResponse: (response: ProductCreationResponse[]) => {
+        console.log('🔍 AI Search Response (after interceptor):', response);
+        console.log('🔍 Is Array:', Array.isArray(response));
+        console.log('🔍 Length:', response?.length);
+        console.log('🔍 First item:', response?.[0]);
+        return response || [];
       },
       providesTags: ["Product"],
     }),
