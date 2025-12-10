@@ -92,8 +92,66 @@ export const orderApi = baseApi.injectEndpoints({
         };
       },
     }),
+
+    // Admin endpoints
+    getAllOrders: builder.query<OrderDetailBackendResponse[], void>({
+      query: () => ({
+        url: "/orders/manager/all",
+        method: "GET",
+      }),
+      providesTags: ["Order"],
+    }),
+
+    updateOrderStatus: builder.mutation<void, { orderId: number; orderStatus: string }>({
+      query: ({ orderId, orderStatus }) => ({
+        url: `/orders/manager/${orderId}/status`,
+        method: "PUT",
+        data: { orderStatus },
+      }),
+      invalidatesTags: ["Order"],
+    }),
+
+    getOrderByIdForManager: builder.query<OrderDetail, number>({
+      query: (orderId: number) => ({
+        url: `/orders/manager/${orderId}`,
+        method: "GET",
+      }),
+      transformResponse: (response: OrderDetailBackendResponse): OrderDetail => {
+        return {
+          id: response.id,
+          customerId: response.customer.id,
+          customerName: response.customer.fullName || response.customer.username,
+          receiverName: response.receiverName,
+          receiverPhone: response.receiverPhone,
+          shippingAddress: response.shippingAddress,
+          paymentMethod: response.paymentMethod as any,
+          totalAmount: response.total,
+          orderStatus: response.orderStatus as any,
+          createdAt: response.orderDate,
+          updatedAt: response.orderDate,
+          items: response.orderDetails.map((detail) => ({
+            id: detail.id,
+            productId: detail.product.id,
+            productName: detail.product.name,
+            quantity: detail.quantity,
+            unitPrice: detail.unitPrice,
+            subtotal: detail.subtotal,
+            indexImage: detail.product.indexImage,
+          })),
+        };
+      },
+      providesTags: (result, error, orderId) => [{ type: "Order", id: orderId }],
+    }),
   }),
   overrideExisting: false,
 });
 
-export const { useCreateOrderMutation, useGetOrderByIdQuery, useGetMyOrdersQuery, useLazyTrackOrderQuery } = orderApi;
+export const {
+  useCreateOrderMutation,
+  useGetOrderByIdQuery,
+  useGetMyOrdersQuery,
+  useLazyTrackOrderQuery,
+  useGetAllOrdersQuery,
+  useUpdateOrderStatusMutation,
+  useGetOrderByIdForManagerQuery,
+} = orderApi;

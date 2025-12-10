@@ -7,7 +7,7 @@ const PERMISSION_MAP: Record<string, string> = {
   "/admin/products": "VIEW_PRODUCTS",
   "/admin/products/add": "ADD_PRODUCT",
   "/admin/categories": "VIEW_CATEGORIES",
-  "/admin/orders": "VIEW_ORDERS",
+  "/admin/orders": "VIEW_ORDER",
   "/admin/managers": "VIEW_MANAGERS",
   "/admin/managers/add": "ADD_MANAGER",
   "/admin/roles": "VIEW_ROLES",
