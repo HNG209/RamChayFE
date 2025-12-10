@@ -67,7 +67,7 @@ const ADMIN_MENU = [
       {
         label: "Quản lý đơn hàng",
         href: "/admin/orders",
-        allowedPermissions: ["VIEW_ORDERS"],
+        allowedPermissions: ["VIEW_ORDER"],
       },
     ],
   },
@@ -131,15 +131,17 @@ export default function AdminSidebar() {
   // Đổi openMenu thành mảng để mở nhiều menu cha
   const [openMenus, setOpenMenus] = useState<string[]>([]);
 
-  const user = useSelector(
-    (state: RootState) => state.auth.user
-  ) as MyProfile | null;
+  const user = useSelector((state: RootState) => state.auth.user) as MyProfile | null;
+
+  // Debug log
+  useEffect(() => {
+    console.log("🔍 User permissions:", user?.permissions);
+    console.log("🔍 Has VIEW_ORDERS?", user?.permissions?.includes("VIEW_ORDERS"));
+  }, [user]);
 
   const hasPermission = (allowedPermissions: string[]) => {
     if (!user || !user.permissions) return false;
-    return user.permissions.some((userPermission) =>
-      allowedPermissions.includes(userPermission)
-    );
+    return user.permissions.some((userPermission) => allowedPermissions.includes(userPermission));
   };
 
   const handleLogout = async () => {
@@ -153,9 +155,7 @@ export default function AdminSidebar() {
 
   // Hàm toggle menu cha
   const toggleMenu = (label: string) => {
-    setOpenMenus((prev) =>
-      prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]
-    );
+    setOpenMenus((prev) => (prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]));
   };
 
   return (
@@ -199,14 +199,21 @@ export default function AdminSidebar() {
 
       {/* 2. MENU NAVIGATION */}
       <nav className="flex-1 py-6 space-y-1 px-4">
-        <p className="px-2 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-          Quản lý chung
-        </p>
+        <p className="px-2 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Quản lý chung</p>
 
         {ADMIN_MENU.map((menu) => {
-          const visibleItems = menu.items.filter((sub) =>
-            hasPermission(sub.allowedPermissions)
-          );
+          const visibleItems = menu.items.filter((sub) => hasPermission(sub.allowedPermissions));
+          
+          // Debug log for each menu
+          if (menu.label === "Đơn hàng") {
+            console.log("📦 Menu Đơn hàng:", {
+              totalItems: menu.items.length,
+              visibleItems: visibleItems.length,
+              items: menu.items,
+              visibleItemsDetail: visibleItems
+            });
+          }
+          
           if (visibleItems.length === 0) return null;
 
           const isOpen = openMenus.includes(menu.label);
@@ -222,10 +229,7 @@ export default function AdminSidebar() {
                   <menu.icon className="w-5 h-5" />
                   {menu.label}
                 </div>
-                <ChevronRight
-                  className={`w-4 h-4 transition-transform ${isOpen ? "rotate-90" : ""
-                    }`}
-                />
+                <ChevronRight className={`w-4 h-4 transition-transform ${isOpen ? "rotate-90" : ""}`} />
               </button>
 
               {/* SUBMENU dạng cây với đường kẻ dọc, padding nhỏ hơn */}
@@ -241,9 +245,10 @@ export default function AdminSidebar() {
                           key={sub.href}
                           href={sub.href}
                           className={`flex items-center gap-2 px-2 py-2 text-sm rounded-lg relative
-                            ${isActive
-                              ? "text-lime-400 bg-lime-primary/10 font-semibold"
-                              : "text-gray-400 hover:text-white hover:bg-gray-800"
+                            ${
+                              isActive
+                                ? "text-lime-400 bg-lime-primary/10 font-semibold"
+                                : "text-gray-400 hover:text-white hover:bg-gray-800"
                             }`}
                         >
                           <span className="w-2 h-2 rounded-full bg-lime-400 mr-2 inline-block" />
