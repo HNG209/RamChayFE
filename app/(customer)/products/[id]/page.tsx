@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { ArrowLeft, Heart, Share2, Minus, Plus, ShoppingCart, Star, Package, Clock, Shield, Truck, Sparkles, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowLeft, Heart, Share2, Minus, Plus, ShoppingCart, Star, Package, Clock, Shield, Truck, Sparkles, ChevronLeft, ChevronRight, SquareCheckBig, RotateCcw } from "lucide-react"
 import { useGetProductByIdQuery } from "@/redux/services/productApi"
 import { useAddItemMutation } from "@/redux/services/cartApi"
 import { toast } from "sonner"
@@ -246,15 +246,15 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                         <div className="bg-green-50/80 backdrop-blur-sm border border-green-200 rounded-lg p-4">
                             <div className="space-y-3">
                                 <div className="flex items-center gap-3">
-                                    <span className="text-2xl">✅</span>
+                                    <SquareCheckBig />
                                     <span className="text-gray-700 font-medium">Cam kết chay 100%</span>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <span className="text-2xl">🛵</span>
+                                    <Truck />
                                     <span className="text-gray-700 font-medium">Giao nhanh 30 phút</span>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <span className="text-2xl">⭐</span>
+                                    <RotateCcw />
                                     <span className="text-gray-700 font-medium">Đổi trả nếu món ăn có lỗi</span>
                                 </div>
                             </div>

@@ -22,8 +22,12 @@ interface ApiResponse<T = unknown> {
   result: T;
 }
 
+// Đọc biến môi trường
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8081/api";
+
 const api = axios.create({
-  baseURL: "http://localhost:8081/api", // Server Spring Boot
+  baseURL: BASE_URL, // Server Spring Boot
   headers: {
     "Content-Type": "application/json",
   },
