@@ -98,18 +98,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         )
     }
 
-    // Lấy danh sách ảnh - indexImage thật từ backend + mock images để demo carousel
-    const mockImages = [
-        "/vegan-food-1.png",
-        "/vegan-food-2.png",
-        "/vegan-food-3.png",
-        "/vegan-food-4.png"
-    ]
-
-    // Ưu tiên indexImage từ API, sau đó thêm mock images để có nhiều ảnh cho carousel
-    const images: string[] = product.indexImage
-        ? [product.indexImage, ...mockImages]
-        : mockImages
+    // Lấy danh sách ảnh thật từ backend - chỉ hiển thị ảnh có thật, không dùng mock
+    const images: string[] = product.mediaList && product.mediaList.length > 0
+        ? product.mediaList.map(media => media.secureUrl)
+        : (product.indexImage ? [product.indexImage] : [])
 
     const hasDiscount = false // Có thể thêm logic discount sau
 
