@@ -203,17 +203,17 @@ export default function AdminSidebar() {
 
         {ADMIN_MENU.map((menu) => {
           const visibleItems = menu.items.filter((sub) => hasPermission(sub.allowedPermissions));
-          
+
           // Debug log for each menu
           if (menu.label === "Đơn hàng") {
             console.log("📦 Menu Đơn hàng:", {
               totalItems: menu.items.length,
               visibleItems: visibleItems.length,
               items: menu.items,
-              visibleItemsDetail: visibleItems
+              visibleItemsDetail: visibleItems,
             });
           }
-          
+
           if (visibleItems.length === 0) return null;
 
           const isOpen = openMenus.includes(menu.label);
