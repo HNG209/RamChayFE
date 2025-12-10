@@ -133,11 +133,7 @@ export default function AdminOrdersPage() {
             </button>
           )}
         </div>
-        {searchId && (
-          <p className="text-sm text-gray-500 mt-2">
-            Tìm thấy {filteredOrders?.length || 0} đơn hàng
-          </p>
-        )}
+        {searchId && <p className="text-sm text-gray-500 mt-2">Tìm thấy {filteredOrders?.length || 0} đơn hàng</p>}
       </div>
 
       {/* Orders Grid */}
@@ -171,7 +167,8 @@ export default function AdminOrdersPage() {
 
                 {/* Customer Info */}
                 <div className="mb-3 pb-3 border-b border-gray-100">
-                  <p className="text-sm font-medium text-gray-800">{order.customer.fullName || order.customer.username}</p>
+                  {/* <p className="text-sm font-medium text-gray-800">{order.customer.fullName || order.customer.username}</p> */}
+                  <p className="text-sm font-medium text-gray-800">{order.receiverName}</p>
                   <p className="text-xs text-gray-500">{order.receiverPhone}</p>
                 </div>
 
@@ -189,9 +186,7 @@ export default function AdminOrdersPage() {
         ) : (
           <div className="col-span-full text-center py-20">
             <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">
-              {searchId ? "Không tìm thấy đơn hàng nào" : "Không có đơn hàng nào"}
-            </p>
+            <p className="text-gray-500">{searchId ? "Không tìm thấy đơn hàng nào" : "Không có đơn hàng nào"}</p>
           </div>
         )}
       </div>
@@ -230,7 +225,7 @@ export default function AdminOrdersPage() {
                   <div className="flex items-start gap-2">
                     <span className="text-gray-500 w-28 shrink-0">Khách hàng:</span>
                     <span className="font-medium text-gray-800">
-                      {selectedOrder.customer.fullName || selectedOrder.customer.username}
+                      {selectedOrder.customer ? selectedOrder.customer.fullName : "Vãng lai"}
                     </span>
                   </div>
                   <div className="flex items-start gap-2">
@@ -371,10 +366,7 @@ export default function AdminOrdersPage() {
                 <span className="font-semibold text-gray-800">
                   {ORDER_STATUS_MAP[selectedOrder.orderStatus]?.label}
                 </span>{" "}
-                sang{" "}
-                <span className="font-semibold text-lime-primary">
-                  {ORDER_STATUS_MAP[newStatus]?.label}
-                </span>?
+                sang <span className="font-semibold text-lime-primary">{ORDER_STATUS_MAP[newStatus]?.label}</span>?
               </p>
               <div className="flex gap-3 mt-6">
                 <button

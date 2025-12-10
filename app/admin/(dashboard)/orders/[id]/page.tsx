@@ -105,10 +105,7 @@ export default function AdminOrderDetailPage() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link
-            href="/admin/orders"
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
+          <Link href="/admin/orders" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
@@ -144,12 +141,7 @@ export default function AdminOrderDetailPage() {
                 >
                   <div className="relative w-16 h-16 shrink-0 bg-gray-100 rounded-lg overflow-hidden">
                     {item.indexImage ? (
-                      <Image
-                        src={item.indexImage}
-                        alt={item.productName}
-                        fill
-                        className="object-cover"
-                      />
+                      <Image src={item.indexImage} alt={item.productName} fill className="object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-400">
                         <Package className="w-6 h-6" />
@@ -172,9 +164,7 @@ export default function AdminOrderDetailPage() {
             {/* Total */}
             <div className="mt-6 pt-6 border-t-2 border-gray-200 flex items-center justify-between">
               <span className="text-lg font-bold text-gray-800">Tổng cộng</span>
-              <span className="text-2xl font-bold text-lime-primary">
-                {formatPrice(order.totalAmount)}
-              </span>
+              <span className="text-2xl font-bold text-lime-primary">{formatPrice(order.totalAmount)}</span>
             </div>
           </div>
         </div>
@@ -190,7 +180,7 @@ export default function AdminOrderDetailPage() {
             <div className="space-y-3 text-sm">
               <div>
                 <p className="text-gray-500 mb-1">Khách hàng</p>
-                <p className="font-medium text-gray-800">{order.customerName}</p>
+                <p className="font-medium text-gray-800">{order.customerName || "Vãng lai"}</p>
               </div>
               <div>
                 <p className="text-gray-500 mb-1">Người nhận</p>
@@ -259,17 +249,13 @@ export default function AdminOrderDetailPage() {
 
             {/* Modal Body */}
             <div className="p-6">
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Chọn trạng thái mới
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Chọn trạng thái mới</label>
               <div className="space-y-2">
                 {Object.entries(ORDER_STATUS_MAP).map(([key, value]) => (
                   <label
                     key={key}
                     className={`flex items-center gap-3 p-3 border-2 rounded-lg cursor-pointer transition-colors ${
-                      newStatus === key
-                        ? "border-lime-primary bg-lime-50"
-                        : "border-gray-200 hover:border-gray-300"
+                      newStatus === key ? "border-lime-primary bg-lime-50" : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
                     <input
@@ -281,9 +267,7 @@ export default function AdminOrderDetailPage() {
                       className="w-4 h-4 text-lime-primary focus:ring-lime-primary"
                     />
                     <span
-                      className={`text-sm font-medium ${
-                        newStatus === key ? "text-lime-primary" : "text-gray-700"
-                      }`}
+                      className={`text-sm font-medium ${newStatus === key ? "text-lime-primary" : "text-gray-700"}`}
                     >
                       {value.label}
                     </span>
