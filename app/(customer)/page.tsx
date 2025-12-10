@@ -12,10 +12,10 @@ export default function Home() {
   const featuredProducts = products.slice(0, 4);
 
   const categories = [
-    { name: "Rau Củ Tươi", image: "/vegan-food-1.png", count: "50+ sản phẩm" },
-    { name: "Đậu & Hạt", image: "/vegan-food-2.png", count: "30+ sản phẩm" },
-    { name: "Nấm Các Loại", image: "/vegan-food-3.png", count: "20+ sản phẩm" },
-    { name: "Gia Vị Chay", image: "/vegan-food-4.png", count: "40+ sản phẩm" },
+    { name: "Rau Củ Tươi", image: "/raucu.png", count: "50+ sản phẩm" },
+    { name: "Đậu & Hạt", image: "/dauvahat.png", count: "30+ sản phẩm" },
+    { name: "Nấm Các Loại", image: "/nam.png", count: "20+ sản phẩm" },
+    { name: "Gia Vị Chay", image: "/giavichay.png", count: "40+ sản phẩm" },
   ];
 
   // Floating stickers state
@@ -208,15 +208,20 @@ export default function Home() {
               <Link
                 key={i}
                 href="/products"
-                className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-2 border-gray-200"
+                className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-2 border-green-200 hover:border-green-400"
               >
-                <div className="aspect-square relative">
-                  <Image src={cat.image} alt={cat.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
+                <div className="aspect-square relative bg-linear-to-br from-green-50 to-lime-50">
+                  <Image
+                    src={cat.image}
+                    alt={cat.name}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-green-600/30 to-transparent"></div>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                  <h3 className="font-bold text-lg">{cat.name}</h3>
-                  <p className="text-sm text-green-200">{cat.count}</p>
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-sm">
+                  <h3 className="font-bold text-lg text-gray-800">{cat.name}</h3>
+                  <p className="text-sm text-green-600 font-medium">{cat.count}</p>
                 </div>
               </Link>
             ))}
