@@ -352,8 +352,8 @@ export default function OrderPage() {
                     Địa chỉ giao hàng <span className="text-red-500">*</span>
                   </label>
 
-                  {/* For logged-in users with saved addresses */}
-                  {user?.id && user.addresses && user.addresses.length > 0 ? (
+                  {/* For logged-in users */}
+                  {user?.id ? (
                     <div className="space-y-2">
                       <button
                         type="button"
@@ -396,7 +396,7 @@ export default function OrderPage() {
                           value={manualWard}
                           onChange={(e) => setManualWard(e.target.value)}
                           className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-lime-primary focus:border-transparent outline-none transition-all"
-                          placeholder="Quận/Huyện/Phường *"
+                          placeholder="Phường *"
                         />
                       </div>
                       <div>
@@ -405,7 +405,7 @@ export default function OrderPage() {
                           value={manualStreet}
                           onChange={(e) => setManualStreet(e.target.value)}
                           className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-lime-primary focus:border-transparent outline-none transition-all"
-                          placeholder="Đường/Phố (tùy chọn)"
+                          placeholder="Đường (tùy chọn)"
                         />
                       </div>
                       <div>
@@ -612,50 +612,56 @@ export default function OrderPage() {
             {/* Modal Body - Scrollable */}
             <div className="flex-1 overflow-y-auto p-6">
               {/* Saved Addresses */}
-              <div className="space-y-2">
-                {user.addresses.map((addr) => {
-                  const formatAddress = (address: typeof addr) => {
-                    // Always format with descriptive labels
-                    const parts = [];
-                    if (address.personalAddress) parts.push(address.personalAddress);
-                    if (address.street) parts.push(`Đường ${address.street}`);
-                    if (address.ward) parts.push(`Phường ${address.ward}`);
-                    if (address.city) parts.push(`Thành phố ${address.city}`);
-                    return parts.join(", ");
-                  };
+              {user.addresses && user.addresses.length > 0 ? (
+                <div className="space-y-2 mb-3">
+                  {user.addresses.map((addr) => {
+                    const formatAddress = (address: typeof addr) => {
+                      // Always format with descriptive labels
+                      const parts = [];
+                      if (address.personalAddress) parts.push(address.personalAddress);
+                      if (address.street) parts.push(`Đường ${address.street}`);
+                      if (address.ward) parts.push(`Phường ${address.ward}`);
+                      if (address.city) parts.push(`Thành phố ${address.city}`);
+                      return parts.join(", ");
+                    };
 
-                  return (
-                    <button
-                      key={addr.id}
-                      onClick={() => handleSelectAddress(addr.id)}
-                      className={`w-full p-4 border-2 rounded-xl text-left transition-colors ${
-                        selectedAddressId === addr.id
-                          ? "border-lime-primary bg-lime-50"
-                          : "border-gray-200 hover:border-lime-primary"
-                      }`}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-800">{formatAddress(addr)}</p>
+                    return (
+                      <button
+                        key={addr.id}
+                        onClick={() => handleSelectAddress(addr.id)}
+                        className={`w-full p-4 border-2 rounded-xl text-left transition-colors ${
+                          selectedAddressId === addr.id
+                            ? "border-lime-primary bg-lime-50"
+                            : "border-gray-200 hover:border-lime-primary"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-800">{formatAddress(addr)}</p>
+                          </div>
+                          {selectedAddressId === addr.id && (
+                            <svg
+                              className="w-5 h-5 text-lime-primary mt-0.5 shrink-0 ml-2"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          )}
                         </div>
-                        {selectedAddressId === addr.id && (
-                          <svg
-                            className="w-5 h-5 text-lime-primary mt-0.5 shrink-0 ml-2"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <p className="text-gray-500 mb-4">Bạn chưa có địa chỉ nào được lưu</p>
+                </div>
+              )}
 
               {/* Add New Address Button */}
               <button
@@ -767,26 +773,26 @@ export default function OrderPage() {
                 {/* Ward */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Quận/Huyện/Phường <span className="text-red-500">*</span>
+                    Phường <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={newAddressWard}
                     onChange={(e) => setNewAddressWard(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-lime-primary focus:border-transparent outline-none transition-all"
-                    placeholder="Ví dụ: Quận 1, Huyện Hoàng Mai"
+                    placeholder="Ví dụ: Gò Vấp"
                   />
                 </div>
 
                 {/* Street (Optional) */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Đường/Phố (Tùy chọn)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Đường (Tùy chọn)</label>
                   <input
                     type="text"
                     value={newAddressStreet}
                     onChange={(e) => setNewAddressStreet(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-lime-primary focus:border-transparent outline-none transition-all"
-                    placeholder="Ví dụ: Đường Lê Lợi, Phố Huế"
+                    placeholder="Ví dụ: Lê Lợi"
                   />
                 </div>
 
