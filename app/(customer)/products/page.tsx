@@ -89,7 +89,7 @@ export default function CustomerProductsPage() {
     const { data: regularProductsData, isLoading: isLoadingRegular } = useGetProductsQuery()
 
     // AI Search - chỉ gọi khi bật AI và có search term
-    const { data: aiSearchData, isLoading: isLoadingAI } = useSearchProductsAIQuery(searchTerm, {
+    const { data: aiSearchData, isLoading: isLoadingAI, error: aiSearchError } = useSearchProductsAIQuery(searchTerm, {
         skip: !searchTerm || !isAISearch
     })
 
@@ -102,14 +102,25 @@ export default function CustomerProductsPage() {
             aiSearchFromUrl,
             willSkipAI: !searchTerm || !isAISearch,
             aiSearchData,
-            regularProductsData: regularProductsData?.length
+            aiSearchDataLength: aiSearchData?.length,
+            aiSearchError,
+            regularProductsData: regularProductsData?.length,
+            isLoadingAI,
+            isLoadingRegular
         })
-    }, [searchTerm, isAISearch, searchFromUrl, aiSearchFromUrl, aiSearchData, regularProductsData])
+    }, [searchTerm, isAISearch, searchFromUrl, aiSearchFromUrl, aiSearchData, aiSearchError, regularProductsData, isLoadingAI, isLoadingRegular])
 
     // Xác định data nào được sử dụng
-    const apiProducts = (searchTerm && isAISearch)
+    // Nếu AI Search lỗi, fallback về regular products và filter bằng tìm kiếm thông thường
+    const apiProducts = (searchTerm && isAISearch && !aiSearchError)
         ? (aiSearchData || [])
         : (regularProductsData || [])
+
+    console.log('📦 API Products Selected:', {
+        source: (searchTerm && isAISearch) ? 'AI Search' : 'Regular',
+        count: apiProducts.length,
+        data: apiProducts
+    })
 
     const isLoading = (searchTerm && isAISearch) ? isLoadingAI : isLoadingRegular
 
@@ -231,6 +242,12 @@ export default function CustomerProductsPage() {
         filteredProducts = [...filteredProducts].sort((a, b) => a.name.localeCompare(b.name))
     }
 
+    console.log('🎯 Filtered Products:', {
+        totalApiProducts: apiProducts.length,
+        afterFiltering: filteredProducts.length,
+        filters: { selectedCategory, minPrice, maxPrice, sortBy, searchTerm, isAISearch }
+    })
+
     // Infinite scroll: Lấy sản phẩm để hiển thị
     const displayedProducts = filteredProducts.slice(0, displayedCount)
     const hasMore = displayedCount < filteredProducts.length
@@ -345,9 +362,14 @@ export default function CustomerProductsPage() {
                                     {isAISearch && <Sparkles className="w-3 h-3" />}
                                     Tìm kiếm {isAISearch && 'AI'}: "{searchTerm}"
                                 </span>
-                                {isAISearch && (
+                                {isAISearch && !aiSearchError && (
                                     <span className="px-3 py-1 bg-linear-to-r from-purple-500 to-pink-500 text-white text-xs rounded-full font-semibold shadow-md">
                                         🤖 AI Semantic Search
+                                    </span>
+                                )}
+                                {isAISearch && aiSearchError && (
+                                    <span className="px-3 py-1 bg-linear-to-r from-orange-500 to-red-500 text-white text-xs rounded-full font-semibold shadow-md animate-pulse">
+                                        ⚠️ AI Search lỗi - Dùng tìm kiếm thường
                                     </span>
                                 )}
                             </>
