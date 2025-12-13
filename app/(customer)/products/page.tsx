@@ -8,46 +8,6 @@ import { useGetProductsQuery, useSearchProductsAIQuery } from "@/redux/services/
 import { useSearchParams, useRouter } from "next/navigation"
 import { useInView } from "react-intersection-observer"
 
-const mockProducts = [
-    {
-        id: 1,
-        name: "Đậu hũ chiên giòn",
-        price: 45000,
-        stock: 20,
-        description: "Đậu hũ chiên giòn, thơm ngon",
-        category: { categoryName: "Món chiên", description: "Các món chiên giòn" },
-        images: ["/vegan-food-1.png", "/vegan-food-2.png", "/vegan-food-3.png", "/vegan-food-4.png"],
-    },
-    {
-        id: 2,
-        name: "Chả chay",
-        price: 38000,
-        stock: 10,
-        description: "Chả chay đặc biệt",
-        category: { categoryName: "Món chay", description: "Món chay truyền thống" },
-        images: ["/vegan-food-1.png", "/vegan-food-2.png", "/vegan-food-3.png", "/vegan-food-4.png"],
-    },
-    {
-        id: 3,
-        name: "Cơm cuộn chay",
-        price: 55000,
-        stock: 15,
-        description: "Cơm cuộn chay ngon miệng",
-        category: { categoryName: "Món cuộn", description: "Các món cuộn" },
-        images: ["/vegan-food-1.png", "/vegan-food-2.png", "/vegan-food-3.png", "/vegan-food-4.png"],
-
-    },
-    {
-        id: 4,
-        name: "Gỏi cuốn chay",
-        price: 30000,
-        stock: 25,
-        description: "Gỏi cuốn tươi mát",
-        category: { categoryName: "Món cuộn", description: "Các món cuốn" },
-        images: ["/vegan-food-1.png", "/vegan-food-2.png", "/vegan-food-3.png", "/vegan-food-4.png"],
-    },
-];
-
 export default function CustomerProductsPage() {
     const router = useRouter()
     const searchParams = useSearchParams()

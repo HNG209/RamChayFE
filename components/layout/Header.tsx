@@ -46,9 +46,9 @@ export default function Header() {
 
   // Load AI search preference from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('aiSearchEnabled');
+    const saved = localStorage.getItem("aiSearchEnabled");
     if (saved !== null) {
-      setIsAISearch(saved === 'true');
+      setIsAISearch(saved === "true");
     }
   }, []);
 
@@ -56,11 +56,13 @@ export default function Header() {
   const toggleAISearch = () => {
     const newValue = !isAISearch;
     setIsAISearch(newValue);
-    localStorage.setItem('aiSearchEnabled', String(newValue));
+    localStorage.setItem("aiSearchEnabled", String(newValue));
 
     // Nếu đang ở trang products và có search term, update URL ngay
-    if (pathname === '/products' && searchTerm.trim()) {
-      const searchUrl = `/products?search=${encodeURIComponent(searchTerm.trim())}&aiSearch=${newValue}`;
+    if (pathname === "/products" && searchTerm.trim()) {
+      const searchUrl = `/products?search=${encodeURIComponent(
+        searchTerm.trim()
+      )}&aiSearch=${newValue}`;
       router.push(searchUrl);
     }
   };
@@ -73,9 +75,11 @@ export default function Header() {
     }
 
     // Only trigger if searchTerm has value and on products page
-    if (searchTerm.trim() && pathname === '/products') {
+    if (searchTerm.trim() && pathname === "/products") {
       debounceTimerRef.current = setTimeout(() => {
-        const searchUrl = `/products?search=${encodeURIComponent(searchTerm.trim())}&aiSearch=${isAISearch}`;
+        const searchUrl = `/products?search=${encodeURIComponent(
+          searchTerm.trim()
+        )}&aiSearch=${isAISearch}`;
         router.push(searchUrl);
       }, 500); // 500ms debounce
     }
@@ -92,8 +96,8 @@ export default function Header() {
   const user = useSelector((state: RootState) => state.auth.user);
 
   // Fetch cart items để lấy số lượng
-  const { data: cartData } = useGetCartItemsQuery(
-    { page: 0, size: 100 },
+  useGetCartItemsQuery(
+    { page: 0, size: 10 },
     {
       // Refetch khi mount component hoặc khi argument thay đổi
       refetchOnMountOrArgChange: true,
@@ -103,7 +107,7 @@ export default function Header() {
       // pollingInterval: 3000,
     }
   );
-  const cartItemsCount = cartData?.content.reduce((total, item) => total + item.quantity, 0) || 0;
+  const totalItems = useSelector((state: RootState) => state.cart.totalItems);
 
   const isActive = (path: string) => pathname === path;
 
@@ -111,7 +115,9 @@ export default function Header() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      const searchUrl = `/products?search=${encodeURIComponent(searchTerm.trim())}&aiSearch=${isAISearch}`;
+      const searchUrl = `/products?search=${encodeURIComponent(
+        searchTerm.trim()
+      )}&aiSearch=${isAISearch}`;
       router.push(searchUrl);
       setSearchTerm("");
     }
@@ -174,10 +180,11 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-sm font-medium transition-colors hover:text-lime-primary ${isActive(item.href)
-                  ? "text-lime-primary font-bold"
-                  : "text-gray-600"
-                  }`}
+                className={`text-sm font-medium transition-colors hover:text-lime-primary ${
+                  isActive(item.href)
+                    ? "text-lime-primary font-bold"
+                    : "text-gray-600"
+                }`}
               >
                 {item.label}
               </Link>
@@ -185,12 +192,19 @@ export default function Header() {
           </nav>
 
           {/* 2.5 SEARCH BAR - Desktop */}
-          <form onSubmit={handleSearch} className="hidden lg:flex items-center flex-1 max-w-md mx-8 gap-2">
+          <form
+            onSubmit={handleSearch}
+            className="hidden lg:flex items-center flex-1 max-w-md mx-8 gap-2"
+          >
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
               <input
                 type="text"
-                placeholder={isAISearch ? "Tìm kiếm thông minh với AI..." : "Tìm kiếm sản phẩm..."}
+                placeholder={
+                  isAISearch
+                    ? "Tìm kiếm thông minh với AI..."
+                    : "Tìm kiếm sản phẩm..."
+                }
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onFocus={() => setIsSearchFocused(true)}
@@ -200,12 +214,21 @@ export default function Header() {
               {/* Sparkle Effect */}
               {isSearchFocused && (
                 <div className="absolute inset-0 -z-10 pointer-events-none">
-                  <span className="absolute -top-2 left-8 text-xl animate-sparkle-1">🥬</span>
-                  <span className="absolute -top-3 left-20 text-lg animate-sparkle-2">🥕</span>
-                  <span className="absolute -bottom-2 left-16 text-xl animate-sparkle-3">🥦</span>
-                  <span className="absolute -top-2 right-12 text-lg animate-sparkle-4">🍄</span>
-                  <span className="absolute -bottom-3 right-8 text-xl animate-sparkle-5">🌽</span>
-                  <span className="absolute -top-1 right-24 text-lg animate-sparkle-1">🫑</span>
+                  <span className="absolute -top-2 left-8 text-xl animate-sparkle-1">
+                    🥬
+                  </span>
+                  <span className="absolute -top-3 left-20 text-lg animate-sparkle-2">
+                    🥕
+                  </span>
+                  <span className="absolute -bottom-2 left-16 text-xl animate-sparkle-3">
+                    🥦
+                  </span>
+                  <span className="absolute -top-2 right-12 text-lg animate-sparkle-4">
+                    🍄
+                  </span>
+                  <span className="absolute -bottom-3 right-8 text-xl animate-sparkle-5">
+                    🌽
+                  </span>
                 </div>
               )}
             </div>
@@ -213,14 +236,21 @@ export default function Header() {
             <button
               type="button"
               onClick={toggleAISearch}
-              className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${isAISearch
-                ? 'bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              title={isAISearch ? "Sử dụng AI Semantic Search" : "Sử dụng tìm kiếm thường"}
+              className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                isAISearch
+                  ? "bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+              title={
+                isAISearch
+                  ? "Sử dụng AI Semantic Search"
+                  : "Sử dụng tìm kiếm thường"
+              }
             >
-              <Sparkles className={`w-4 h-4 ${isAISearch ? 'animate-pulse' : ''}`} />
-              {isAISearch ? 'AI' : 'ABC'}
+              <Sparkles
+                className={`w-4 h-4 ${isAISearch ? "animate-pulse" : ""}`}
+              />
+              {isAISearch ? "AI" : "ABC"}
             </button>
           </form>
 
@@ -233,9 +263,9 @@ export default function Header() {
               data-cart-icon
             >
               <ShoppingCart className="w-5 h-5 text-gray-700" />
-              {cartItemsCount > 0 && (
+              {totalItems > 0 && (
                 <span className="absolute top-0 right-0 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
-                  {cartItemsCount}
+                  {totalItems}
                 </span>
               )}
             </Link>
@@ -342,8 +372,9 @@ export default function Header() {
       )}
 
       <div
-        className={`fixed top-0 right-0 h-full w-[280px] bg-white shadow-2xl z-60 transform transition-transform duration-300 ease-in-out ${isDrawerOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+        className={`fixed top-0 right-0 h-full w-[280px] bg-white shadow-2xl z-60 transform transition-transform duration-300 ease-in-out ${
+          isDrawerOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <div className="flex flex-col h-full">
           {/* Drawer Header: Hiển thị User nếu đã login */}
@@ -384,7 +415,9 @@ export default function Header() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder={isAISearch ? "Tìm kiếm với AI..." : "Tìm kiếm sản phẩm..."}
+                    placeholder={
+                      isAISearch ? "Tìm kiếm với AI..." : "Tìm kiếm sản phẩm..."
+                    }
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-lime-primary/50 focus:border-lime-primary bg-white"
@@ -393,13 +426,16 @@ export default function Header() {
                 <button
                   type="button"
                   onClick={toggleAISearch}
-                  className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all ${isAISearch
-                    ? 'bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
+                  className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all ${
+                    isAISearch
+                      ? "bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
                 >
-                  <Sparkles className={`w-4 h-4 ${isAISearch ? 'animate-pulse' : ''}`} />
-                  {isAISearch ? 'Đang dùng AI Search' : 'Dùng AI Search'}
+                  <Sparkles
+                    className={`w-4 h-4 ${isAISearch ? "animate-pulse" : ""}`}
+                  />
+                  {isAISearch ? "Đang dùng AI Search" : "Dùng AI Search"}
                 </button>
               </form>
               <div className="mt-3 border-t border-gray-100"></div>
@@ -410,10 +446,11 @@ export default function Header() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className={`block px-4 py-3 rounded-lg ${isActive(item.href)
-                      ? "bg-lime-accent/30 text-lime-primary font-bold"
-                      : "text-gray-700 hover:bg-gray-50"
-                      }`}
+                    className={`block px-4 py-3 rounded-lg ${
+                      isActive(item.href)
+                        ? "bg-lime-accent/30 text-lime-primary font-bold"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
                     onClick={() => setIsDrawerOpen(false)}
                   >
                     {item.label}

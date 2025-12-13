@@ -40,7 +40,6 @@ export const cartApi = baseApi.injectEndpoints({
         method: "PUT",
         data: { quantity },
       }),
-      invalidatesTags: ["Cart"],
     }),
 
     deleteCartItem: builder.mutation<void, { itemId: number }>({
@@ -48,13 +47,11 @@ export const cartApi = baseApi.injectEndpoints({
         url: `/cart-items/${itemId}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Cart"],
     }),
   }),
   overrideExisting: false, // Để tránh ghi đè nếu lỡ import 2 lần
 });
 
-// Xuất Hooks riêng từ file này
 export const {
   useAddItemMutation,
   useGetCartItemsQuery,

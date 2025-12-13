@@ -1,11 +1,12 @@
 // components/cart/CartItem.tsx
 import Image from "next/image";
 import { Minus, Plus, Trash2, Check } from "lucide-react";
-import { CartProduct, GetItemsResponse } from "@/types/backend";
+import {
+  GetItemsResponseWithSelected,
+} from "@/types/backend";
 
 interface CartItemProps {
-  item: GetItemsResponse;
-  isSelected: boolean;
+  item: GetItemsResponseWithSelected;
   onToggleSelect: (id: number) => void;
   onUpdateQuantity: (id: number, newQuantity: number) => void;
   onRemove: (id: number) => void;
@@ -13,7 +14,6 @@ interface CartItemProps {
 
 export default function CartItem({
   item,
-  isSelected,
   onToggleSelect,
   onUpdateQuantity,
   onRemove,
@@ -32,12 +32,13 @@ export default function CartItem({
         {/* Custom Checkbox */}
         <button
           onClick={() => onToggleSelect(item.id)}
-          className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${isSelected
-            ? "bg-lime-primary border-lime-primary text-white"
-            : "border-gray-300 bg-white"
-            }`}
+          className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
+            item.selected
+              ? "bg-lime-primary border-lime-primary text-white"
+              : "border-gray-300 bg-white"
+          }`}
         >
-          {isSelected && <Check className="w-3.5 h-3.5" />}
+          {item.selected && <Check className="w-3.5 h-3.5" />}
         </button>
 
         {/* Ảnh sản phẩm */}
@@ -72,7 +73,7 @@ export default function CartItem({
             <button
               onClick={() => {
                 if (item.quantity > 1) {
-                  onUpdateQuantity(item.id, item.quantity - 1)
+                  onUpdateQuantity(item.id, item.quantity - 1);
                 }
               }}
               disabled={item.quantity <= 1}
