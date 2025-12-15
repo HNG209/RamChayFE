@@ -335,12 +335,7 @@ export default function CartPage() {
                     alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán!");
                     return;
                   }
-                  router.push(
-                    `/order?items=${cartItems
-                      .filter((item) => item.selected)
-                      .map((item) => item.id)
-                      .join(",")}`
-                  );
+                  router.push("/order");
                 }}
                 disabled={
                   cartItems.filter((item) => item.selected).length === 0
