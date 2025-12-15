@@ -2,37 +2,46 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Loader2, ShoppingBag, MapPin, Phone, User, CreditCard, Mail, Plus, Trash2 } from "lucide-react";
-import { useGetCartItemsQuery } from "@/redux/services/cartApi";
+import {
+  ArrowLeft,
+  Loader2,
+  ShoppingBag,
+  MapPin,
+  Phone,
+  User,
+  CreditCard,
+  Mail,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useCreateOrderMutation } from "@/redux/services/orderApi";
-import { useCreateAddressMutation, useDeleteAddressMutation } from "@/redux/services/addressApi";
+import {
+  useCreateAddressMutation,
+  useDeleteAddressMutation,
+} from "@/redux/services/addressApi";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import Image from "next/image";
 
 export default function OrderPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const user = useSelector((state: RootState) => state.auth.user);
+  const items = useSelector((state: RootState) => state.cart.items);
 
-  // Get selected item IDs from URL query params
-  const selectedIdsParam = searchParams.get("items");
-  const selectedIds = selectedIdsParam ? selectedIdsParam.split(",").map(Number) : [];
-
-  const { data: cartData, isLoading: isLoadingCart } = useGetCartItemsQuery({
-    page: 0,
-    size: 100,
-  });
-  const [createOrder, { isLoading: isCreatingOrder }] = useCreateOrderMutation();
-  const [createAddress, { isLoading: isCreatingAddress }] = useCreateAddressMutation();
+  const [createOrder, { isLoading: isCreatingOrder }] =
+    useCreateOrderMutation();
+  const [createAddress, { isLoading: isCreatingAddress }] =
+    useCreateAddressMutation();
   const [deleteAddress] = useDeleteAddressMutation();
 
   // Form state
   const [receiverName, setReceiverName] = useState("");
   const [receiverPhone, setReceiverPhone] = useState("");
-  const [selectedAddressId, setSelectedAddressId] = useState<number | "manual" | null>(null);
+  const [selectedAddressId, setSelectedAddressId] = useState<
+    number | "manual" | null
+  >(null);
   const [manualCity, setManualCity] = useState("");
   const [manualWard, setManualWard] = useState("");
   const [manualStreet, setManualStreet] = useState("");
@@ -41,7 +50,8 @@ export default function OrderPage() {
   const [paymentMethod, setPaymentMethod] = useState<"COD" | "QRPAY">("COD");
 
   // Address selection modal state
-  const [showAddressSelectionModal, setShowAddressSelectionModal] = useState(false);
+  const [showAddressSelectionModal, setShowAddressSelectionModal] =
+    useState(false);
 
   // Address management modal state
   const [showAddressModal, setShowAddressModal] = useState(false);
@@ -66,13 +76,16 @@ export default function OrderPage() {
 
   // Filter selected items from cart
   const selectedCartItems = useMemo(() => {
-    if (!cartData?.content) return [];
-    return cartData.content.filter((item) => selectedIds.includes(item.id));
-  }, [cartData, selectedIds]);
+    // Lọc ra từ items có selected = true trong redux state
+    return items.filter((item) => item.selected);
+  }, [items]);
 
   // Calculate total
   const totalAmount = useMemo(() => {
-    return selectedCartItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+    return selectedCartItems.reduce(
+      (sum, item) => sum + item.unitPrice * item.quantity,
+      0
+    );
   }, [selectedCartItems]);
 
   // Format price
@@ -122,7 +135,9 @@ export default function OrderPage() {
   // Handle create new address
   const handleCreateAddress = async () => {
     if (!newAddressCity || !newAddressWard || !newAddressPersonal) {
-      alert("Vui lòng điền đầy đủ thông tin địa chỉ (Thành phố, Phường, Địa chỉ cụ thể)!");
+      alert(
+        "Vui lòng điền đầy đủ thông tin địa chỉ (Thành phố, Phường, Địa chỉ cụ thể)!"
+      );
       return;
     }
 
@@ -242,49 +257,68 @@ export default function OrderPage() {
 
       // For guest users, redirect to success page with email info
       if (!user?.id) {
-        router.push(`/order/success?email=${encodeURIComponent(email)}&guest=true`);
+        router.push(
+          `/order/success?email=${encodeURIComponent(email)}&guest=true`
+        );
         return;
       }
 
       // For logged-in users, redirect to order detail page
-      const orderId = result?.id || result?.orderId || (typeof result === "number" ? result : null);
+      const orderId =
+        result?.id ||
+        result?.orderId ||
+        (typeof result === "number" ? result : null);
 
       if (orderId) {
         router.push(`/order/${orderId}`);
       } else {
-        alert(`Đặt hàng thành công nhưng không thể chuyển trang. Response: ${JSON.stringify(result)}`);
+        alert(
+          `Đặt hàng thành công nhưng không thể chuyển trang. Response: ${JSON.stringify(
+            result
+          )}`
+        );
         router.push("/products");
       }
     } catch (error: any) {
       console.error("Order creation failed:", error);
-      alert(`Đặt hàng thất bại: ${error?.data?.message || "Vui lòng thử lại sau"}`);
+      alert(
+        `Đặt hàng thất bại: ${error?.data?.message || "Vui lòng thử lại sau"}`
+      );
     }
   };
 
-  if (isLoadingCart) {
-    return (
-      <div className="min-h-screen bg-cream-light flex items-center justify-center">
-        <div className="flex items-center gap-2">
-          <Loader2 className="w-6 h-6 animate-spin text-lime-primary" />
-          <span className="text-gray-600">Đang tải thông tin đơn hàng...</span>
-        </div>
-      </div>
-    );
-  }
+  // if (isLoadingCart) {
+  //   return (
+  //     <div className="min-h-screen bg-cream-light flex items-center justify-center">
+  //       <div className="flex items-center gap-2">
+  //         <Loader2 className="w-6 h-6 animate-spin text-lime-primary" />
+  //         <span className="text-gray-600">Đang tải thông tin đơn hàng...</span>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   if (selectedCartItems.length === 0) {
     return (
       <div className="min-h-screen bg-cream-light">
         <div className="container mx-auto px-4 pt-6">
           <div className="flex items-center gap-2 mb-6">
-            <Link href="/cart" className="p-2 hover:bg-white rounded-full transition-colors">
+            <Link
+              href="/cart"
+              className="p-2 hover:bg-white rounded-full transition-colors"
+            >
               <ArrowLeft className="w-5 h-5 text-gray-600" />
             </Link>
             <h1 className="text-2xl font-bold text-gray-800">Đặt hàng</h1>
           </div>
           <div className="bg-white p-8 rounded-xl text-center">
-            <p className="text-gray-500 mb-4">Không có sản phẩm nào được chọn để đặt hàng.</p>
-            <Link href="/cart" className="text-lime-primary font-bold hover:underline">
+            <p className="text-gray-500 mb-4">
+              Không có sản phẩm nào được chọn để đặt hàng.
+            </p>
+            <Link
+              href="/cart"
+              className="text-lime-primary font-bold hover:underline"
+            >
               Quay lại giỏ hàng
             </Link>
           </div>
@@ -298,7 +332,10 @@ export default function OrderPage() {
       <div className="container mx-auto px-4 pt-6">
         {/* Header */}
         <div className="flex items-center gap-2 mb-6">
-          <Link href="/cart" className="p-2 hover:bg-white rounded-full transition-colors">
+          <Link
+            href="/cart"
+            className="p-2 hover:bg-white rounded-full transition-colors"
+          >
             <ArrowLeft className="w-5 h-5 text-gray-600" />
           </Link>
           <h1 className="text-2xl font-bold text-gray-800">Đặt hàng</h1>
@@ -360,7 +397,13 @@ export default function OrderPage() {
                         onClick={() => setShowAddressSelectionModal(true)}
                         className="w-full px-4 py-3 border border-gray-200 rounded-xl hover:border-lime-primary focus:ring-2 focus:ring-lime-primary focus:border-transparent outline-none transition-all text-left flex items-center justify-between"
                       >
-                        <span className={getShippingAddress() ? "text-gray-800" : "text-gray-400"}>
+                        <span
+                          className={
+                            getShippingAddress()
+                              ? "text-gray-800"
+                              : "text-gray-400"
+                          }
+                        >
                           {getShippingAddress() || "Chọn địa chỉ giao hàng"}
                         </span>
                         <MapPin className="w-5 h-5 text-lime-primary" />
@@ -412,7 +455,9 @@ export default function OrderPage() {
                         <input
                           type="text"
                           value={manualPersonalAddress}
-                          onChange={(e) => setManualPersonalAddress(e.target.value)}
+                          onChange={(e) =>
+                            setManualPersonalAddress(e.target.value)
+                          }
                           className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-lime-primary focus:border-transparent outline-none transition-all"
                           placeholder="Số nhà, ngõ, ngách *"
                         />
@@ -432,7 +477,11 @@ export default function OrderPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-lime-primary focus:border-transparent outline-none transition-all"
-                    placeholder={!user?.id ? "Email để nhận thông tin đơn hàng" : "Email (tùy chọn)"}
+                    placeholder={
+                      !user?.id
+                        ? "Email để nhận thông tin đơn hàng"
+                        : "Email (tùy chọn)"
+                    }
                     required={!user?.id}
                   />
                   {!user?.id && (
@@ -462,8 +511,12 @@ export default function OrderPage() {
                     className="w-4 h-4 text-lime-primary focus:ring-lime-primary"
                   />
                   <div className="flex-1">
-                    <p className="font-medium text-gray-800">Thanh toán khi nhận hàng (COD)</p>
-                    <p className="text-sm text-gray-500">Thanh toán bằng tiền mặt khi nhận hàng</p>
+                    <p className="font-medium text-gray-800">
+                      Thanh toán khi nhận hàng (COD)
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Thanh toán bằng tiền mặt khi nhận hàng
+                    </p>
                   </div>
                 </label>
 
@@ -477,8 +530,12 @@ export default function OrderPage() {
                     className="w-4 h-4 text-lime-primary focus:ring-lime-primary"
                   />
                   <div className="flex-1">
-                    <p className="font-medium text-gray-800">Thanh toán QR Code</p>
-                    <p className="text-sm text-gray-500">Quét mã QR để thanh toán qua ví điện tử</p>
+                    <p className="font-medium text-gray-800">
+                      Thanh toán QR Code
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Quét mã QR để thanh toán qua ví điện tử
+                    </p>
                   </div>
                 </label>
               </div>
@@ -493,10 +550,18 @@ export default function OrderPage() {
 
               <div className="space-y-3">
                 {selectedCartItems.map((item) => (
-                  <div key={item.id} className="flex items-center gap-4 p-3 border border-gray-100 rounded-xl">
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-4 p-3 border border-gray-100 rounded-xl"
+                  >
                     <div className="relative w-16 h-16 shrink-0 bg-gray-100 rounded-lg overflow-hidden">
                       {item.indexImage ? (
-                        <Image src={item.indexImage} alt={item.productName} fill className="object-cover" />
+                        <Image
+                          src={item.indexImage}
+                          alt={item.productName}
+                          fill
+                          className="object-cover"
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-400">
                           <ShoppingBag className="w-6 h-6" />
@@ -504,13 +569,17 @@ export default function OrderPage() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-800 truncate">{item.productName}</h4>
+                      <h4 className="font-medium text-gray-800 truncate">
+                        {item.productName}
+                      </h4>
                       <p className="text-sm text-gray-500">
                         {formatPrice(item.unitPrice)} x {item.quantity}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-lime-primary">{formatPrice(item.unitPrice * item.quantity)}</p>
+                      <p className="font-bold text-lime-primary">
+                        {formatPrice(item.unitPrice * item.quantity)}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -521,12 +590,16 @@ export default function OrderPage() {
           {/* Right: Order Summary (Desktop) */}
           <div className="hidden lg:block lg:col-span-1">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-lime-accent/50 sticky top-24">
-              <h3 className="font-bold text-lg text-gray-800 mb-4">Tóm tắt đơn hàng</h3>
+              <h3 className="font-bold text-lg text-gray-800 mb-4">
+                Tóm tắt đơn hàng
+              </h3>
 
               <div className="space-y-3 text-sm text-gray-600 mb-6 border-b border-gray-100 pb-6">
                 <div className="flex justify-between">
                   <span>Tạm tính ({selectedCartItems.length} món)</span>
-                  <span className="font-medium">{formatPrice(totalAmount)}</span>
+                  <span className="font-medium">
+                    {formatPrice(totalAmount)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Phí vận chuyển</span>
@@ -541,8 +614,12 @@ export default function OrderPage() {
               <div className="flex justify-between items-end mb-6">
                 <span className="font-bold text-gray-800">Tổng cộng</span>
                 <div className="text-right">
-                  <span className="block text-2xl font-bold text-lime-primary">{formatPrice(totalAmount)}</span>
-                  <span className="text-xs text-gray-400">(Đã bao gồm VAT)</span>
+                  <span className="block text-2xl font-bold text-lime-primary">
+                    {formatPrice(totalAmount)}
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    (Đã bao gồm VAT)
+                  </span>
                 </div>
               </div>
 
@@ -570,7 +647,9 @@ export default function OrderPage() {
         <div className="flex items-center gap-4 justify-between mb-3">
           <div>
             <p className="text-xs text-gray-500">Tổng thanh toán:</p>
-            <p className="text-lg font-bold text-lime-primary">{formatPrice(totalAmount)}</p>
+            <p className="text-lg font-bold text-lime-primary">
+              {formatPrice(totalAmount)}
+            </p>
           </div>
         </div>
         <button
@@ -603,8 +682,18 @@ export default function OrderPage() {
                 onClick={() => setShowAddressSelectionModal(false)}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -618,7 +707,8 @@ export default function OrderPage() {
                     const formatAddress = (address: typeof addr) => {
                       // Always format with descriptive labels
                       const parts = [];
-                      if (address.personalAddress) parts.push(address.personalAddress);
+                      if (address.personalAddress)
+                        parts.push(address.personalAddress);
                       if (address.street) parts.push(`Đường ${address.street}`);
                       if (address.ward) parts.push(`Phường ${address.ward}`);
                       if (address.city) parts.push(`Thành phố ${address.city}`);
@@ -637,7 +727,9 @@ export default function OrderPage() {
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <p className="font-medium text-gray-800">{formatAddress(addr)}</p>
+                            <p className="font-medium text-gray-800">
+                              {formatAddress(addr)}
+                            </p>
                           </div>
                           {selectedAddressId === addr.id && (
                             <svg
@@ -659,7 +751,9 @@ export default function OrderPage() {
                 </div>
               ) : (
                 <div className="text-center py-6">
-                  <p className="text-gray-500 mb-4">Bạn chưa có địa chỉ nào được lưu</p>
+                  <p className="text-gray-500 mb-4">
+                    Bạn chưa có địa chỉ nào được lưu
+                  </p>
                 </div>
               )}
 
@@ -706,8 +800,18 @@ export default function OrderPage() {
                 onClick={() => setShowAddressModal(false)}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -717,16 +821,21 @@ export default function OrderPage() {
               {/* Saved Addresses List */}
               {user.addresses && user.addresses.length > 0 && (
                 <div className="mb-6">
-                  <h4 className="font-semibold text-gray-700 mb-3">Địa chỉ đã lưu</h4>
+                  <h4 className="font-semibold text-gray-700 mb-3">
+                    Địa chỉ đã lưu
+                  </h4>
                   <div className="space-y-2">
                     {user.addresses.map((addr) => {
                       const formatAddress = (address: typeof addr) => {
                         // Always format with descriptive labels
                         const parts = [];
-                        if (address.personalAddress) parts.push(address.personalAddress);
-                        if (address.street) parts.push(`Đường ${address.street}`);
+                        if (address.personalAddress)
+                          parts.push(address.personalAddress);
+                        if (address.street)
+                          parts.push(`Đường ${address.street}`);
                         if (address.ward) parts.push(`Phường ${address.ward}`);
-                        if (address.city) parts.push(`Thành phố ${address.city}`);
+                        if (address.city)
+                          parts.push(`Thành phố ${address.city}`);
                         return parts.join(", ");
                       };
 
@@ -736,7 +845,9 @@ export default function OrderPage() {
                           className="flex items-start justify-between p-4 border-2 border-gray-200 rounded-xl hover:border-gray-300 transition-colors"
                         >
                           <div className="flex-1 pr-3">
-                            <p className="font-medium text-gray-800">{formatAddress(addr)}</p>
+                            <p className="font-medium text-gray-800">
+                              {formatAddress(addr)}
+                            </p>
                           </div>
                           <button
                             onClick={() => handleDeleteAddress(addr.id)}
@@ -754,7 +865,9 @@ export default function OrderPage() {
 
               {/* Add New Address Form */}
               <div className="space-y-4">
-                <h4 className="font-semibold text-gray-700">Thêm địa chỉ mới</h4>
+                <h4 className="font-semibold text-gray-700">
+                  Thêm địa chỉ mới
+                </h4>
 
                 {/* City */}
                 <div>
@@ -786,7 +899,9 @@ export default function OrderPage() {
 
                 {/* Street (Optional) */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Đường (Tùy chọn)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Đường (Tùy chọn)
+                  </label>
                   <input
                     type="text"
                     value={newAddressStreet}
