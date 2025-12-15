@@ -328,24 +328,23 @@ export default function OrderPage() {
   }
 
   return (
-    <div className="min-h-screen bg-cream-light pb-32 md:pb-10">
-      <div className="container mx-auto px-4 pt-6">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-green-50/30 py-8">
+      <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
-        <div className="flex items-center gap-2 mb-6">
-          <Link
-            href="/cart"
-            className="p-2 hover:bg-white rounded-full transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
-          </Link>
-          <h1 className="text-2xl font-bold text-gray-800">Đặt hàng</h1>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold bg-linear-to-r from-chocolate to-amber-700 bg-clip-text text-transparent mb-2">
+            Đặt hàng
+          </h1>
+          <p className="text-gray-600">
+            Xác nhận thông tin và hoàn tất đơn hàng của bạn
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left: Order Form */}
           <div className="lg:col-span-2 space-y-6">
             {/* Shipping Information */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div className="bg-white rounded-2xl shadow-lg border-2 border-green-200 p-8">
               <h3 className="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-lime-primary" />
                 Thông tin giao hàng
@@ -494,7 +493,7 @@ export default function OrderPage() {
             </div>
 
             {/* Payment Method */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div className="bg-white rounded-2xl shadow-lg border-2 border-green-200 p-8">
               <h3 className="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
                 <CreditCard className="w-5 h-5 text-lime-primary" />
                 Phương thức thanh toán
@@ -542,7 +541,7 @@ export default function OrderPage() {
             </div>
 
             {/* Order Items Preview */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div className="bg-white rounded-2xl shadow-lg border-2 border-green-200 p-8">
               <h3 className="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
                 <ShoppingBag className="w-5 h-5 text-lime-primary" />
                 Sản phẩm đã chọn ({selectedCartItems.length})
@@ -588,36 +587,41 @@ export default function OrderPage() {
           </div>
 
           {/* Right: Order Summary (Desktop) */}
-          <div className="hidden lg:block lg:col-span-1">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-lime-accent/50 sticky top-24">
-              <h3 className="font-bold text-lg text-gray-800 mb-4">
-                Tóm tắt đơn hàng
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl shadow-lg border-2 border-green-200 p-8 sticky top-24">
+              <h3 className="font-bold text-xl text-chocolate mb-6 flex items-center gap-2">
+                <ShoppingBag className="w-6 h-6" />
+                Thông tin đơn hàng
               </h3>
 
-              <div className="space-y-3 text-sm text-gray-600 mb-6 border-b border-gray-100 pb-6">
-                <div className="flex justify-between">
-                  <span>Tạm tính ({selectedCartItems.length} món)</span>
+              <div className="space-y-4 text-sm mb-6 pb-6 border-b-2 border-green-100">
+                <div className="flex justify-between items-center bg-green-50 p-3 rounded-lg shadow-sm">
+                  <span className="text-gray-700">
+                    Tạm tính ({selectedCartItems.length} món)
+                  </span>
                   <span className="font-medium">
                     {formatPrice(totalAmount)}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Phí vận chuyển</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Phí vận chuyển</span>
                   <span className="text-gray-400">Miễn phí</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Giảm giá</span>
-                  <span className="text-lime-primary">-0đ</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Giảm giá</span>
+                  <span className="text-green-600 font-semibold">-0đ</span>
                 </div>
               </div>
 
-              <div className="flex justify-between items-end mb-6">
-                <span className="font-bold text-gray-800">Tổng cộng</span>
+              <div className="flex justify-between items-end mb-6 bg-linear-to-r from-green-50 to-lime-50 p-4 rounded-xl border-2 border-green-100">
+                <span className="font-bold text-gray-800 text-lg">
+                  Tổng tiền
+                </span>
                 <div className="text-right">
-                  <span className="block text-2xl font-bold text-lime-primary">
+                  <span className="block text-3xl font-bold text-chocolate">
                     {formatPrice(totalAmount)}
                   </span>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-gray-500 font-medium">
                     (Đã bao gồm VAT)
                   </span>
                 </div>
@@ -626,7 +630,12 @@ export default function OrderPage() {
               <button
                 onClick={handleSubmitOrder}
                 disabled={isCreatingOrder}
-                className="w-full bg-lime-primary hover:bg-lime-hover text-white font-bold py-3.5 rounded-xl shadow-lg shadow-lime-primary/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="
+        w-full bg-chocolate hover:bg-chocolate/90 text-white font-bold 
+        py-4 rounded-xl shadow-lg shadow-chocolate/30 transition-all 
+        hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2
+        disabled:opacity-50 disabled:cursor-not-allowed
+      "
               >
                 {isCreatingOrder ? (
                   <>

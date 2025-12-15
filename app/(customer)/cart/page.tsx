@@ -143,49 +143,21 @@ export default function CartPage() {
     cartItems.length > 0 && cartItems.every((item) => item.selected);
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden pb-32 md:pb-10">
-      {/* Background Image */}
-      <div className="absolute inset-0" style={{ zIndex: 0 }}>
-        <Image
-          src="/Background-vegan-product.jpg"
-          alt="Cart Background"
-          fill
-          className="object-cover opacity-80 blur-sm"
-          quality={100}
-        />
-        <div className="absolute inset-0 bg-green/80"></div>
-      </div>
-
-      <div
-        className="container mx-auto px-4 pt-8 relative"
-        style={{ zIndex: 1 }}
-      >
-        {/* Header Trang */}
-        <div className="flex items-center gap-4 mb-8">
-          <Link
-            href="/products"
-            className="p-3 bg-green-100 hover:bg-green-50 rounded-full transition-all shadow-md hover:shadow-lg border-2 border-green-200"
-          >
-            <ArrowLeft className="w-6 h-6 text-chocolate" />
-          </Link>
-          <div className="bg-green-100 px-6 py-4 rounded-xl shadow-lg border-2 border-green-200 flex items-center gap-3">
-            <ShoppingBag className="w-7 h-7 text-chocolate" />
-            <div>
-              <h1 className="text-2xl font-bold text-chocolate">
-                Giỏ hàng của bạn
-              </h1>
-              <span className="text-sm text-gray-600">
-                {totalItems || 0} sản phẩm
-              </span>
-            </div>
-          </div>
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-green-50/30 py-8">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold bg-linear-to-r from-chocolate to-amber-700 bg-clip-text text-transparent mb-2">
+            Giỏ hàng của bạn
+          </h1>
+          <p className="text-gray-600">{totalItems || 0} sản phẩm trong giỏ</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* --- CỘT TRÁI: DANH SÁCH SẢN PHẨM --- */}
-          <div className="lg:col-span-2 space-y-4">
-            {/* Desktop: Header List (Chọn tất cả) */}
-            <div className="hidden md:flex items-center justify-between bg-green-50/80 backdrop-blur-sm p-5 rounded-xl border-2 border-green-200 shadow-lg">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Cột trái: Danh sách sản phẩm */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Header List (Chọn tất cả) */}
+            <div className="hidden md:flex items-center justify-between bg-white border-2 border-green-200 rounded-xl shadow-md p-6">
               <div className="flex items-center gap-3">
                 <button
                   onClick={toggleSelectAll}
@@ -203,7 +175,6 @@ export default function CartPage() {
               </div>
               <button
                 onClick={() => {
-                  // Bỏ chọn tất cả
                   dispatch(deselectAllItems());
                   setIsSelectedAll(false);
                 }}
@@ -213,24 +184,28 @@ export default function CartPage() {
                 Bỏ chọn
               </button>
             </div>
-            {/* List Items */}
 
+            {/* List Items */}
             {cartItems.length > 0 ? (
               <>
                 {cartItems.map((item) => (
-                  <CartItem
+                  <div
                     key={item.id}
-                    item={item}
-                    onToggleSelect={toggleSelect}
-                    onUpdateQuantity={updateQuantity}
-                    onRemove={removeItem}
-                  />
+                    className="bg-white rounded-xl border-2 border-green-200 shadow-md p-6"
+                  >
+                    <CartItem
+                      item={item}
+                      onToggleSelect={toggleSelect}
+                      onUpdateQuantity={updateQuantity}
+                      onRemove={removeItem}
+                    />
+                  </div>
                 ))}
 
-                {/* --- PHẦN TẢI THÊM (INFINITE SCROLL) --- */}
+                {/* Infinite scroll loading */}
                 {hasMore && (
-                  <div ref={ref} className="flex justify-center py-6">
-                    <div className="flex items-center gap-3 text-chocolate text-sm bg-green-100 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg border-2 border-green-200 font-semibold">
+                  <div className="flex justify-center py-6">
+                    <div className="flex items-center gap-3 text-chocolate text-sm bg-white border-2 border-green-200 px-6 py-3 rounded-full shadow-md font-semibold">
                       <Loader2 className="w-5 h-5 animate-spin" />
                       Đang tải thêm sản phẩm...
                     </div>
@@ -239,7 +214,7 @@ export default function CartPage() {
 
                 {!hasMore && cartItems.length > 5 && (
                   <div className="text-center py-4">
-                    <p className="text-gray-500 text-sm bg-green-100 inline-block px-4 py-2 rounded-full">
+                    <p className="text-gray-500 text-sm bg-white border-2 border-green-200 inline-block px-4 py-2 rounded-full">
                       Đã hiển thị tất cả sản phẩm
                     </p>
                   </div>
@@ -247,7 +222,7 @@ export default function CartPage() {
               </>
             ) : (
               !isFetching && (
-                <div className="text-center py-16 bg-green-50 backdrop-blur-sm rounded-2xl border-2 border-green-200 shadow-lg">
+                <div className="text-center py-16 bg-white rounded-2xl border-2 border-green-200 shadow-lg">
                   <div className="mb-4 flex justify-center">
                     <ShoppingBasket
                       className="w-24 h-24 text-chocolate/40"
@@ -277,7 +252,7 @@ export default function CartPage() {
                 {[1, 2, 3].map((i) => (
                   <div
                     key={i}
-                    className="bg-green-100 backdrop-blur-sm p-5 rounded-xl shadow-lg border-2 border-green-200 h-32 animate-pulse flex gap-4"
+                    className="bg-white border-2 border-green-200 rounded-xl shadow-md p-6 h-32 animate-pulse flex gap-4"
                   >
                     <div className="w-24 h-24 bg-green-200 rounded-xl shrink-0"></div>
                     <div className="flex-1 space-y-3 py-2">
@@ -291,16 +266,16 @@ export default function CartPage() {
             )}
           </div>
 
-          {/* --- CỘT PHẢI: SUMMARY (DESKTOP STICKY) --- */}
-          <div className="hidden lg:block lg:col-span-1">
-            <div className="bg-green-50/80 backdrop-blur-sm p-6 rounded-2xl shadow-xl border-2 border-green-200 sticky top-24">
+          {/* Cột phải: Summary */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl shadow-lg border-2 border-green-200 p-8 sticky top-24">
               <h3 className="font-bold text-xl text-chocolate mb-6 flex items-center gap-2">
                 <ShoppingBag className="w-6 h-6" />
                 Thông tin đơn hàng
               </h3>
 
               <div className="space-y-4 text-sm mb-6 pb-6 border-b-2 border-green-100">
-                <div className="flex justify-between items-center bg-green-100 p-3 rounded-lg shadow-sm">
+                <div className="flex justify-between items-center bg-green-50 p-3 rounded-lg shadow-sm">
                   <span className="text-gray-700">
                     Tạm tính ({cartItems.filter((item) => item.selected).length}
                     /{totalItems} món)
@@ -341,11 +316,11 @@ export default function CartPage() {
                   cartItems.filter((item) => item.selected).length === 0
                 }
                 className="
-    w-full bg-chocolate hover:bg-chocolate/90 text-white font-bold 
-    py-4 rounded-xl shadow-lg shadow-chocolate/30 transition-all 
-    hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2
-    disabled:opacity-50 disabled:cursor-not-allowed
-  "
+                w-full bg-chocolate hover:bg-chocolate/90 text-white font-bold 
+                py-4 rounded-xl shadow-lg shadow-chocolate/30 transition-all 
+                hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2
+                disabled:opacity-50 disabled:cursor-not-allowed
+              "
               >
                 <ShoppingBag className="w-5 h-5" />
                 Thanh toán ngay
@@ -355,8 +330,8 @@ export default function CartPage() {
         </div>
       </div>
 
-      {/* --- MOBILE BOTTOM BAR (FIXED) --- */}
-      <div className="fixed bottom-0 left-0 w-full bg-green-100 backdrop-blur-sm border-t-2 border-green-200 p-4 z-50 lg:hidden shadow-[0_-8px_16px_-4px_rgba(0,0,0,0.1)]">
+      {/* MOBILE BOTTOM BAR (giữ nguyên, chỉ đổi màu nếu muốn) */}
+      <div className="fixed bottom-0 left-0 w-full bg-white border-t-2 border-green-200 p-4 z-50 lg:hidden shadow-[0_-8px_16px_-4px_rgba(0,0,0,0.1)]">
         {/* Dòng 1: Chọn tất cả (Mobile) */}
         <div className="flex items-center justify-between mb-3 pb-3 border-b-2 border-green-100">
           <div className="flex items-center gap-3" onClick={toggleSelectAll}>
@@ -404,12 +379,12 @@ export default function CartPage() {
             }}
             disabled={cartItems.filter((item) => item.selected).length === 0}
             className="
-    flex-1 bg-chocolate hover:bg-chocolate/90 text-white font-bold 
-    py-4 rounded-xl shadow-lg shadow-chocolate/30 
-    transition-all hover:scale-[1.02] active:scale-[0.98] 
-    flex items-center justify-center gap-2 
-    disabled:opacity-50 disabled:cursor-not-allowed
-  "
+            flex-1 bg-chocolate hover:bg-chocolate/90 text-white font-bold 
+            py-4 rounded-xl shadow-lg shadow-chocolate/30 
+            transition-all hover:scale-[1.02] active:scale-[0.98] 
+            flex items-center justify-center gap-2 
+            disabled:opacity-50 disabled:cursor-not-allowed
+          "
           >
             <ShoppingBag className="w-5 h-5" />
             Thanh toán ({cartItems.filter((item) => item.selected).length})
