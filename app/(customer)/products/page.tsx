@@ -284,172 +284,193 @@ export default function CustomerProductsPage() {
   }, [searchTerm, selectedCategory, minPrice, maxPrice, sortBy]);
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-green-50/30 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold bg-linear-to-r from-chocolate to-amber-700 bg-clip-text text-transparent mb-2">
-            Sản phẩm
-          </h1>
-          <p className="text-gray-600">
-            Khám phá các sản phẩm tươi ngon, thuần chay
-          </p>
-        </div>
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0" style={{ zIndex: 0 }}>
+        <Image
+          src="/Background-vegan-product.jpg"
+          alt="Background"
+          fill
+          className="object-cover opacity-30 blur-sm"
+          quality={100}
+        />
+        <div className="absolute inset-0 bg-white/60"></div>
+      </div>
+      <div className="relative z-10">
+        <div className="min-h-screen bg-linear-to-br from-gray-50 to-green-50/30 py-8">
+          <div className="max-w-6xl mx-auto px-4">
+            {/* Header */}
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold bg-linear-to-r from-chocolate to-amber-700 bg-clip-text text-transparent mb-2">
+                Sản phẩm
+              </h1>
+              <p className="text-gray-600">
+                Khám phá các sản phẩm tươi ngon, thuần chay
+              </p>
+            </div>
 
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            {/* Grid Columns Toggle (Desktop only) */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-2 bg-muted rounded-lg">
-              <span className="text-sm text-muted-foreground">Hiển thị:</span>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                {/* Grid Columns Toggle (Desktop only) */}
+                <div className="hidden md:flex items-center gap-2 px-3 py-2 bg-muted rounded-lg">
+                  <span className="text-sm text-muted-foreground">
+                    Hiển thị:
+                  </span>
+                  <button
+                    onClick={() => setGridCols(3)}
+                    className={`p-2 rounded transition-colors ${
+                      gridCols === 3
+                        ? "bg-chocolate text-white"
+                        : "bg-background hover:bg-muted-foreground/10"
+                    }`}
+                    title="3 cột"
+                  >
+                    <Grid3x3 className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setGridCols(4)}
+                    className={`p-2 rounded transition-colors ${
+                      gridCols === 4
+                        ? "bg-chocolate text-white"
+                        : "bg-background hover:bg-muted-foreground/10"
+                    }`}
+                    title="4 cột"
+                  >
+                    <LayoutGrid className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Filter Toggle Button - Right side */}
               <button
-                onClick={() => setGridCols(3)}
-                className={`p-2 rounded transition-colors ${
-                  gridCols === 3
-                    ? "bg-chocolate text-white"
-                    : "bg-background hover:bg-muted-foreground/10"
-                }`}
-                title="3 cột"
+                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                className="flex items-center gap-2 px-4 py-2 bg-chocolate text-white rounded-lg hover:bg-chocolate/90 transition-colors"
               >
-                <Grid3x3 className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => setGridCols(4)}
-                className={`p-2 rounded transition-colors ${
-                  gridCols === 4
-                    ? "bg-chocolate text-white"
-                    : "bg-background hover:bg-muted-foreground/10"
-                }`}
-                title="4 cột"
-              >
-                <LayoutGrid className="w-5 h-5" />
+                <SlidersHorizontal className="w-5 h-5" />
+                Bộ lọc
               </button>
             </div>
-          </div>
 
-          {/* Filter Toggle Button - Right side */}
-          <button
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="flex items-center gap-2 px-4 py-2 bg-chocolate text-white rounded-lg hover:bg-chocolate/90 transition-colors"
-          >
-            <SlidersHorizontal className="w-5 h-5" />
-            Bộ lọc
-          </button>
-        </div>
-
-        {/* Active Filters Display */}
-        {(selectedCategory !== "all" ||
-          minPrice !== MIN_PRICE ||
-          maxPrice !== MAX_PRICE ||
-          sortBy !== "default" ||
-          searchTerm) && (
-          <div className="mb-4 flex flex-wrap gap-2 items-center">
-            <span className="text-sm text-muted-foreground">Đang lọc:</span>
-            {searchTerm && (
-              <>
-                <span className="px-3 py-1 bg-green-100 text-amber-950 text-sm rounded-full flex items-center gap-1">
-                  {isAISearch && <Sparkles className="w-3 h-3" />}
-                  Tìm kiếm {isAISearch && "AI"}: "{searchTerm}"
-                </span>
-                {isAISearch && !aiSearchError && (
-                  <span className="px-3 py-1 bg-linear-to-r from-purple-500 to-pink-500 text-white text-xs rounded-full font-semibold shadow-md">
-                    🤖 AI Semantic Search
+            {/* Active Filters Display */}
+            {(selectedCategory !== "all" ||
+              minPrice !== MIN_PRICE ||
+              maxPrice !== MAX_PRICE ||
+              sortBy !== "default" ||
+              searchTerm) && (
+              <div className="mb-4 flex flex-wrap gap-2 items-center">
+                <span className="text-sm text-muted-foreground">Đang lọc:</span>
+                {searchTerm && (
+                  <>
+                    <span className="px-3 py-1 bg-green-100 text-amber-950 text-sm rounded-full flex items-center gap-1">
+                      {isAISearch && <Sparkles className="w-3 h-3" />}
+                      Tìm kiếm {isAISearch && "AI"}: "{searchTerm}"
+                    </span>
+                    {isAISearch && !aiSearchError && (
+                      <span className="px-3 py-1 bg-linear-to-r from-purple-500 to-pink-500 text-white text-xs rounded-full font-semibold shadow-md">
+                        🤖 AI Semantic Search
+                      </span>
+                    )}
+                    {isAISearch && aiSearchError && (
+                      <span className="px-3 py-1 bg-linear-to-r from-orange-500 to-red-500 text-white text-xs rounded-full font-semibold shadow-md animate-pulse">
+                        ⚠️ AI Search lỗi - Dùng tìm kiếm thường
+                      </span>
+                    )}
+                  </>
+                )}
+                {selectedCategory !== "all" && (
+                  <span className="px-3 py-1 bg-chocolate/10 text-chocolate text-sm rounded-full">
+                    {selectedCategory}
                   </span>
                 )}
-                {isAISearch && aiSearchError && (
-                  <span className="px-3 py-1 bg-linear-to-r from-orange-500 to-red-500 text-white text-xs rounded-full font-semibold shadow-md animate-pulse">
-                    ⚠️ AI Search lỗi - Dùng tìm kiếm thường
+                {(minPrice !== MIN_PRICE || maxPrice !== MAX_PRICE) && (
+                  <span className="px-3 py-1 bg-chocolate/10 text-chocolate text-sm rounded-full">
+                    {minPrice.toLocaleString()}đ - {maxPrice.toLocaleString()}đ
                   </span>
+                )}
+                {sortBy !== "default" && (
+                  <span className="px-3 py-1 bg-chocolate/10 text-chocolate text-sm rounded-full">
+                    {sortBy === "price-asc" && "Giá tăng dần"}
+                    {sortBy === "price-desc" && "Giá giảm dần"}
+                    {sortBy === "name" && "A-Z"}
+                  </span>
+                )}
+                <button
+                  onClick={handleResetFilters}
+                  className="text-sm rounded-full bg-green-100 text-amber-950 hover:underline"
+                >
+                  Xóa tất cả
+                </button>
+              </div>
+            )}
+
+            {/* Result Count */}
+            <div className="inline-block bg-white/90 px-4 py-2 rounded-lg shadow-md border border-green-200 mb-4">
+              <p className="text-sm font-semibold text-chocolate">
+                Tìm thấy{" "}
+                <span className="text-lg font-bold">
+                  {filteredProducts.length}
+                </span>{" "}
+                sản phẩm
+              </p>
+            </div>
+
+            {/* Filter Sidebar giữ nguyên code cũ, chỉ cần đổi className nếu muốn đồng bộ hơn */}
+
+            {/* Products Grid */}
+            {isLoading ? (
+              <div className="col-span-full text-center py-12">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-chocolate"></div>
+                <p className="mt-4 text-muted-foreground">
+                  Đang tải sản phẩm...
+                </p>
+              </div>
+            ) : (
+              <>
+                <div
+                  className={`grid grid-cols-2 sm:grid-cols-2 gap-4 ${
+                    gridCols === 3
+                      ? "md:grid-cols-3"
+                      : "md:grid-cols-3 lg:grid-cols-4"
+                  }`}
+                >
+                  {displayedProducts && displayedProducts.length > 0 ? (
+                    displayedProducts.map((p) => (
+                      <ProductCard key={p.id} product={p} />
+                    ))
+                  ) : (
+                    <div className="col-span-full text-center text-muted-foreground py-12">
+                      Không tìm thấy sản phẩm nào.
+                    </div>
+                  )}
+                </div>
+
+                {/* Load More Trigger */}
+                {hasMore && (
+                  <div
+                    ref={loadMoreRef}
+                    className="col-span-full flex justify-center py-8"
+                  >
+                    <div className="flex items-center gap-2 text-chocolate bg-white/90 px-6 py-3 rounded-full shadow-md border border-green-200">
+                      <div className="w-5 h-5 border-3 border-chocolate border-t-transparent rounded-full animate-spin"></div>
+                      <span className="font-semibold">
+                        Đang tải thêm sản phẩm...
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* End Message */}
+                {!hasMore && displayedProducts.length > 12 && (
+                  <div className="col-span-full text-center py-6">
+                    <p className="text-sm text-muted-foreground bg-white/80 inline-block px-4 py-2 rounded-full">
+                      Đã hiển thị tất cả {filteredProducts.length} sản phẩm
+                    </p>
+                  </div>
                 )}
               </>
             )}
-            {selectedCategory !== "all" && (
-              <span className="px-3 py-1 bg-chocolate/10 text-chocolate text-sm rounded-full">
-                {selectedCategory}
-              </span>
-            )}
-            {(minPrice !== MIN_PRICE || maxPrice !== MAX_PRICE) && (
-              <span className="px-3 py-1 bg-chocolate/10 text-chocolate text-sm rounded-full">
-                {minPrice.toLocaleString()}đ - {maxPrice.toLocaleString()}đ
-              </span>
-            )}
-            {sortBy !== "default" && (
-              <span className="px-3 py-1 bg-chocolate/10 text-chocolate text-sm rounded-full">
-                {sortBy === "price-asc" && "Giá tăng dần"}
-                {sortBy === "price-desc" && "Giá giảm dần"}
-                {sortBy === "name" && "A-Z"}
-              </span>
-            )}
-            <button
-              onClick={handleResetFilters}
-              className="text-sm rounded-full bg-green-100 text-amber-950 hover:underline"
-            >
-              Xóa tất cả
-            </button>
           </div>
-        )}
-
-        {/* Result Count */}
-        <div className="inline-block bg-white/90 px-4 py-2 rounded-lg shadow-md border border-green-200 mb-4">
-          <p className="text-sm font-semibold text-chocolate">
-            Tìm thấy{" "}
-            <span className="text-lg font-bold">{filteredProducts.length}</span>{" "}
-            sản phẩm
-          </p>
         </div>
-
-        {/* Filter Sidebar giữ nguyên code cũ, chỉ cần đổi className nếu muốn đồng bộ hơn */}
-
-        {/* Products Grid */}
-        {isLoading ? (
-          <div className="col-span-full text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-chocolate"></div>
-            <p className="mt-4 text-muted-foreground">Đang tải sản phẩm...</p>
-          </div>
-        ) : (
-          <>
-            <div
-              className={`grid grid-cols-2 sm:grid-cols-2 gap-4 ${
-                gridCols === 3
-                  ? "md:grid-cols-3"
-                  : "md:grid-cols-3 lg:grid-cols-4"
-              }`}
-            >
-              {displayedProducts && displayedProducts.length > 0 ? (
-                displayedProducts.map((p) => (
-                  <ProductCard key={p.id} product={p} />
-                ))
-              ) : (
-                <div className="col-span-full text-center text-muted-foreground py-12">
-                  Không tìm thấy sản phẩm nào.
-                </div>
-              )}
-            </div>
-
-            {/* Load More Trigger */}
-            {hasMore && (
-              <div
-                ref={loadMoreRef}
-                className="col-span-full flex justify-center py-8"
-              >
-                <div className="flex items-center gap-2 text-chocolate bg-white/90 px-6 py-3 rounded-full shadow-md border border-green-200">
-                  <div className="w-5 h-5 border-3 border-chocolate border-t-transparent rounded-full animate-spin"></div>
-                  <span className="font-semibold">
-                    Đang tải thêm sản phẩm...
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {/* End Message */}
-            {!hasMore && displayedProducts.length > 12 && (
-              <div className="col-span-full text-center py-6">
-                <p className="text-sm text-muted-foreground bg-white/80 inline-block px-4 py-2 rounded-full">
-                  Đã hiển thị tất cả {filteredProducts.length} sản phẩm
-                </p>
-              </div>
-            )}
-          </>
-        )}
       </div>
     </div>
   );

@@ -191,7 +191,7 @@ export default function CartPage() {
                 {cartItems.map((item) => (
                   <div
                     key={item.id}
-                    className="bg-white rounded-xl border-2 border-green-200 shadow-md p-6"
+                    className="bg-white rounded-xl border-2 border-green-200 shadow-md p-2"
                   >
                     <CartItem
                       item={item}
