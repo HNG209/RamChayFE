@@ -21,6 +21,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
+import { useUpdateMyProfileMutation } from "@/redux/services/customerApi";
 
 type Address = {
   id: number;
@@ -177,6 +178,8 @@ export default function AccountPage() {
     addresses: initialAddresses.length ? [...initialAddresses] : [],
   });
 
+  const [updateMyProfile] = useUpdateMyProfileMutation();
+
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAddressIdx, setEditingAddressIdx] = useState<number | null>(
@@ -190,10 +193,9 @@ export default function AccountPage() {
   }
 
   const handleSave = () => {
-    // TODO: Call API to update user info
     console.log("Updating user info:", formData);
+    updateMyProfile(formData);
     setIsEditing(false);
-    // Sau này sẽ gọi API update user
   };
 
   const handleCancel = () => {

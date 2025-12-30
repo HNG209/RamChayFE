@@ -1,10 +1,22 @@
 import { baseApi } from "./baseApi";
-import { ProductCreationRequest, ProductCreationResponse, PageResponse } from "@/types/backend";
+import {
+  ProductCreationRequest,
+  ProductCreationResponse,
+  PageResponse,
+} from "@/types/backend";
 
 export const productApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // 1. Lấy danh sách phân trang & Lọc
-    getProductsPage: builder.query<PageResponse<ProductCreationResponse>, { page: number; size: number; keyword: string; categoryId: string | number }>({
+    getProductsPage: builder.query<
+      PageResponse<ProductCreationResponse>,
+      {
+        page: number;
+        size: number;
+        keyword: string;
+        categoryId: string | number;
+      }
+    >({
       query: ({ page, size, keyword, categoryId }) => {
         // Tạo object params
         const params: Record<string, any> = {
@@ -46,7 +58,10 @@ export const productApi = baseApi.injectEndpoints({
     }),
 
     // 4. Tạo sản phẩm mới (Multipart)
-    createProduct: builder.mutation<ProductCreationResponse, ProductCreationRequest & { images: File[] }>({
+    createProduct: builder.mutation<
+      ProductCreationResponse,
+      ProductCreationRequest & { images: File[] }
+    >({
       query: ({ images, ...productData }) => {
         const formData = new FormData();
         // Backend yêu cầu @RequestPart("product") là JSON string
@@ -62,7 +77,7 @@ export const productApi = baseApi.injectEndpoints({
           method: "POST",
           data: formData,
           // Để undefined để browser tự set boundary cho multipart
-          headers: { "Content-Type": undefined }
+          headers: { "Content-Type": undefined },
         };
       },
       invalidatesTags: ["Product"],
@@ -72,7 +87,7 @@ export const productApi = baseApi.injectEndpoints({
     deleteProduct: builder.mutation<void, number>({
       query: (id) => ({
         url: `/products/${id}`,
-        method: "DELETE"
+        method: "DELETE",
       }),
       invalidatesTags: ["Product"],
     }),
@@ -81,20 +96,26 @@ export const productApi = baseApi.injectEndpoints({
     getProductById: builder.query<ProductCreationResponse, number>({
       query: (id) => ({
         url: `/products/${id}`,
-        method: "GET"
+        method: "GET",
       }),
       providesTags: (result, error, id) => [{ type: "Product", id }],
     }),
 
     // 7. Cập nhật sản phẩm
-    updateProduct: builder.mutation<ProductCreationResponse, { id: number; data: FormData }>({
+    updateProduct: builder.mutation<
+      ProductCreationResponse,
+      { id: number; data: FormData }
+    >({
       query: ({ id, data }) => ({
         url: `/products/${id}`,
         method: "PUT",
         data: data,
-        headers: { "Content-Type": undefined }
+        headers: { "Content-Type": undefined },
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: "Product", id }, "Product"],
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Product", id },
+        "Product",
+      ],
     }),
 
     // 6. AI Semantic Search
@@ -105,10 +126,6 @@ export const productApi = baseApi.injectEndpoints({
         params: { query: searchTerm },
       }),
       transformResponse: (response: ProductCreationResponse[]) => {
-        console.log('🔍 AI Search Response (after interceptor):', response);
-        console.log('🔍 Is Array:', Array.isArray(response));
-        console.log('🔍 Length:', response?.length);
-        console.log('🔍 First item:', response?.[0]);
         return response || [];
       },
       providesTags: ["Product"],
@@ -127,4 +144,3 @@ export const {
   useUpdateProductMutation,
   useSearchProductsAIQuery,
 } = productApi;
-

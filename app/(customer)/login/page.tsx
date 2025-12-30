@@ -22,11 +22,28 @@ interface FloatingSticker {
 export default function LoginPage() {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
-  const [floatingStickers, setFloatingStickers] = useState<FloatingSticker[]>([]);
+  const [floatingStickers, setFloatingStickers] = useState<FloatingSticker[]>(
+    []
+  );
 
   const [login, { isLoading: isLoggingIn }] = useLoginMutation();
 
-  const veganEmojis = ['🥬', '🥦', '🥕', '🍄', '🌽', '🫑', '🥒', '🍅', '🥑', '🪭', '🌶️', '🧅', '🍆', '🧄', '🪸', '🥗'];
+  const veganEmojis = [
+    "🥬",
+    "🥦",
+    "🥕",
+    "🍄",
+    "🌽",
+    "🥒",
+    "🍅",
+    "🥑",
+    "🪭",
+    "🌶️",
+    "🧅",
+    "🍆",
+    "🧄",
+    "🥗",
+  ];
 
   // Generate floating stickers on mount
   useEffect(() => {
@@ -38,7 +55,7 @@ export default function LoginPage() {
         left: `${Math.random() * 100}%`,
         animationDuration: `${12 + Math.random() * 18}s`,
         animationDelay: `${Math.random() * 10}s`,
-        size: `${1.5 + Math.random() * 2.5}rem`
+        size: `${1.5 + Math.random() * 2.5}rem`,
       });
     }
     setFloatingStickers(stickers);
@@ -105,7 +122,7 @@ export default function LoginPage() {
             className="absolute will-change-transform"
             style={{
               left: sticker.left,
-              bottom: '-5rem',
+              bottom: "-5rem",
               fontSize: sticker.size,
               animation: `float-up ${sticker.animationDuration} linear ${sticker.animationDelay} infinite`,
             }}
@@ -154,10 +171,11 @@ export default function LoginPage() {
                 type="text"
                 {...formik.getFieldProps("username")}
                 className={`w-full px-4 py-3.5 rounded-xl border-2 outline-none transition-all
-                ${formik.touched.username && formik.errors.username
+                ${
+                  formik.touched.username && formik.errors.username
                     ? "border-red-500 bg-red-50 focus:ring-4 focus:ring-red-200"
                     : "border-green-200 bg-green-50/30 focus:border-chocolate focus:ring-4 focus:ring-chocolate/20 focus:bg-white"
-                  }`}
+                }`}
                 placeholder="Nhập username..."
               />
               {formik.touched.username && formik.errors.username && (
@@ -177,10 +195,11 @@ export default function LoginPage() {
                 type="password"
                 {...formik.getFieldProps("password")}
                 className={`w-full px-4 py-3.5 rounded-xl border-2 outline-none transition-all
-                ${formik.touched.password && formik.errors.password
+                ${
+                  formik.touched.password && formik.errors.password
                     ? "border-red-500 bg-red-50 focus:ring-4 focus:ring-red-200"
                     : "border-green-200 bg-green-50/30 focus:border-chocolate focus:ring-4 focus:ring-chocolate/20 focus:bg-white"
-                  }`}
+                }`}
                 placeholder="••••••••"
               />
               {formik.touched.password && formik.errors.password && (
@@ -196,26 +215,42 @@ export default function LoginPage() {
               className="w-full bg-linear-to-r from-chocolate via-amber-700 to-chocolate bg-size-200 hover:bg-pos-100 text-white font-bold py-4 px-4 rounded-xl shadow-lg shadow-chocolate/40 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2 relative overflow-hidden group"
             >
               {/* Sticker effects on hover */}
-              <span className="absolute -top-2 -left-2 text-2xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300">🥬</span>
-              <span className="absolute -top-1 left-1/4 text-xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-75">🥕</span>
-              <span className="absolute -bottom-2 left-1/3 text-2xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-150">🥦</span>
-              <span className="absolute -top-2 right-1/4 text-xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-100">🍄</span>
-              <span className="absolute -bottom-1 -right-2 text-2xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-200">🌽</span>
-              <span className="relative z-10">{isLoggingIn ? "Đang kiểm tra..." : "Đăng nhập"}</span>
+              <span className="absolute -top-2 -left-2 text-2xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300">
+                🥬
+              </span>
+              <span className="absolute -top-1 left-1/4 text-xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-75">
+                🥕
+              </span>
+              <span className="absolute -bottom-2 left-1/3 text-2xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-150">
+                🥦
+              </span>
+              <span className="absolute -top-2 right-1/4 text-xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-100">
+                🍄
+              </span>
+              <span className="absolute -bottom-1 -right-2 text-2xl opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-200">
+                🌽
+              </span>
+              <span className="relative z-10">
+                {isLoggingIn ? "Đang kiểm tra..." : "Đăng nhập"}
+              </span>
             </button>
           </form>
           <div className="mt-8 text-center">
-            <p className="text-gray-500 text-sm">
+            <div className="text-gray-500 text-sm">
               Chưa có tài khoản?{" "}
               <Link
                 href="/register"
                 className="text-chocolate font-bold hover:underline relative inline-block group"
               >
-                <span className="absolute -top-3 -left-3 text-lg opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300">🥬</span>
-                <span className="absolute -top-4 -right-3 text-base opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-100">🥕</span>
+                <span className="absolute -top-3 -left-3 text-lg opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300">
+                  🥬
+                </span>
+                <span className="absolute -top-4 -right-3 text-base opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-opacity duration-300 delay-100">
+                  🥕
+                </span>
                 <span className="relative z-10">Đăng ký ngay</span>
               </Link>
-            </p>
+            </div>
           </div>
         </div>
       </div>

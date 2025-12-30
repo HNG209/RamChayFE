@@ -51,6 +51,13 @@ export interface Address {
   fullAddress?: string; // Combined address string for display
 }
 
+export interface CustomerUpdateRequest {
+  fullName: string;
+  phones: string[];
+  email: string;
+  addresses: Address[];
+}
+
 export interface MyProfile {
   // Thông tin chung
   id: number;
